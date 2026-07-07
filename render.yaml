@@ -16,3 +16,7 @@ services:
         value: /tmp/magnom-data
       - key: RENDER
         value: "true"
+      - key: BOOTSTRAP_ADMIN_USER
+        value: admin
+      - key: BOOTSTRAP_ADMIN_PASSWORD
+        value: "2786"

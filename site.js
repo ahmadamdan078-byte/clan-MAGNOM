@@ -50,6 +50,7 @@ function openAuthOverlay(tab) {
     document.body.classList.add('auth-overlay-mode');
     document.getElementById('authContainer').style.display = 'flex';
     if (tab) switchAuthTab(tab);
+    if (typeof updateSetupHint === 'function') updateSetupHint();
     document.getElementById('loginUsername')?.focus();
 }
 

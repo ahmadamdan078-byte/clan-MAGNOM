@@ -41,6 +41,7 @@ from database import (
     create_remember_token,
     delete_remember_token,
     get_public_stats,
+    seed_bootstrap_admin,
     list_announcements,
     create_announcement,
     delete_announcement,
@@ -1424,6 +1425,7 @@ def index():
 
 
 init_db()
+seed_bootstrap_admin()
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 3000))

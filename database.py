@@ -535,6 +535,18 @@ def delete_remember_tokens_for_user(user_id: int):
         conn.commit()
 
 
+def seed_bootstrap_admin() -> bool:
+    """Create admin from env when the database is empty (production deploy)."""
+    username = os.environ.get('BOOTSTRAP_ADMIN_USER', 'admin').strip()
+    password = os.environ.get('BOOTSTRAP_ADMIN_PASSWORD', '').strip()
+    if not password or get_user_count() > 0:
+        return False
+    if find_user_by_username(username):
+        return False
+    create_user(username, password, 'admin', 'approved')
+    return True
+
+
 def get_public_stats():
     with get_connection() as conn:
         members = conn.execute('SELECT COUNT(*) as c FROM clan_members').fetchone()['c']

@@ -483,6 +483,17 @@
             margin-top: 15px;
         }
 
+        .setup-hint {
+            margin: 0 0 14px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: rgba(var(--primary-rgb), 0.12);
+            border: 1px solid rgba(var(--primary-rgb), 0.35);
+            color: var(--primary-color);
+            font-size: 0.92em;
+            line-height: 1.45;
+        }
+
         .error-message {
             color: #e74c3c;
             background: rgba(231, 76, 60, 0.2);
@@ -2934,6 +2945,7 @@
                     <button class="auth-tab active" onclick="switchAuthTab('login')" data-i18n="auth.login">Login</button>
                     <button class="auth-tab" onclick="switchAuthTab('register')" data-i18n="auth.register">Register</button>
                 </div>
+                <div id="setupHint" class="setup-hint" style="display:none" role="status"></div>
 
                 <form class="auth-form active" id="loginForm">
                     <div id="loginMessage"></div>
@@ -4100,6 +4112,24 @@
             localStorage.removeItem('magnomRememberUsername');
         }
 
+        async function updateSetupHint() {
+            const hint = document.getElementById('setupHint');
+            if (!hint) return;
+            try {
+                const stats = await fetch('/api/site/stats').then(r => r.json());
+                if ((stats.users || 0) === 0) {
+                    hint.style.display = 'block';
+                    hint.textContent = typeof t === 'function'
+                        ? t('auth.firstAdminHint')
+                        : 'New site — use Register. The first account becomes admin.';
+                } else {
+                    hint.style.display = 'none';
+                }
+            } catch {
+                hint.style.display = 'none';
+            }
+        }
+
         async function handleLogin(e) {
             e.preventDefault();
             const username = document.getElementById('loginUsername').value.trim();
@@ -4114,9 +4144,14 @@
 
                 saveRememberLoginPref(username, rememberMe);
                 currentUser = user;
+                document.getElementById('loginMessage').innerHTML = '';
                 showDashboard();
             } catch (err) {
-                showMessage('loginMessage', err.message, true);
+                let msg = err.message || 'Login failed';
+                if (/invalid username or password/i.test(msg)) {
+                    msg += typeof t === 'function' ? ` — ${t('auth.loginFailHint')}` : ' — Try Register if this is a new server.';
+                }
+                showMessage('loginMessage', msg, true);
             }
         }
 
