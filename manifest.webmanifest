@@ -1,0 +1,18 @@
+{
+  "name": "MAGNOM Clan",
+  "short_name": "MAGNOM",
+  "description": "Elite Rocket League clan — roster, chat, events, MAGNOM AI",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#151A24",
+  "theme_color": "#FDBE55",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "photos/magnom-bg.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "MAGNOM AI",
+    "slug": "magnom-ai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "scheme": "magnom-ai",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#1a2330"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.magnom.ai"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1a2330"
+      },
+      "package": "com.magnom.ai"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-asset",
+      "expo-font"
+    ],
+    "extra": {
+      "apiUrl": "https://calm-days-knock.loca.lt",
+      "eas": {
+        "projectId": "927d93fd-b257-440a-96a2-8f5e513a8e93"
+      }
+    }
+  }
+}

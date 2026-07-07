@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MAGNOM AI — Server</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f0f1a;
+      color: #f0f0f5;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      max-width: 480px;
+      background: #1a1a2e;
+      border: 1px solid #2e2e4a;
+      border-radius: 20px;
+      padding: 32px;
+      text-align: center;
+    }
+    h1 { font-size: 28px; margin-bottom: 8px; letter-spacing: 1px; }
+    .badge {
+      display: inline-block;
+      background: #00d4aa;
+      color: #0f0f1a;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+    p { color: #9898b0; line-height: 1.6; margin-bottom: 16px; }
+    code {
+      background: #252540;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #9d85ff;
+    }
+    .note {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #2e2e4a;
+      font-size: 14px;
+    }
+    a { color: #9d85ff; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge">ONLINE</div>
+    <h1>MAGNOM AI</h1>
+    <p>This address is the <strong>AI server</strong> for the MAGNOM AI mobile app — not the app itself.</p>
+    <p>Open the app on your phone with <strong>Expo Go</strong> or <strong>Xcode</strong>, then in Settings set:</p>
+    <p><code>/api/ai/chat</code></p>
+    <p class="note">
+      The main page (<code>/</code>) is the Magnom Clan web dashboard.<br>
+      Clan site: <a href="/">Magnom Clan</a>
+    </p>
+  </div>
+</body>
+</html>
