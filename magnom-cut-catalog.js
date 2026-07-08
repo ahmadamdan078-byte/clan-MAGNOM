@@ -282,11 +282,42 @@ window.CUT_TEMPLATE_CATALOG = [
     { id: 'pixelHop', name: 'Pixel Hop', cat: 'Fun', emoji: '🕹️', filter: 'retro', effect: 'bounce', music: 'pixelHop', textStyle: 'comic', caption: 'PIXEL', sticker: '🕹️', bright: 1.05, contrast: 1.15, saturate: 1.25, ratio: '1x1', fit: 'contain', photoDuration: 6 },
 ];
 
-// Fix accidental bad effect id if any
-window.CUT_TEMPLATE_CATALOG = window.CUT_TEMPLATE_CATALOG.map((t) => {
+// CapCut-style enrichment: covers, badges, trending flags
+window.CUT_TEMPLATE_CATALOG = (window.CUT_TEMPLATE_CATALOG || []).map((t, i) => {
     if (t.effect === 'victory-ish') t.effect = 'goalBurst';
+    const covers = {
+        Brand: 'linear-gradient(160deg,#3A2A00 0%,#F0B429 45%,#FE2C55 100%)',
+        Rank: 'linear-gradient(160deg,#0B1C2C 0%,#1B6CA8 50%,#5EEAD4 100%)',
+        Hype: 'linear-gradient(160deg,#2A0612 0%,#FE2C55 50%,#FF8A3D 100%)',
+        Pro: 'linear-gradient(160deg,#12131A 0%,#2A2D3A 50%,#F0B429 100%)',
+        RL: 'linear-gradient(160deg,#071018 0%,#143B6B 45%,#F0B429 100%)',
+        Mechs: 'linear-gradient(160deg,#12061F 0%,#7C3AED 50%,#FE2C55 100%)',
+        Mood: 'linear-gradient(160deg,#0D1118 0%,#1E3A5F 50%,#5EEAD4 100%)',
+        Cine: 'linear-gradient(160deg,#0A0A0A 0%,#2C2C2C 55%,#888 100%)',
+        Story: 'linear-gradient(160deg,#1A1008 0%,#8B5A2B 50%,#F0B429 100%)',
+        Focus: 'linear-gradient(160deg,#09090B 0%,#27272A 50%,#FE2C55 100%)',
+        Fun: 'linear-gradient(160deg,#1A0A2E 0%,#DB2777 50%,#F0B429 100%)',
+    };
+    t.cover = t.cover || covers[t.cat] || covers.Hype;
+    t.uses = t.uses || (12000 - i * 137);
+    t.duration = t.photoDuration || 8;
+    if (!t.badge) {
+        if (i < 6) t.badge = 'Hot';
+        else if (i < 14) t.badge = 'New';
+        else if (i % 7 === 0) t.badge = 'Pro';
+        else t.badge = '';
+    }
+    t.trending = t.trending != null ? t.trending : (i < 12 || i % 5 === 0);
+    t.forYou = t.forYou != null ? t.forYou : (i % 2 === 0 || i < 10);
     return t;
 });
+
+window.CUT_TEMPLATE_TABS = [
+    { id: 'foryou', name: 'For you' },
+    { id: 'trending', name: 'Trending' },
+    { id: 'new', name: 'New' },
+    { id: 'all', name: 'All' },
+];
 
 window.CUT_FILTER_MAP = Object.fromEntries(
     (window.CUT_FILTER_CATALOG || []).map((f) => [f.id, f.css || '']),

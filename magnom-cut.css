@@ -360,60 +360,223 @@
 .capcut-text-overlay.s-boxed { background: #fff; }
 .capcut-text-overlay.s-banner { background: #F0B429; border-radius: 999px; }
 
+.capcut-template-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.capcut-template-head strong {
+    display: block;
+    font-family: var(--font-display);
+    color: var(--cc-text);
+    font-size: 1em;
+    letter-spacing: 0.04em;
+}
+
+.capcut-template-head span {
+    display: block;
+    color: var(--cc-muted);
+    font-size: 0.72em;
+    margin-top: 3px;
+    font-weight: 500;
+    line-height: 1.35;
+}
+
+.capcut-template-count {
+    flex-shrink: 0;
+    background: rgba(254, 44, 85, 0.16);
+    color: #ff8aa3;
+    border: 1px solid rgba(254, 44, 85, 0.35);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 0.72em;
+    font-weight: 800;
+}
+
+.capcut-template-search input {
+    width: 100%;
+    border-radius: 999px;
+    border: 1px solid var(--cc-line);
+    background: #0E0F13;
+    color: var(--cc-text);
+    padding: 10px 14px;
+    font: inherit;
+    margin-bottom: 10px;
+}
+
+.capcut-template-tabs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    margin-bottom: 8px;
+    scrollbar-width: none;
+}
+
+.capcut-template-tabs::-webkit-scrollbar { display: none; }
+
+.capcut-template-tab {
+    flex-shrink: 0;
+    border: none;
+    background: transparent;
+    color: var(--cc-muted);
+    font-weight: 800;
+    font-size: 0.82em;
+    padding: 8px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.capcut-template-tab.active {
+    background: rgba(254, 44, 85, 0.16);
+    color: #fff;
+}
+
+.capcut-template-cats {
+    margin-bottom: 8px;
+    max-height: none;
+}
+
+.capcut-template-rail {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 2px 2px 12px;
+    margin-bottom: 4px;
+    scrollbar-width: thin;
+}
+
+.capcut-template-rail .capcut-template-card {
+    width: 118px;
+    min-width: 118px;
+    min-height: 210px;
+}
+
 .capcut-template-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-    max-height: 420px;
+    gap: 10px;
+    max-height: 460px;
     overflow-y: auto;
-    margin-top: 10px;
+    margin-top: 6px;
     padding-right: 2px;
 }
 
+.capcut-template-grid-cc {
+    max-height: 360px;
+}
+
 .capcut-template-card {
+    position: relative;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-    border: 1px solid var(--cc-line);
-    background: linear-gradient(160deg, #1A1B22, #12131A);
-    color: var(--cc-text);
+    justify-content: flex-end;
+    align-items: stretch;
+    gap: 0;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #fff;
     border-radius: 14px;
-    padding: 10px;
+    padding: 0;
     cursor: pointer;
     text-align: left;
     transition: 0.18s ease;
-    min-height: 92px;
+    min-height: 210px;
+    overflow: hidden;
+    background: #17181F;
 }
 
 .capcut-template-card:hover {
-    border-color: rgba(254, 44, 85, 0.45);
-    transform: translateY(-1px);
+    border-color: rgba(254, 44, 85, 0.55);
+    transform: translateY(-2px);
 }
 
 .capcut-template-card.active {
     border-color: var(--cc-pink);
-    box-shadow: 0 0 0 1px rgba(254, 44, 85, 0.35), 0 10px 24px rgba(0,0,0,0.35);
+    box-shadow: 0 0 0 2px rgba(254, 44, 85, 0.45);
+}
+
+.capcut-template-cover {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+}
+
+.capcut-template-cover::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.05) 20%, rgba(0,0,0,0.82) 100%);
+}
+
+.capcut-template-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 2;
+    background: #FE2C55;
+    color: #fff;
+    font-size: 0.62em;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    border-radius: 6px;
+}
+
+.capcut-template-badge.new { background: #22C55E; color: #06240f; }
+.capcut-template-badge.pro { background: #F0B429; color: #1a1200; }
+
+.capcut-template-body {
+    position: relative;
+    z-index: 2;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .capcut-template-emoji {
-    font-size: 1.35rem;
+    font-size: 1.5rem;
     line-height: 1;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.45));
 }
 
 .capcut-template-name {
     font-family: var(--font-display);
     font-weight: 800;
-    font-size: 0.82em;
+    font-size: 0.8em;
     letter-spacing: 0.02em;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.65);
 }
 
-.capcut-template-cat {
-    color: var(--cc-muted);
-    font-size: 0.68em;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+.capcut-template-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    color: rgba(255,255,255,0.75);
+    font-size: 0.62em;
+    font-weight: 650;
+}
+
+.capcut-template-use {
+    margin-top: 6px;
+    border: none;
+    border-radius: 999px;
+    background: #FE2C55;
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.7em;
+    padding: 6px 0;
+    width: 100%;
+    pointer-events: none;
+}
+
+.capcut-template-card.active .capcut-template-use {
+    background: #fff;
+    color: #111;
 }
 
 .capcut-chip-scroll {

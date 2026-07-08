@@ -16,10 +16,10 @@
     <meta property="og:image" content="photos/magnom-bg.jpeg">
     <meta property="og:type" content="website">
     <title>MAGNOM Clan — Elite Rocket League Community</title>
-    <link rel="stylesheet" href="site.css?v=20260708l">
-    <link rel="stylesheet" href="magnom-cut.css?v=20260708l">
-    <link rel="preload" href="site.css?v=20260708l" as="style">
-    <link rel="preload" href="i18n.js?v=20260708l" as="script">
+    <link rel="stylesheet" href="site.css?v=20260708m">
+    <link rel="stylesheet" href="magnom-cut.css?v=20260708m">
+    <link rel="preload" href="site.css?v=20260708m" as="style">
+    <link rel="preload" href="i18n.js?v=20260708m" as="script">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&family=Oxanium:wght@500;600;700;800&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -3327,9 +3327,20 @@
                             </div>
 
                             <div class="capcut-panel" data-panel="templates">
-                                <p class="capcut-val" style="margin:0 0 8px;color:var(--cc-muted);font-weight:500" data-i18n="cut.templatesHint">One-tap CapCut-style looks: filter + music + text + sticker + effect.</p>
-                                <div class="capcut-chip-row" id="cutTemplateFilters"></div>
-                                <div class="capcut-template-grid" id="cutTemplateGrid"></div>
+                                <div class="capcut-template-head">
+                                    <div>
+                                        <strong data-i18n="cut.templates">Templates</strong>
+                                        <span data-i18n="cut.templatesHint">CapCut-style one-tap looks for your clip</span>
+                                    </div>
+                                    <span class="capcut-template-count" id="cutTemplateCount">55</span>
+                                </div>
+                                <div class="capcut-template-search">
+                                    <input type="search" id="cutTemplateSearch" placeholder="Search templates" data-i18n-placeholder="cut.templateSearch" autocomplete="off">
+                                </div>
+                                <div class="capcut-template-tabs" id="cutTemplateTabs"></div>
+                                <div class="capcut-chip-row capcut-template-cats" id="cutTemplateFilters"></div>
+                                <div class="capcut-template-rail" id="cutTemplateRail"></div>
+                                <div class="capcut-template-grid capcut-template-grid-cc" id="cutTemplateGrid"></div>
                             </div>
 
                             <div class="capcut-panel" data-panel="audio">
@@ -3700,14 +3711,14 @@
         </div>
     </div>
 
-    <script src="i18n.js?v=20260708l"></script>
+    <script src="i18n.js?v=20260708m"></script>
     <script src="notifications.js"></script>
     <script src="push.js"></script>
     <script src="support_queue.js"></script>
     <script src="support_call.js"></script>
-    <script src="magnom-cut-catalog.js?v=20260708l"></script>
-    <script src="magnom-cut.js?v=20260708l"></script>
-    <script src="site.js?v=20260708l"></script>
+    <script src="magnom-cut-catalog.js?v=20260708m"></script>
+    <script src="magnom-cut.js?v=20260708m"></script>
+    <script src="site.js?v=20260708m"></script>
     <script>
         const RL_TIERS = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Champion', 'Grand Champion'];
         const RL_DIVISIONS = ['I', 'II', 'III'];
