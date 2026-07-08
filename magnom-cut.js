@@ -146,6 +146,8 @@ function getFilteredMagnomTemplates() {
         slowmo: 'Slow Motion',
         photodump: 'Photo Dump',
         beatsync: 'Beat Sync',
+        aesthetic: 'Aesthetic',
+        gaming: 'Gaming',
     };
     return (window.CUT_TEMPLATE_CATALOG || []).filter((t) => {
         if (cutTemplateTab === 'trending' && !t.trending) return false;
@@ -175,6 +177,8 @@ function renderMagnomCutTemplates() {
             { id: 'slowmo', name: 'Slow Mo' },
             { id: 'photodump', name: 'Photo Dump' },
             { id: 'beatsync', name: 'Beat Sync' },
+            { id: 'aesthetic', name: 'Aesthetic' },
+            { id: 'gaming', name: 'Gaming' },
             { id: 'all', name: 'All' },
         ]).map((tab) =>
             `<button type="button" class="capcut-template-tab${tab.id === cutTemplateTab ? ' active' : ''}" data-tab="${tab.id}" onclick="setMagnomTemplateTab('${tab.id}')">${tab.name}</button>`
