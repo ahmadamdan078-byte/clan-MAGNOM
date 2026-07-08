@@ -52,15 +52,10 @@ from database import (
     list_gallery,
     create_gallery_item,
     delete_gallery_item,
-    list_clubs,
-    find_club_by_id,
-    find_club_by_name,
-    create_club,
-    list_club_members,
-    is_club_member,
-    join_club,
-    leave_club,
-    delete_club,
+    list_clips,
+    find_clip_by_id,
+    create_clip,
+    delete_clip,
     log_activity,
     list_activities,
     list_recent_activities,
@@ -138,6 +133,8 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
 ALLOWED_IMAGE_EXT = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}
 ALLOWED_AUDIO_EXT = {'.webm', '.ogg', '.mp4', '.m4a', '.mpeg', '.mp3', '.wav', '.aac'}
+ALLOWED_VIDEO_EXT = {'.mp4', '.webm', '.mov', '.m4v'}
+MAX_CLIP_UPLOAD_MB = 80
 AUDIO_MIME = {
     '.webm': 'audio/webm',
     '.ogg': 'audio/ogg',
@@ -814,7 +811,7 @@ def add_cors_headers(response):
     elif path == '/service-worker.js':
         response.headers['Cache-Control'] = 'no-cache'
         response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
-    elif path.startswith('/api/site/') or path == '/api/announcements' or path.startswith('/api/events') or path == '/api/gallery' or path.startswith('/api/clubs'):
+    elif path.startswith('/api/site/') or path == '/api/announcements' or path.startswith('/api/events') or path == '/api/gallery' or path.startswith('/api/clips'):
         if request.method == 'GET' and response.status_code == 200:
             response.headers.setdefault('Cache-Control', 'private, max-age=15')
     elif path.startswith('/api/activity'):
@@ -1154,119 +1151,109 @@ def remove_gallery(item_id):
     return jsonify({'message': 'Deleted'})
 
 
-CLUB_GAME_MODES = ('1v1', '2v2', '3v3', 'Mixed')
+
+def _detect_clip_platform(url: str) -> str:
+    u = (url or '').lower()
+    if 'youtube.com' in u or 'youtu.be' in u:
+        return 'youtube'
+    if 'twitch.tv' in u:
+        return 'twitch'
+    if 'medal.tv' in u:
+        return 'medal'
+    if 'streamable.com' in u:
+        return 'streamable'
+    if 'tiktok.com' in u:
+        return 'tiktok'
+    return 'link'
 
 
-def _row_club(row):
-    item = dict(row) if not isinstance(row, dict) else row
-    data = {
-        'id': item['id'],
-        'name': item['name'],
-        'description': item.get('description') or '',
-        'gameMode': item.get('game_mode') or item.get('gameMode') or '3v3',
-        'ownerId': item.get('owner_id') if 'owner_id' in item else item.get('ownerId'),
-        'ownerName': item.get('owner_name') if 'owner_name' in item else item.get('ownerName'),
-        'memberCount': item.get('member_count') if 'member_count' in item else item.get('memberCount', 0),
-        'createdAt': item.get('created_at') if 'created_at' in item else item.get('createdAt'),
-    }
-    if 'joined' in item:
-        data['joined'] = bool(item['joined'])
-    return data
+def _youtube_embed(url: str):
+    import re
+    m = re.search(r'(?:youtu\.be/|v=|embed/|shorts/)([A-Za-z0-9_-]{6,})', url or '')
+    if not m:
+        return None
+    return f'https://www.youtube.com/embed/{m.group(1)}'
 
 
-@app.route('/api/clubs', methods=['GET'])
-@login_required
-def get_clubs():
-    user = request.current_user
-    clubs = list_clubs(viewer_id=user['id'])
-    return jsonify({'clubs': [_row_club(c) for c in clubs]})
-
-
-@app.route('/api/clubs', methods=['POST'])
-@login_required
-def post_club():
-    user = request.current_user
-    data = request.get_json(silent=True) or {}
-    name = (data.get('name') or '').strip()
-    description = (data.get('description') or '').strip()
-    game_mode = (data.get('gameMode') or '3v3').strip()
-    if len(name) < 2 or len(name) > 40:
-        return jsonify({'error': 'Club name must be 2–40 characters'}), 400
-    if game_mode not in CLUB_GAME_MODES:
-        return jsonify({'error': 'Invalid game mode'}), 400
-    if find_club_by_name(name):
-        return jsonify({'error': 'A club with that name already exists'}), 409
-    club = create_club(name, description[:400], game_mode, user['id'], user['username'])
-    _activity('club', f'Club created: {name}', game_mode, user['username'], user['id'], club['id'])
-    return jsonify({'club': _row_club({**dict(club), 'joined': True})}), 201
-
-
-@app.route('/api/clubs/<int:club_id>', methods=['GET'])
-@login_required
-def get_club(club_id):
-    club = find_club_by_id(club_id)
-    if not club:
-        return jsonify({'error': 'Club not found'}), 404
-    user = request.current_user
-    members = [_row_club_member(m) for m in list_club_members(club_id)]
-    payload = _row_club(club)
-    payload['joined'] = is_club_member(club_id, user['id'])
-    payload['members'] = members
-    return jsonify({'club': payload})
-
-
-def _row_club_member(row):
+def _row_clip(row):
+    item = dict(row)
+    url = item.get('url') or ''
+    file_path = item.get('file_path') or ''
     return {
-        'id': row['id'],
-        'userId': row['user_id'],
-        'username': row['username'],
-        'joinedAt': row['joined_at'],
+        'id': item['id'],
+        'title': item.get('title') or '',
+        'url': url,
+        'fileUrl': f'/uploads/{file_path}' if file_path else None,
+        'platform': item.get('platform') or 'link',
+        'embedUrl': _youtube_embed(url),
+        'uploadedBy': item.get('uploaded_by') or '',
+        'uploaderId': item.get('uploader_id'),
+        'createdAt': item.get('created_at'),
     }
 
 
-@app.route('/api/clubs/<int:club_id>/join', methods=['POST'])
+@app.route('/api/clips', methods=['GET'])
 @login_required
-def join_club_route(club_id):
-    user = request.current_user
-    club = find_club_by_id(club_id)
-    if not club:
-        return jsonify({'error': 'Club not found'}), 404
-    if is_club_member(club_id, user['id']):
-        return jsonify({'error': 'Already a member'}), 409
-    updated = join_club(club_id, user['id'], user['username'])
-    _activity('club', f'{user["username"]} joined {club["name"]}', '', user['username'], user['id'], club_id)
-    payload = _row_club(updated)
-    payload['joined'] = True
-    return jsonify({'club': payload})
+def get_clips():
+    return jsonify({'clips': [_row_clip(c) for c in list_clips()]})
 
 
-@app.route('/api/clubs/<int:club_id>/leave', methods=['POST'])
+@app.route('/api/clips', methods=['POST'])
 @login_required
-def leave_club_route(club_id):
+def post_clip():
     user = request.current_user
-    club = find_club_by_id(club_id)
-    if not club:
-        return jsonify({'error': 'Club not found'}), 404
-    if club['owner_id'] == user['id']:
-        return jsonify({'error': 'Owners cannot leave — delete the club instead'}), 400
-    if not leave_club(club_id, user['id']):
-        return jsonify({'error': 'Not a member'}), 400
-    _activity('club', f'{user["username"]} left {club["name"]}', '', user['username'], user['id'], club_id)
-    return jsonify({'message': 'Left club'})
+    title = (request.form.get('title') or '').strip()
+    url = (request.form.get('url') or '').strip()
+    upload = request.files.get('file')
+    file_path = ''
+    platform = 'link'
+
+    if upload and upload.filename:
+        # size check after save is simpler; reject extension first
+        filename, err = save_upload(upload, ALLOWED_VIDEO_EXT)
+        if err:
+            return jsonify({'error': err}), 400
+        saved = UPLOAD_DIR / filename
+        try:
+            if saved.stat().st_size > MAX_CLIP_UPLOAD_MB * 1024 * 1024:
+                saved.unlink(missing_ok=True)
+                return jsonify({'error': f'Video must be under {MAX_CLIP_UPLOAD_MB}MB'}), 400
+        except OSError:
+            pass
+        file_path = filename
+        platform = 'upload'
+    elif url:
+        if not (url.startswith('http://') or url.startswith('https://')):
+            return jsonify({'error': 'Clip URL must start with http:// or https://'}), 400
+        if len(url) > 500:
+            return jsonify({'error': 'URL is too long'}), 400
+        platform = _detect_clip_platform(url)
+    else:
+        return jsonify({'error': 'Add a clip link or upload a video'}), 400
+
+    if len(title) > 120:
+        title = title[:120]
+    if not title:
+        title = 'MAGNOM Clip'
+
+    clip = create_clip(title, url if not file_path else '', file_path, platform, user['username'], user['id'])
+    _activity('clip', f'New clip: {title}', platform, user['username'], user['id'], clip['id'])
+    return jsonify({'clip': _row_clip(clip)}), 201
 
 
-@app.route('/api/clubs/<int:club_id>', methods=['DELETE'])
+@app.route('/api/clips/<int:clip_id>', methods=['DELETE'])
 @login_required
-def remove_club(club_id):
+def remove_clip(clip_id):
     user = request.current_user
-    club = find_club_by_id(club_id)
-    if not club:
-        return jsonify({'error': 'Club not found'}), 404
-    if club['owner_id'] != user['id'] and not is_admin(user):
-        return jsonify({'error': 'Only the owner or an admin can delete this club'}), 403
-    delete_club(club_id)
-    _activity('club', f'Club deleted: {club["name"]}', '', user['username'], user['id'], club_id)
-    return jsonify({'message': 'Club deleted'})
+    clip = find_clip_by_id(clip_id)
+    if not clip:
+        return jsonify({'error': 'Clip not found'}), 404
+    owner_id = clip['uploader_id'] if 'uploader_id' in clip.keys() else None
+    if owner_id != user['id'] and not is_admin(user):
+        return jsonify({'error': 'Only the uploader or an admin can delete this clip'}), 403
+    delete_clip(clip_id)
+    _activity('clip', 'Clip removed', clip['title'] or '', user['username'], user['id'], clip_id)
+    return jsonify({'message': 'Clip deleted'})
 
 
 @app.route('/api/support-queue', methods=['GET'])
@@ -1529,6 +1516,13 @@ def uploaded_file(filename):
     if not mimetype:
         if ext in ALLOWED_IMAGE_EXT:
             mimetype = f'image/{ext[1:].replace("jpg", "jpeg")}'
+        elif ext in ALLOWED_VIDEO_EXT:
+            mimetype = {
+                '.mp4': 'video/mp4',
+                '.webm': 'video/webm',
+                '.mov': 'video/quicktime',
+                '.m4v': 'video/x-m4v',
+            }.get(ext, 'video/mp4')
         else:
             mimetype = 'application/octet-stream'
 
