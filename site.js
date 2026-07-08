@@ -7,7 +7,7 @@ let panelNavAnimating = false;
 
 const SITE_SECTION_ORDER = [
     'home', 'roster', 'leaderboard', 'chat', 'support',
-    'news', 'events', 'gallery', 'about',
+    'news', 'events', 'gallery', 'clubs', 'about',
 ];
 const PANEL_ANIM_MS = 620;
 const PANEL_ANIM_CLASSES = [
@@ -192,6 +192,7 @@ function _loadSiteSectionData(section) {
     if (section === 'news') loadNewsSection();
     if (section === 'events') loadEventsSection();
     if (section === 'gallery') loadGallerySection();
+    if (section === 'clubs') loadClubsSection();
     if (section === 'leaderboard') renderLeaderboard();
     if (section === 'roster') renderAll();
     if (section === 'home') loadHomeSection();
@@ -515,6 +516,105 @@ async function deleteGalleryItem(id) {
     }
 }
 
+async function loadClubsSection(force = false) {
+    const grid = document.getElementById('clubsGrid');
+    if (!grid) return;
+    try {
+        if (force) bustFetchCache('/api/clubs');
+        const data = await fetchCachedJson('/api/clubs');
+        const clubs = data.clubs || [];
+        if (!clubs.length) {
+            grid.innerHTML = `<div class="empty-state"><p>${escapeHtml(tx('clubs.empty'))}</p></div>`;
+            return;
+        }
+        grid.innerHTML = clubs.map((club) => {
+            const joined = !!club.joined;
+            const isOwner = typeof currentUser !== 'undefined' && currentUser && club.ownerId === currentUser.id;
+            const canDelete = isOwner || (typeof isAdmin === 'function' && isAdmin());
+            let actions = '';
+            if (joined && !isOwner) {
+                actions += `<button type="button" class="btn-secondary btn-sm" onclick="leaveClub(${club.id})">${escapeHtml(tx('clubs.leave'))}</button>`;
+            } else if (!joined) {
+                actions += `<button type="button" class="btn-primary btn-sm" onclick="joinClub(${club.id})">${escapeHtml(tx('clubs.join'))}</button>`;
+            } else {
+                actions += `<span class="club-badge">${escapeHtml(tx('clubs.owner'))}</span>`;
+            }
+            if (canDelete) {
+                actions += `<button type="button" class="btn-danger btn-sm" onclick="deleteClub(${club.id})">${escapeHtml(tx('delete'))}</button>`;
+            }
+            return `<article class="club-card${joined ? ' joined' : ''}">
+                <div class="club-card-top">
+                    <h3>${escapeHtml(club.name)}</h3>
+                    <span class="club-mode">${escapeHtml(club.gameMode || '3v3')}</span>
+                </div>
+                <p class="club-desc">${escapeHtml(club.description || tx('clubs.noDesc'))}</p>
+                <div class="club-meta">
+                    <span>${escapeHtml(tx('clubs.members'))}: <strong>${club.memberCount || 0}</strong></span>
+                    <span>${escapeHtml(tx('clubs.createdBy'))}: <strong>${escapeHtml(club.ownerName || '—')}</strong></span>
+                </div>
+                <div class="club-actions">${actions}</div>
+            </article>`;
+        }).join('');
+    } catch (err) {
+        grid.innerHTML = `<div class="empty-state"><p>${escapeHtml(err.message || tx('clubs.loadError'))}</p></div>`;
+    }
+}
+
+async function postClub(e) {
+    e.preventDefault();
+    const name = document.getElementById('clubName')?.value.trim();
+    const description = document.getElementById('clubDescription')?.value.trim();
+    const gameMode = document.getElementById('clubMode')?.value || '3v3';
+    if (!name) return;
+    try {
+        await api('/api/clubs', {
+            method: 'POST',
+            body: JSON.stringify({ name, description, gameMode }),
+        });
+        document.getElementById('clubForm')?.reset();
+        bustFetchCache('/api/clubs');
+        notify(tx('clubs.created'));
+        loadClubsSection(true);
+    } catch (err) {
+        notify(err.message, true);
+    }
+}
+
+async function joinClub(id) {
+    try {
+        await api(`/api/clubs/${id}/join`, { method: 'POST', body: '{}' });
+        bustFetchCache('/api/clubs');
+        notify(tx('clubs.joined'));
+        loadClubsSection(true);
+    } catch (err) {
+        notify(err.message, true);
+    }
+}
+
+async function leaveClub(id) {
+    if (!confirm(tx('clubs.leaveConfirm'))) return;
+    try {
+        await api(`/api/clubs/${id}/leave`, { method: 'POST', body: '{}' });
+        bustFetchCache('/api/clubs');
+        notify(tx('clubs.left'));
+        loadClubsSection(true);
+    } catch (err) {
+        notify(err.message, true);
+    }
+}
+
+async function deleteClub(id) {
+    if (!confirm(tx('clubs.deleteConfirm'))) return;
+    try {
+        await api(`/api/clubs/${id}`, { method: 'DELETE' });
+        bustFetchCache('/api/clubs');
+        notify(tx('clubs.deleted'));
+        loadClubsSection(true);
+    } catch (err) {
+        notify(err.message, true);
+    }
+}
+
 function initSiteNav() {
     document.querySelectorAll('.site-nav-link').forEach(btn => {
         btn.addEventListener('click', () => navigateSiteSection(btn.dataset.section));
@@ -522,6 +622,7 @@ function initSiteNav() {
     document.getElementById('newsForm')?.addEventListener('submit', postAnnouncement);
     document.getElementById('eventForm')?.addEventListener('submit', postEvent);
     document.getElementById('galleryForm')?.addEventListener('submit', postGallery);
+    document.getElementById('clubForm')?.addEventListener('submit', postClub);
 }
 
 function updateSiteAdminForms() {

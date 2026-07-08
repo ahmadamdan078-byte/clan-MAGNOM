@@ -52,6 +52,15 @@ from database import (
     list_gallery,
     create_gallery_item,
     delete_gallery_item,
+    list_clubs,
+    find_club_by_id,
+    find_club_by_name,
+    create_club,
+    list_club_members,
+    is_club_member,
+    join_club,
+    leave_club,
+    delete_club,
     log_activity,
     list_activities,
     list_recent_activities,
@@ -805,7 +814,7 @@ def add_cors_headers(response):
     elif path == '/service-worker.js':
         response.headers['Cache-Control'] = 'no-cache'
         response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
-    elif path.startswith('/api/site/') or path == '/api/announcements' or path.startswith('/api/events') or path == '/api/gallery':
+    elif path.startswith('/api/site/') or path == '/api/announcements' or path.startswith('/api/events') or path == '/api/gallery' or path.startswith('/api/clubs'):
         if request.method == 'GET' and response.status_code == 200:
             response.headers.setdefault('Cache-Control', 'private, max-age=15')
     elif path.startswith('/api/activity'):
@@ -1143,6 +1152,121 @@ def remove_gallery(item_id):
     _activity('gallery', 'Gallery photo removed', '', request.current_user['username'],
               request.current_user['id'], item_id)
     return jsonify({'message': 'Deleted'})
+
+
+CLUB_GAME_MODES = ('1v1', '2v2', '3v3', 'Mixed')
+
+
+def _row_club(row):
+    item = dict(row) if not isinstance(row, dict) else row
+    data = {
+        'id': item['id'],
+        'name': item['name'],
+        'description': item.get('description') or '',
+        'gameMode': item.get('game_mode') or item.get('gameMode') or '3v3',
+        'ownerId': item.get('owner_id') if 'owner_id' in item else item.get('ownerId'),
+        'ownerName': item.get('owner_name') if 'owner_name' in item else item.get('ownerName'),
+        'memberCount': item.get('member_count') if 'member_count' in item else item.get('memberCount', 0),
+        'createdAt': item.get('created_at') if 'created_at' in item else item.get('createdAt'),
+    }
+    if 'joined' in item:
+        data['joined'] = bool(item['joined'])
+    return data
+
+
+@app.route('/api/clubs', methods=['GET'])
+@login_required
+def get_clubs():
+    user = request.current_user
+    clubs = list_clubs(viewer_id=user['id'])
+    return jsonify({'clubs': [_row_club(c) for c in clubs]})
+
+
+@app.route('/api/clubs', methods=['POST'])
+@login_required
+def post_club():
+    user = request.current_user
+    data = request.get_json(silent=True) or {}
+    name = (data.get('name') or '').strip()
+    description = (data.get('description') or '').strip()
+    game_mode = (data.get('gameMode') or '3v3').strip()
+    if len(name) < 2 or len(name) > 40:
+        return jsonify({'error': 'Club name must be 2–40 characters'}), 400
+    if game_mode not in CLUB_GAME_MODES:
+        return jsonify({'error': 'Invalid game mode'}), 400
+    if find_club_by_name(name):
+        return jsonify({'error': 'A club with that name already exists'}), 409
+    club = create_club(name, description[:400], game_mode, user['id'], user['username'])
+    _activity('club', f'Club created: {name}', game_mode, user['username'], user['id'], club['id'])
+    return jsonify({'club': _row_club({**dict(club), 'joined': True})}), 201
+
+
+@app.route('/api/clubs/<int:club_id>', methods=['GET'])
+@login_required
+def get_club(club_id):
+    club = find_club_by_id(club_id)
+    if not club:
+        return jsonify({'error': 'Club not found'}), 404
+    user = request.current_user
+    members = [_row_club_member(m) for m in list_club_members(club_id)]
+    payload = _row_club(club)
+    payload['joined'] = is_club_member(club_id, user['id'])
+    payload['members'] = members
+    return jsonify({'club': payload})
+
+
+def _row_club_member(row):
+    return {
+        'id': row['id'],
+        'userId': row['user_id'],
+        'username': row['username'],
+        'joinedAt': row['joined_at'],
+    }
+
+
+@app.route('/api/clubs/<int:club_id>/join', methods=['POST'])
+@login_required
+def join_club_route(club_id):
+    user = request.current_user
+    club = find_club_by_id(club_id)
+    if not club:
+        return jsonify({'error': 'Club not found'}), 404
+    if is_club_member(club_id, user['id']):
+        return jsonify({'error': 'Already a member'}), 409
+    updated = join_club(club_id, user['id'], user['username'])
+    _activity('club', f'{user["username"]} joined {club["name"]}', '', user['username'], user['id'], club_id)
+    payload = _row_club(updated)
+    payload['joined'] = True
+    return jsonify({'club': payload})
+
+
+@app.route('/api/clubs/<int:club_id>/leave', methods=['POST'])
+@login_required
+def leave_club_route(club_id):
+    user = request.current_user
+    club = find_club_by_id(club_id)
+    if not club:
+        return jsonify({'error': 'Club not found'}), 404
+    if club['owner_id'] == user['id']:
+        return jsonify({'error': 'Owners cannot leave — delete the club instead'}), 400
+    if not leave_club(club_id, user['id']):
+        return jsonify({'error': 'Not a member'}), 400
+    _activity('club', f'{user["username"]} left {club["name"]}', '', user['username'], user['id'], club_id)
+    return jsonify({'message': 'Left club'})
+
+
+@app.route('/api/clubs/<int:club_id>', methods=['DELETE'])
+@login_required
+def remove_club(club_id):
+    user = request.current_user
+    club = find_club_by_id(club_id)
+    if not club:
+        return jsonify({'error': 'Club not found'}), 404
+    if club['owner_id'] != user['id'] and not is_admin(user):
+        return jsonify({'error': 'Only the owner or an admin can delete this club'}), 403
+    delete_club(club_id)
+    _activity('club', f'Club deleted: {club["name"]}', '', user['username'], user['id'], club_id)
+    return jsonify({'message': 'Club deleted'})
 
 
 @app.route('/api/support-queue', methods=['GET'])

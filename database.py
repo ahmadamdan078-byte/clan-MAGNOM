@@ -125,6 +125,36 @@ def init_db():
             )
         ''')
         conn.execute('''
+            CREATE TABLE IF NOT EXISTS clubs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL UNIQUE,
+                description TEXT NOT NULL DEFAULT '',
+                game_mode TEXT NOT NULL DEFAULT '3v3',
+                owner_id INTEGER NOT NULL,
+                owner_name TEXT NOT NULL,
+                created_at TEXT DEFAULT (datetime('now')),
+                FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS club_members (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                club_id INTEGER NOT NULL,
+                user_id INTEGER NOT NULL,
+                username TEXT NOT NULL,
+                joined_at TEXT DEFAULT (datetime('now')),
+                UNIQUE(club_id, user_id),
+                FOREIGN KEY (club_id) REFERENCES clubs(id) ON DELETE CASCADE,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            )
+        ''')
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_club_members_club ON club_members(club_id)"
+        )
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_club_members_user ON club_members(user_id)"
+        )
+        conn.execute('''
             CREATE TABLE IF NOT EXISTS activity_log (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 kind TEXT NOT NULL,
@@ -781,6 +811,116 @@ def delete_gallery_item(item_id: int) -> bool:
             if file_path.exists():
                 file_path.unlink()
         cursor = conn.execute('DELETE FROM gallery_items WHERE id = ?', (item_id,))
+        conn.commit()
+        return cursor.rowcount > 0
+
+
+def list_clubs(viewer_id: Optional[int] = None):
+    with get_connection() as conn:
+        rows = conn.execute(
+            '''SELECT c.id, c.name, c.description, c.game_mode, c.owner_id, c.owner_name, c.created_at,
+                      (SELECT COUNT(*) FROM club_members cm WHERE cm.club_id = c.id) AS member_count
+               FROM clubs c
+               ORDER BY member_count DESC, c.created_at DESC'''
+        ).fetchall()
+        if not viewer_id:
+            return rows
+        joined = {
+            r['club_id']
+            for r in conn.execute(
+                'SELECT club_id FROM club_members WHERE user_id = ?', (viewer_id,)
+            ).fetchall()
+        }
+        enriched = []
+        for row in rows:
+            item = dict(row)
+            item['joined'] = row['id'] in joined
+            enriched.append(item)
+        return enriched
+
+
+def find_club_by_id(club_id: int):
+    with get_connection() as conn:
+        return conn.execute(
+            '''SELECT c.id, c.name, c.description, c.game_mode, c.owner_id, c.owner_name, c.created_at,
+                      (SELECT COUNT(*) FROM club_members cm WHERE cm.club_id = c.id) AS member_count
+               FROM clubs c WHERE c.id = ?''',
+            (club_id,)
+        ).fetchone()
+
+
+def find_club_by_name(name: str):
+    with get_connection() as conn:
+        return conn.execute(
+            'SELECT id, name FROM clubs WHERE name = ? COLLATE NOCASE',
+            (name,),
+        ).fetchone()
+
+
+def create_club(name: str, description: str, game_mode: str, owner_id: int, owner_name: str):
+    with get_connection() as conn:
+        cursor = conn.execute(
+            '''INSERT INTO clubs (name, description, game_mode, owner_id, owner_name)
+               VALUES (?, ?, ?, ?, ?)''',
+            (name, description or '', game_mode, owner_id, owner_name),
+        )
+        club_id = cursor.lastrowid
+        conn.execute(
+            'INSERT INTO club_members (club_id, user_id, username) VALUES (?, ?, ?)',
+            (club_id, owner_id, owner_name),
+        )
+        conn.commit()
+    return find_club_by_id(club_id)
+
+
+def list_club_members(club_id: int):
+    with get_connection() as conn:
+        return conn.execute(
+            '''SELECT id, club_id, user_id, username, joined_at
+               FROM club_members WHERE club_id = ?
+               ORDER BY joined_at ASC''',
+            (club_id,),
+        ).fetchall()
+
+
+def is_club_member(club_id: int, user_id: int) -> bool:
+    with get_connection() as conn:
+        row = conn.execute(
+            'SELECT 1 FROM club_members WHERE club_id = ? AND user_id = ?',
+            (club_id, user_id),
+        ).fetchone()
+        return bool(row)
+
+
+def join_club(club_id: int, user_id: int, username: str):
+    with get_connection() as conn:
+        conn.execute(
+            'INSERT OR IGNORE INTO club_members (club_id, user_id, username) VALUES (?, ?, ?)',
+            (club_id, user_id, username),
+        )
+        conn.commit()
+    return find_club_by_id(club_id)
+
+
+def leave_club(club_id: int, user_id: int) -> bool:
+    club = find_club_by_id(club_id)
+    if not club:
+        return False
+    if club['owner_id'] == user_id:
+        return False
+    with get_connection() as conn:
+        cursor = conn.execute(
+            'DELETE FROM club_members WHERE club_id = ? AND user_id = ?',
+            (club_id, user_id),
+        )
+        conn.commit()
+        return cursor.rowcount > 0
+
+
+def delete_club(club_id: int) -> bool:
+    with get_connection() as conn:
+        conn.execute('DELETE FROM club_members WHERE club_id = ?', (club_id,))
+        cursor = conn.execute('DELETE FROM clubs WHERE id = ?', (club_id,))
         conn.commit()
         return cursor.rowcount > 0
 
