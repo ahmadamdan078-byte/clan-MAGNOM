@@ -1,0 +1,432 @@
+/* MAGNOMCUT editor chrome */
+
+.capcut-app {
+    --cc-bg: #0E0F13;
+    --cc-panel: #17181F;
+    --cc-line: rgba(255,255,255,0.08);
+    --cc-accent: #F0B429;
+    --cc-pink: #FF2D55;
+    --cc-text: #F5F6FA;
+    --cc-muted: #8B90A0;
+    margin: 0 0 28px;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid var(--cc-line);
+    background: var(--cc-bg);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+    font-family: var(--font-body);
+}
+
+.capcut-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    background: linear-gradient(180deg, #1B1C24, #12131A);
+    border-bottom: 1px solid var(--cc-line);
+}
+
+.capcut-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.capcut-logo {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 1px solid rgba(240,180,41,0.45);
+}
+
+.capcut-brand-text strong {
+    display: block;
+    font-family: var(--font-display);
+    letter-spacing: 0.08em;
+    color: var(--cc-accent);
+    font-size: 0.95em;
+}
+
+.capcut-brand-text span {
+    display: block;
+    color: var(--cc-muted);
+    font-size: 0.72em;
+}
+
+.capcut-top-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.capcut-btn {
+    border: 1px solid var(--cc-line);
+    background: rgba(255,255,255,0.04);
+    color: var(--cc-text);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 0.8em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.capcut-btn:hover { border-color: rgba(240,180,41,0.45); color: var(--cc-accent); }
+.capcut-btn.primary {
+    background: linear-gradient(135deg, var(--cc-accent), #FF8A3D);
+    color: #111;
+    border: none;
+}
+.capcut-btn.ghost { background: transparent; }
+
+.capcut-stage {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr) minmax(240px, 300px);
+    min-height: 520px;
+    background: #0A0B10;
+}
+
+.capcut-dock {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 6px;
+    border-right: 1px solid var(--cc-line);
+    background: #12131A;
+    overflow-y: auto;
+}
+
+.capcut-dock-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    border: none;
+    background: transparent;
+    color: var(--cc-muted);
+    border-radius: 12px;
+    padding: 10px 4px;
+    cursor: pointer;
+    font-size: 0.62em;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.capcut-dock-btn span { font-size: 1.35rem; line-height: 1; }
+.capcut-dock-btn.active,
+.capcut-dock-btn:hover {
+    color: var(--cc-text);
+    background: rgba(240,180,41,0.12);
+}
+
+.capcut-preview-col {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.capcut-preview-frame {
+    position: relative;
+    flex: 1;
+    display: grid;
+    place-items: center;
+    background:
+        radial-gradient(ellipse at 50% 20%, rgba(240,180,41,0.08), transparent 50%),
+        #05060A;
+    min-height: 360px;
+    overflow: hidden;
+}
+
+.capcut-preview-inner {
+    position: relative;
+    width: min(100%, 420px);
+    aspect-ratio: 9 / 16;
+    background: #000;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.55);
+    transition: aspect-ratio 0.25s;
+}
+
+.capcut-preview-inner.ratio-16x9 { aspect-ratio: 16 / 9; width: min(100%, 640px); }
+.capcut-preview-inner.ratio-1x1 { aspect-ratio: 1 / 1; width: min(100%, 420px); }
+.capcut-preview-inner.ratio-9x16 { aspect-ratio: 9 / 16; width: min(100%, 360px); }
+
+.capcut-preview-inner video,
+.capcut-preview-inner canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    background: #000;
+}
+
+.capcut-overlay-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.capcut-text-overlay {
+    position: absolute;
+    left: 50%;
+    bottom: 18%;
+    transform: translateX(-50%);
+    max-width: 90%;
+    text-align: center;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(1.1rem, 4.2vw, 1.8rem);
+    line-height: 1.15;
+    display: none;
+}
+
+.capcut-text-overlay.on { display: block; }
+.capcut-text-overlay.s-gold { color: #F0B429; text-shadow: 0 2px 0 #111, 0 0 18px rgba(240,180,41,.55); }
+.capcut-text-overlay.s-impact { color: #fff; text-transform: uppercase; text-shadow: 3px 3px 0 #FF2D55, -2px 0 #111; }
+.capcut-text-overlay.s-neon { color: #5EEAD4; text-shadow: 0 0 16px rgba(94,234,212,.8); }
+.capcut-text-overlay.s-clean { color: #fff; text-shadow: 0 2px 12px rgba(0,0,0,.8); }
+.capcut-text-overlay.s-bubble {
+    color: #111;
+    background: #F0B429;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: clamp(0.9rem, 3vw, 1.2rem);
+}
+
+.capcut-sticker-overlay {
+    position: absolute;
+    font-size: 2.4rem;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,.45));
+    display: none;
+}
+.capcut-sticker-overlay.on { display: block; }
+
+.capcut-fx-flash {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    background: #fff;
+    z-index: 4;
+}
+.capcut-fx-flash.pulse { animation: ccFlash 0.35s ease; }
+@keyframes ccFlash {
+    0% { opacity: 0.7; }
+    100% { opacity: 0; }
+}
+
+.capcut-empty {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    color: var(--cc-muted);
+    padding: 24px;
+    z-index: 5;
+    background: rgba(5,6,10,0.72);
+}
+.capcut-empty.hidden { display: none; }
+.capcut-empty strong {
+    display: block;
+    color: var(--cc-accent);
+    font-family: var(--font-display);
+    margin-bottom: 8px;
+    letter-spacing: 0.08em;
+}
+
+.capcut-transport {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-top: 1px solid var(--cc-line);
+    background: #12131A;
+}
+
+.capcut-time {
+    font-variant-numeric: tabular-nums;
+    color: var(--cc-muted);
+    font-size: 0.78em;
+    min-width: 96px;
+}
+
+.capcut-timeline {
+    flex: 1;
+    height: 56px;
+    border-radius: 10px;
+    background: #0A0B10;
+    border: 1px solid var(--cc-line);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.capcut-timeline-track {
+    position: absolute;
+    inset: 12px 8px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #2A2D3A, #1A1C26 40%, #F0B42955, #1A1C26);
+    opacity: 0.9;
+}
+
+.capcut-timeline-range {
+    position: absolute;
+    top: 8px;
+    bottom: 8px;
+    left: 0%;
+    right: 0%;
+    border-left: 2px solid #5EEAD4;
+    border-right: 2px solid #FF2D55;
+    background: rgba(94,234,212,0.08);
+    pointer-events: none;
+}
+
+.capcut-playhead {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #F0B429;
+    left: 0%;
+    box-shadow: 0 0 10px rgba(240,180,41,0.8);
+    pointer-events: none;
+}
+
+.capcut-side {
+    border-left: 1px solid var(--cc-line);
+    background: var(--cc-panel);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.capcut-side-title {
+    padding: 12px 14px 8px;
+    font-family: var(--font-display);
+    letter-spacing: 0.06em;
+    color: var(--cc-accent);
+    font-size: 0.85em;
+    border-bottom: 1px solid var(--cc-line);
+}
+
+.capcut-panel {
+    display: none;
+    padding: 12px 14px 16px;
+    overflow-y: auto;
+    flex: 1;
+}
+.capcut-panel.active { display: block; }
+
+.capcut-panel label {
+    display: block;
+    color: var(--cc-muted);
+    font-size: 0.75em;
+    margin: 10px 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.capcut-panel input[type="text"],
+.capcut-panel input[type="url"],
+.capcut-panel select,
+.capcut-panel textarea {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid var(--cc-line);
+    background: #0E0F13;
+    color: var(--cc-text);
+    padding: 10px 12px;
+    font: inherit;
+}
+
+.capcut-panel input[type="range"] { width: 100%; accent-color: var(--cc-accent); }
+
+.capcut-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.capcut-chip {
+    border: 1px solid var(--cc-line);
+    background: #0E0F13;
+    color: var(--cc-text);
+    border-radius: 12px;
+    padding: 10px 12px;
+    cursor: pointer;
+    font-size: 0.78em;
+    font-weight: 700;
+}
+.capcut-chip.active {
+    border-color: var(--cc-accent);
+    background: rgba(240,180,41,0.15);
+    color: var(--cc-accent);
+}
+
+.capcut-sticker-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+.capcut-sticker-grid button {
+    border: 1px solid var(--cc-line);
+    background: #0E0F13;
+    border-radius: 12px;
+    font-size: 1.5rem;
+    padding: 10px 0;
+    cursor: pointer;
+}
+
+.capcut-val {
+    color: var(--cc-accent);
+    font-size: 0.8em;
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+.capcut-filter-preview.filter-gold { filter: saturate(1.25) contrast(1.08) sepia(0.28) hue-rotate(-8deg); }
+.capcut-filter-preview.filter-neon { filter: saturate(1.45) contrast(1.15) brightness(1.05) hue-rotate(150deg); }
+.capcut-filter-preview.filter-heat { filter: saturate(1.4) contrast(1.2) sepia(0.35) hue-rotate(-25deg); }
+.capcut-filter-preview.filter-ice { filter: saturate(0.85) contrast(1.1) brightness(1.08) hue-rotate(180deg); }
+.capcut-filter-preview.filter-cinema { filter: contrast(1.25) saturate(0.9) brightness(0.92); }
+.capcut-filter-preview.filter-retro { filter: sepia(0.45) contrast(1.15) saturate(1.2); }
+.capcut-filter-preview.filter-glow { filter: brightness(1.15) contrast(1.2) saturate(1.35); }
+
+.capcut-status {
+    padding: 8px 14px 12px;
+    color: var(--cc-muted);
+    font-size: 0.78em;
+    border-top: 1px solid var(--cc-line);
+}
+
+@media (max-width: 980px) {
+    .capcut-stage {
+        grid-template-columns: 64px 1fr;
+        grid-template-rows: auto auto;
+    }
+    .capcut-side {
+        grid-column: 1 / -1;
+        border-left: none;
+        border-top: 1px solid var(--cc-line);
+        max-height: 320px;
+    }
+}
+
+@media (max-width: 640px) {
+    .capcut-stage { grid-template-columns: 1fr; }
+    .capcut-dock {
+        flex-direction: row;
+        overflow-x: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--cc-line);
+    }
+    .capcut-dock-btn { min-width: 64px; }
+}

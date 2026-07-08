@@ -16,9 +16,10 @@
     <meta property="og:image" content="photos/magnom-bg.jpeg">
     <meta property="og:type" content="website">
     <title>MAGNOM Clan — Elite Rocket League Community</title>
-    <link rel="stylesheet" href="site.css?v=20260708d">
-    <link rel="preload" href="site.css?v=20260708d" as="style">
-    <link rel="preload" href="i18n.js?v=20260708d" as="script">
+    <link rel="stylesheet" href="site.css?v=20260708f">
+    <link rel="stylesheet" href="magnom-cut.css?v=20260708f">
+    <link rel="preload" href="site.css?v=20260708f" as="style">
+    <link rel="preload" href="i18n.js?v=20260708f" as="script">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&family=Oxanium:wght@500;600;700;800&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -2846,7 +2847,7 @@
             <button type="button" class="site-nav-link" data-section="news" data-i18n="nav.news">News</button>
             <button type="button" class="site-nav-link" data-section="events" data-i18n="nav.events">Events</button>
             <button type="button" class="site-nav-link" data-section="gallery" data-i18n="nav.gallery">Gallery</button>
-            <button type="button" class="site-nav-link" data-section="clips" data-i18n="nav.clips">Clips</button>
+            <button type="button" class="site-nav-link" data-section="clips" data-i18n="nav.clips">MAGNOMCUT</button>
             <button type="button" class="site-nav-link" data-section="about" data-i18n="nav.about">About</button>
         </div>
         <div class="site-nav-actions">
@@ -2941,7 +2942,7 @@
             <div class="footer-brand">MAGNOM CLAN</div>
             <p data-i18n="footer.tagline">Elite Rocket League Community · Train Together · Rank Up Together</p>
             <button type="button" class="share-link-btn" onclick="copyShareLink()" data-i18n="footer.copy">🔗 Copy site link</button>
-            <p class="footer-hint" data-i18n-html="footer.hint">Tip: Open Clips → MAGNOM CapCut to edit highlights · Add to Home Screen for app-like experience</p>
+            <p class="footer-hint" data-i18n-html="footer.hint">Tip: Open MAGNOMCUT to edit highlights · Add to Home Screen for app-like experience</p>
             <p data-i18n="footer.rights">© 2026 MAGNOM Clan. All rights reserved.</p>
         </footer>
     </div>
@@ -3230,64 +3231,208 @@
             </div>
 
             <div class="site-section" data-section="clips" id="sectionClips">
-                <h2 class="section-title" data-i18n="section.clips">🎬 Clips</h2>
-                <p class="section-sub clips-intro" data-i18n="clips.intro">Edit highlights in MAGNOM CapCut, then post your clip to the clan feed.</p>
+                <h2 class="section-title" data-i18n="section.clips">🎬 MAGNOMCUT</h2>
+                <p class="section-sub clips-intro" data-i18n="clips.intro">MAGNOMCUT — full editor for MAGNOM: timeline, text, stickers, effects, trim, then post to the clan.</p>
 
-                <div class="magnom-cut panel" id="magnomCutStudio">
-                    <div class="magnom-cut-header">
-                        <div>
-                            <div class="magnom-cut-brand">MAGNOM CAPCUT</div>
-                            <p data-i18n="cut.sub">Quick edit like CapCut — filters, captions, speed, then export to Clips.</p>
+                <div class="capcut-app" id="magnomCutStudio">
+                    <div class="capcut-topbar">
+                        <div class="capcut-brand">
+                            <img class="capcut-logo" src="photos/magnom-bg.jpeg" alt="">
+                            <div class="capcut-brand-text">
+                                <strong>MAGNOMCUT</strong>
+                                <span data-i18n="cut.sub">Video editor for MAGNOM</span>
+                            </div>
+                        </div>
+                        <div class="capcut-top-actions">
+                            <label class="capcut-btn ghost" for="cutImport" data-i18n="cut.import">Import</label>
+                            <input type="file" id="cutImport" accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov,.m4v" hidden>
+                            <button type="button" class="capcut-btn" onclick="toggleCutPlayback()" data-i18n="cut.play">Play</button>
+                            <button type="button" class="capcut-btn primary" onclick="exportMagnomCutProject()" data-i18n="cut.export">Export &amp; Post</button>
                         </div>
                     </div>
-                    <div class="magnom-cut-layout">
-                        <div class="magnom-cut-preview-wrap">
-                            <video id="cutPreview" class="magnom-cut-preview" playsinline controls></video>
-                            <canvas id="cutCanvas" class="magnom-cut-canvas" hidden></canvas>
-                            <div class="magnom-cut-caption-overlay" id="cutCaptionOverlay"></div>
-                            <div class="magnom-cut-empty" id="cutEmptyHint" data-i18n="cut.empty">Import a video to start editing</div>
+
+                    <div class="capcut-stage">
+                        <nav class="capcut-dock" id="capcutDock" aria-label="MAGNOMCUT tools">
+                            <button type="button" class="capcut-dock-btn active" data-panel="media"><span>📁</span>Media</button>
+                            <button type="button" class="capcut-dock-btn" data-panel="audio"><span>🎵</span>Audio</button>
+                            <button type="button" class="capcut-dock-btn" data-panel="text"><span>Tt</span>Text</button>
+                            <button type="button" class="capcut-dock-btn" data-panel="stickers"><span>✨</span>Stickers</button>
+                            <button type="button" class="capcut-dock-btn" data-panel="effects"><span>🪄</span>Effects</button>
+                            <button type="button" class="capcut-dock-btn" data-panel="filters"><span>🎞</span>Filters</button>
+                            <button type="button" class="capcut-dock-btn" data-panel="adjust"><span>⚙</span>Adjust</button>
+                            <button type="button" class="capcut-dock-btn" data-panel="canvas"><span>🖼</span>Canvas</button>
+                            <button type="button" class="capcut-dock-btn" data-panel="speed"><span>⏱</span>Speed</button>
+                            <button type="button" class="capcut-dock-btn" data-panel="trim"><span>✂</span>Trim</button>
+                            <button type="button" class="capcut-dock-btn" data-panel="export"><span>⬆</span>Export</button>
+                        </nav>
+
+                        <div class="capcut-preview-col">
+                            <div class="capcut-preview-frame">
+                                <div class="capcut-preview-inner ratio-9x16" id="cutPreviewInner">
+                                    <video id="cutPreview" class="capcut-filter-preview" playsinline></video>
+                                    <canvas id="cutCanvas" hidden></canvas>
+                                    <div class="capcut-overlay-layer">
+                                        <div class="capcut-sticker-overlay" id="cutStickerOverlay" style="top:12%;right:10%"></div>
+                                        <div class="capcut-text-overlay s-gold" id="cutCaptionOverlay"></div>
+                                    </div>
+                                    <div class="capcut-fx-flash" id="cutFxFlash"></div>
+                                    <div class="capcut-empty" id="cutEmptyHint">
+                                        <div>
+                                            <strong>MAGNOMCUT</strong>
+                                            <span data-i18n="cut.empty">Import a video to start editing</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="capcut-transport">
+                                <button type="button" class="capcut-btn" onclick="toggleCutPlayback()">⏯</button>
+                                <span class="capcut-time" id="cutTimeLabel">0:00 / 0:00</span>
+                                <div class="capcut-timeline" id="cutTimeline" title="Seek">
+                                    <div class="capcut-timeline-track"></div>
+                                    <div class="capcut-timeline-range" id="cutTrimRange"></div>
+                                    <div class="capcut-playhead" id="cutPlayhead"></div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="magnom-cut-tools">
-                            <div class="form-group">
-                                <label for="cutImport" data-i18n="cut.import">Import video</label>
-                                <input type="file" id="cutImport" accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov,.m4v">
+
+                        <aside class="capcut-side">
+                            <div class="capcut-side-title" id="capcutSideTitle">Media</div>
+
+                            <div class="capcut-panel active" data-panel="media">
+                                <label data-i18n="cut.import">Import video</label>
+                                <button type="button" class="capcut-btn primary" style="width:100%" onclick="document.getElementById('cutImport').click()" data-i18n="cut.import">Import</button>
+                                <p class="capcut-val" id="cutMediaName" style="margin-top:10px;color:var(--cc-muted)">—</p>
+                                <label>Project name</label>
+                                <input type="text" id="cutProjectName" maxlength="80" placeholder="MAGNOM highlight">
                             </div>
-                            <div class="form-group">
-                                <label for="cutFilter" data-i18n="cut.filter">Filter</label>
-                                <select id="cutFilter">
-                                    <option value="none" data-i18n="cut.filter.none">Original</option>
-                                    <option value="gold" data-i18n="cut.filter.gold">MAGNOM Gold</option>
-                                    <option value="neon" data-i18n="cut.filter.neon">Arena Neon</option>
-                                    <option value="heat" data-i18n="cut.filter.heat">Clutch Heat</option>
-                                    <option value="ice" data-i18n="cut.filter.ice">SSL Ice</option>
-                                    <option value="cinema" data-i18n="cut.filter.cinema">Cinema Night</option>
-                                </select>
+
+                            <div class="capcut-panel" data-panel="audio">
+                                <label>Music / SFX (preview in editor)</label>
+                                <div class="capcut-chip-row" id="cutMusicChips">
+                                    <button type="button" class="capcut-chip active" data-music="none">Mute bed</button>
+                                    <button type="button" class="capcut-chip" data-music="pulse">Arena Pulse</button>
+                                    <button type="button" class="capcut-chip" data-music="boost">Boost Drop</button>
+                                    <button type="button" class="capcut-chip" data-music="clutch">Clutch Rise</button>
+                                </div>
+                                <label>Volume</label>
+                                <input type="range" id="cutMusicVol" min="0" max="1" step="0.05" value="0.35">
+                                <div class="capcut-val"><span id="cutMusicVolVal">35%</span></div>
+                                <label>Original video audio</label>
+                                <input type="range" id="cutVideoVol" min="0" max="1" step="0.05" value="1">
+                                <div class="capcut-val"><span id="cutVideoVolVal">100%</span></div>
                             </div>
-                            <div class="form-group">
-                                <label for="cutSpeed" data-i18n="cut.speed">Speed</label>
-                                <input type="range" id="cutSpeed" min="0.5" max="2" step="0.1" value="1">
-                                <div class="cut-range-val"><span id="cutSpeedVal">1.0x</span></div>
-                            </div>
-                            <div class="form-group">
-                                <label for="cutCaption" data-i18n="cut.caption">Caption</label>
+
+                            <div class="capcut-panel" data-panel="text">
+                                <label data-i18n="cut.caption">Caption</label>
                                 <input type="text" id="cutCaption" maxlength="80" data-i18n-placeholder="cut.captionPh" placeholder="MAGNOM · clutch">
+                                <label data-i18n="cut.template">Style</label>
+                                <div class="capcut-chip-row" id="cutTextStyles">
+                                    <button type="button" class="capcut-chip active" data-style="gold">Gold</button>
+                                    <button type="button" class="capcut-chip" data-style="impact">Impact</button>
+                                    <button type="button" class="capcut-chip" data-style="neon">Neon</button>
+                                    <button type="button" class="capcut-chip" data-style="clean">Clean</button>
+                                    <button type="button" class="capcut-chip" data-style="bubble">Bubble</button>
+                                </div>
+                                <label>Templates</label>
+                                <div class="capcut-chip-row">
+                                    <button type="button" class="capcut-chip" onclick="setCutCaptionPreset('MAGNOM CLUTCH')">MAGNOM CLUTCH</button>
+                                    <button type="button" class="capcut-chip" onclick="setCutCaptionPreset('SSL PATH')">SSL PATH</button>
+                                    <button type="button" class="capcut-chip" onclick="setCutCaptionPreset('W TEAM')">W TEAM</button>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="cutTemplate" data-i18n="cut.template">Caption style</label>
-                                <select id="cutTemplate">
-                                    <option value="gold">MAGNOM Gold</option>
-                                    <option value="impact">Impact</option>
-                                    <option value="neon">Neon Outline</option>
-                                    <option value="clean">Clean White</option>
-                                </select>
+
+                            <div class="capcut-panel" data-panel="stickers">
+                                <label>Stickers</label>
+                                <div class="capcut-sticker-grid" id="cutStickers">
+                                    <button type="button" data-sticker="🔥">🔥</button>
+                                    <button type="button" data-sticker="⚡">⚡</button>
+                                    <button type="button" data-sticker="🏆">🏆</button>
+                                    <button type="button" data-sticker="🚀">🚀</button>
+                                    <button type="button" data-sticker="😎">😎</button>
+                                    <button type="button" data-sticker="💯">💯</button>
+                                    <button type="button" data-sticker="🎯">🎯</button>
+                                    <button type="button" data-sticker="💪">💪</button>
+                                    <button type="button" data-sticker="">✖</button>
+                                </div>
                             </div>
-                            <div class="magnom-cut-actions">
-                                <button type="button" class="btn-secondary" id="cutPlayBtn" onclick="toggleCutPlayback()" data-i18n="cut.play">Play / Pause</button>
-                                <button type="button" class="btn-primary" id="cutExportBtn" onclick="exportMagnomCut()" data-i18n="cut.export">Export to Clips form</button>
+
+                            <div class="capcut-panel" data-panel="effects">
+                                <label>Effects</label>
+                                <div class="capcut-chip-row" id="cutEffects">
+                                    <button type="button" class="capcut-chip active" data-fx="none">None</button>
+                                    <button type="button" class="capcut-chip" data-fx="flash">Flash In</button>
+                                    <button type="button" class="capcut-chip" data-fx="zoom">Zoom Punch</button>
+                                    <button type="button" class="capcut-chip" data-fx="shake">Shake</button>
+                                    <button type="button" class="capcut-chip" data-fx="glitch">Glitch</button>
+                                </div>
+                                <button type="button" class="capcut-btn" style="width:100%;margin-top:12px" onclick="previewCutEffect()">Preview effect</button>
                             </div>
-                            <p class="cut-hint" id="cutStatus" data-i18n="cut.hint">Tip: keep clips under ~30s for fast export.</p>
-                        </div>
+
+                            <div class="capcut-panel" data-panel="filters">
+                                <label data-i18n="cut.filter">Filters</label>
+                                <div class="capcut-chip-row" id="cutFilters">
+                                    <button type="button" class="capcut-chip active" data-filter="none">Original</button>
+                                    <button type="button" class="capcut-chip" data-filter="gold">MAGNOM Gold</button>
+                                    <button type="button" class="capcut-chip" data-filter="neon">Arena Neon</button>
+                                    <button type="button" class="capcut-chip" data-filter="heat">Clutch Heat</button>
+                                    <button type="button" class="capcut-chip" data-filter="ice">SSL Ice</button>
+                                    <button type="button" class="capcut-chip" data-filter="cinema">Cinema</button>
+                                    <button type="button" class="capcut-chip" data-filter="retro">Retro</button>
+                                    <button type="button" class="capcut-chip" data-filter="glow">Glow Up</button>
+                                </div>
+                            </div>
+
+                            <div class="capcut-panel" data-panel="adjust">
+                                <label>Brightness</label>
+                                <input type="range" id="cutBright" min="0.6" max="1.5" step="0.05" value="1">
+                                <div class="capcut-val"><span id="cutBrightVal">1.00</span></div>
+                                <label>Contrast</label>
+                                <input type="range" id="cutContrast" min="0.6" max="1.6" step="0.05" value="1">
+                                <div class="capcut-val"><span id="cutContrastVal">1.00</span></div>
+                                <label>Saturation</label>
+                                <input type="range" id="cutSaturate" min="0.2" max="2" step="0.05" value="1">
+                                <div class="capcut-val"><span id="cutSaturateVal">1.00</span></div>
+                            </div>
+
+                            <div class="capcut-panel" data-panel="canvas">
+                                <label>Canvas ratio</label>
+                                <div class="capcut-chip-row" id="cutRatios">
+                                    <button type="button" class="capcut-chip active" data-ratio="9x16">9:16</button>
+                                    <button type="button" class="capcut-chip" data-ratio="1x1">1:1</button>
+                                    <button type="button" class="capcut-chip" data-ratio="16x9">16:9</button>
+                                </div>
+                            </div>
+
+                            <div class="capcut-panel" data-panel="speed">
+                                <label data-i18n="cut.speed">Speed</label>
+                                <input type="range" id="cutSpeed" min="0.25" max="3" step="0.05" value="1">
+                                <div class="capcut-val"><span id="cutSpeedVal">1.00x</span></div>
+                                <div class="capcut-chip-row" style="margin-top:10px">
+                                    <button type="button" class="capcut-chip" onclick="setCutSpeed(0.5)">0.5x</button>
+                                    <button type="button" class="capcut-chip" onclick="setCutSpeed(1)">1x</button>
+                                    <button type="button" class="capcut-chip" onclick="setCutSpeed(1.5)">1.5x</button>
+                                    <button type="button" class="capcut-chip" onclick="setCutSpeed(2)">2x</button>
+                                </div>
+                            </div>
+
+                            <div class="capcut-panel" data-panel="trim">
+                                <label>Start (sec)</label>
+                                <input type="range" id="cutTrimStart" min="0" max="100" step="0.1" value="0">
+                                <div class="capcut-val"><span id="cutTrimStartVal">0.0s</span></div>
+                                <label>End (sec)</label>
+                                <input type="range" id="cutTrimEnd" min="0" max="100" step="0.1" value="100">
+                                <div class="capcut-val"><span id="cutTrimEndVal">0.0s</span></div>
+                                <button type="button" class="capcut-btn" style="width:100%;margin-top:10px" onclick="applyCutTrimToPlayhead()">Jump to start</button>
+                            </div>
+
+                            <div class="capcut-panel" data-panel="export">
+                                <p style="color:var(--cc-muted);font-size:0.85em;line-height:1.45;margin-bottom:10px" data-i18n="cut.hint">Export burns filter + caption into a WebM, then fills the post form.</p>
+                                <button type="button" class="capcut-btn primary" style="width:100%" onclick="exportMagnomCutProject()" data-i18n="cut.export">Export &amp; Post</button>
+                                <p class="capcut-val" id="cutExportProgress" style="margin-top:10px"></p>
+                            </div>
+                        </aside>
                     </div>
+                    <div class="capcut-status" id="cutStatus" data-i18n="cut.hint">Import a clip, edit in MAGNOMCUT, then Export &amp; Post.</div>
                 </div>
 
                 <div class="admin-post-form" id="clipCreateFormWrap">
@@ -3320,7 +3465,7 @@
                         <ul>
                             <li><strong data-i18n="about.mission">Mission:</strong> <span data-i18n="about.missionVal">Train together, compete together, reach SSL together</span></li>
                             <li><strong data-i18n="about.game">Game:</strong> <span data-i18n="about.gameVal">Rocket League — 1v1, 2v2, 3v3</span></li>
-                            <li><strong data-i18n="about.tools">Tools:</strong> <span data-i18n="about.toolsVal">Roster, Chat, Events, Gallery, MAGNOM AI</span></li>
+                            <li><strong data-i18n="about.tools">Tools:</strong> <span data-i18n="about.toolsVal">Roster, Chat, Events, MAGNOMCUT, Gallery, MAGNOM AI</span></li>
                             <li><strong data-i18n="about.roles">Roles:</strong> <span data-i18n="about.rolesVal">Admin, Coach, Member, Pro Player, Leader</span></li>
                             <li><strong data-i18n="about.join">Join:</strong> <span data-i18n="about.joinVal">Register → Admin approval → Full access</span></li>
                         </ul>
@@ -3548,12 +3693,13 @@
         </div>
     </div>
 
-    <script src="i18n.js?v=20260708d"></script>
+    <script src="i18n.js?v=20260708f"></script>
     <script src="notifications.js"></script>
     <script src="push.js"></script>
     <script src="support_queue.js"></script>
     <script src="support_call.js"></script>
-    <script src="site.js?v=20260708d"></script>
+    <script src="magnom-cut.js?v=20260708f"></script>
+    <script src="site.js?v=20260708f"></script>
     <script>
         const RL_TIERS = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Champion', 'Grand Champion'];
         const RL_DIVISIONS = ['I', 'II', 'III'];
