@@ -112,6 +112,7 @@ let cutTemplateCat = 'All';
 
 function formatCutUses(n) {
     if (!Number.isFinite(n)) return '';
+    if (n >= 1000000) return `${(n / 1000000).toFixed(n >= 10000000 ? 0 : 1)}M uses`;
     if (n >= 1000) return `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}K uses`;
     return `${n} uses`;
 }
@@ -120,9 +121,13 @@ function cutTemplateCardHtml(t) {
     const badge = t.badge
         ? `<span class="capcut-template-badge ${String(t.badge).toLowerCase()}">${t.badge}</span>`
         : '';
+    const source = t.source === 'capcut'
+        ? '<span class="capcut-template-source">CapCut</span>'
+        : '';
     return `
       <button type="button" class="capcut-template-card" data-template="${t.id}" data-cat="${t.cat}" onclick="applyMagnomCutTemplate('${t.id}')">
         <span class="capcut-template-cover" style="background-image:${t.cover}"></span>
+        ${source}
         ${badge}
         <span class="capcut-template-body">
           <span class="capcut-template-name">${t.name}</span>
@@ -137,9 +142,14 @@ function cutTemplateCardHtml(t) {
 
 function getFilteredMagnomTemplates() {
     const q = (document.getElementById('cutTemplateSearch')?.value || '').trim().toLowerCase();
+    const tabCat = {
+        slowmo: 'Slow Motion',
+        photodump: 'Photo Dump',
+        beatsync: 'Beat Sync',
+    };
     return (window.CUT_TEMPLATE_CATALOG || []).filter((t) => {
         if (cutTemplateTab === 'trending' && !t.trending) return false;
-        if (cutTemplateTab === 'new' && t.badge !== 'New' && t.badge !== 'Hot') return false;
+        if (tabCat[cutTemplateTab] && t.cat !== tabCat[cutTemplateTab]) return false;
         if (cutTemplateTab === 'foryou' && !t.forYou) return false;
         if (cutTemplateCat !== 'All' && t.cat !== cutTemplateCat) return false;
         if (q) {
@@ -162,7 +172,9 @@ function renderMagnomCutTemplates() {
         tabsHost.innerHTML = (window.CUT_TEMPLATE_TABS || [
             { id: 'foryou', name: 'For you' },
             { id: 'trending', name: 'Trending' },
-            { id: 'new', name: 'New' },
+            { id: 'slowmo', name: 'Slow Mo' },
+            { id: 'photodump', name: 'Photo Dump' },
+            { id: 'beatsync', name: 'Beat Sync' },
             { id: 'all', name: 'All' },
         ]).map((tab) =>
             `<button type="button" class="capcut-template-tab${tab.id === cutTemplateTab ? ' active' : ''}" data-tab="${tab.id}" onclick="setMagnomTemplateTab('${tab.id}')">${tab.name}</button>`
