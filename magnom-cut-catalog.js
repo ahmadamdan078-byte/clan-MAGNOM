@@ -1,4 +1,4 @@
-/* MAGNOMCUT CapCut-style asset catalog — 50+ each */
+/* MAGNOMEDITS CapCut-style asset catalog — 50+ each */
 
 window.CUT_MUSIC_CATALOG = [
     { id: 'none', name: 'Mute', freqs: null },

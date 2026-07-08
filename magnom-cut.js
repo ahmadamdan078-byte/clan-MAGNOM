@@ -1,4 +1,4 @@
-/* MAGNOMCUT — CapCut-like photo + video editor */
+/* MAGNOMEDITS — CapCut-like photo + video editor */
 
 let cutObjectUrl = null;
 let cutImportedFile = null;
@@ -758,7 +758,7 @@ function handleCutImport(e) {
             image.src = cutObjectUrl;
         }
         syncCutModeUI();
-        setCutStatus(typeof tx === 'function' ? tx('cut.readyImage') : 'Image imported — edit with MAGNOMCUT tools.');
+        setCutStatus(typeof tx === 'function' ? tx('cut.readyImage') : 'Image imported — edit with MAGNOMEDITS tools.');
     } else {
         const video = document.getElementById('cutPreview');
         if (video) {
@@ -791,7 +791,7 @@ function handleCutImport(e) {
         }
         syncCutModeUI();
         cutRaf = requestAnimationFrame(syncCutTransport);
-        setCutStatus(typeof tx === 'function' ? tx('cut.ready') : 'Video imported — use the MAGNOMCUT tool dock.');
+        setCutStatus(typeof tx === 'function' ? tx('cut.ready') : 'Video imported — use the MAGNOMEDITS tool dock.');
     }
 
     syncControlsFromState();
@@ -1452,13 +1452,13 @@ async function exportMagnomCutProject() {
         document.getElementById('cutProjectName')?.value.trim() ||
         document.getElementById('cutCaption')?.value.trim() ||
         cutImportedFile.name.replace(/\.[^.]+$/, '') ||
-        'MAGNOMCUT';
+        'MAGNOMEDITS';
     const progress = document.getElementById('cutExportProgress');
     const safeName = projectName.replace(/\s+/g, '_');
 
     try {
         if (progress) progress.textContent = cutMediaKind === 'image' ? 'Rendering image…' : 'Rendering video…';
-        setCutStatus(typeof tx === 'function' ? tx('cut.exporting') : 'Exporting MAGNOMCUT project…');
+        setCutStatus(typeof tx === 'function' ? tx('cut.exporting') : 'Exporting MAGNOMEDITS project…');
 
         let outFile;
         if (cutMediaKind === 'image') {

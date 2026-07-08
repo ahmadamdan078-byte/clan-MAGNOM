@@ -597,7 +597,7 @@ async function deleteClip(id) {
     }
 }
 
-// MAGNOMCUT lives in magnom-cut.js
+// MAGNOMEDITS lives in magnom-cut.js
 
 function initSiteNav() {
     document.querySelectorAll('.site-nav-link').forEach(btn => {
