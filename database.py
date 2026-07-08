@@ -189,8 +189,31 @@ def init_db():
 
 
 def _seed_site_content(conn):
-    count = conn.execute('SELECT COUNT(*) as c FROM announcements').fetchone()['c']
-    if count == 0:
+    """Seed demo news/events once per database lifetime.
+
+    Uses app_meta so deleting all events never re-creates the demos on restart.
+    """
+    conn.execute(
+        '''CREATE TABLE IF NOT EXISTS app_meta (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        )'''
+    )
+    already = conn.execute(
+        "SELECT value FROM app_meta WHERE key = 'site_content_seeded'"
+    ).fetchone()
+    if already:
+        return
+
+    user_count = conn.execute('SELECT COUNT(*) as c FROM users').fetchone()['c']
+    announcement_count = conn.execute('SELECT COUNT(*) as c FROM announcements').fetchone()['c']
+    event_count = conn.execute('SELECT COUNT(*) as c FROM events').fetchone()['c']
+
+    # Only auto-create demos on a brand-new empty database.
+    # If users already exist (production), never re-insert after deletes/resets.
+    may_seed_demos = user_count == 0
+
+    if may_seed_demos and announcement_count == 0:
         seeds = [
             ('Welcome to MAGNOM Clan', 'We are an elite Rocket League community focused on teamwork, coaching, and climbing ranks together. Register to join the roster!', 'MAGNOM Admin', 1),
             ('MAGNOM AI is Live', 'Ask our AI coach anything — mechanics, rotations, camera settings, and rank-up strategies. Open the gear menu → Ask MAGNOM AI.', 'MAGNOM Admin', 0),
@@ -200,8 +223,8 @@ def _seed_site_content(conn):
             'INSERT INTO announcements (title, body, author, pinned) VALUES (?, ?, ?, ?)',
             seeds,
         )
-    count = conn.execute('SELECT COUNT(*) as c FROM events').fetchone()['c']
-    if count == 0:
+
+    if may_seed_demos and event_count == 0:
         conn.executemany(
             'INSERT INTO events (title, description, event_date, event_time, created_by) VALUES (?, ?, ?, ?, ?)',
             [
@@ -210,6 +233,11 @@ def _seed_site_content(conn):
                 ('Rank Review Night', 'Replay review session — submit your games in chat.', '2026-07-20', '21:00', 'MAGNOM Coach'),
             ],
         )
+
+    # Mark seed complete so empties after delete stay empty forever on this DB.
+    conn.execute(
+        "INSERT OR REPLACE INTO app_meta (key, value) VALUES ('site_content_seeded', '1')"
+    )
 
 
 def list_all_users():
