@@ -158,13 +158,28 @@
 .capcut-preview-inner.ratio-9x16 { aspect-ratio: 9 / 16; width: min(100%, 360px); }
 
 .capcut-preview-inner video,
-.capcut-preview-inner img,
+.capcut-preview-inner img.capcut-filter-preview,
 .capcut-preview-inner canvas {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    display: block;
+    object-fit: contain;
+    display: none;
     background: #000;
+    z-index: 1;
+}
+
+.capcut-preview-inner video.is-shown,
+.capcut-preview-inner img.capcut-filter-preview.is-shown {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.capcut-preview-inner video[hidden],
+.capcut-preview-inner img[hidden] {
+    display: none !important;
 }
 
 .capcut-dock-btn.disabled,

@@ -85,6 +85,29 @@ function openCapcutPanel(name) {
     if (title) title.textContent = name.charAt(0).toUpperCase() + name.slice(1);
 }
 
+function setCutMediaVisibility() {
+    const video = document.getElementById('cutPreview');
+    const image = document.getElementById('cutImagePreview');
+    if (video) {
+        const showVideo = cutMediaKind === 'video';
+        video.classList.toggle('is-shown', showVideo);
+        video.toggleAttribute('hidden', !showVideo);
+        video.style.display = showVideo ? 'block' : 'none';
+        if (!showVideo) {
+            video.pause?.();
+            video.removeAttribute('src');
+            try { video.load?.(); } catch { /* ignore */ }
+        }
+    }
+    if (image) {
+        const showImage = cutMediaKind === 'image';
+        image.classList.toggle('is-shown', showImage);
+        image.toggleAttribute('hidden', !showImage);
+        image.style.display = showImage ? 'block' : 'none';
+        if (!showImage) image.removeAttribute('src');
+    }
+}
+
 function syncCutModeUI() {
     const studio = document.getElementById('magnomCutStudio');
     if (studio) {
@@ -92,19 +115,7 @@ function syncCutModeUI() {
         studio.classList.toggle('is-image', cutMediaKind === 'image');
         studio.classList.toggle('is-video', cutMediaKind === 'video');
     }
-    const video = document.getElementById('cutPreview');
-    const image = document.getElementById('cutImagePreview');
-    if (video) {
-        video.hidden = cutMediaKind !== 'video';
-        if (cutMediaKind !== 'video') {
-            video.removeAttribute('src');
-            video.load?.();
-        }
-    }
-    if (image) {
-        image.hidden = cutMediaKind !== 'image';
-        if (cutMediaKind !== 'image') image.removeAttribute('src');
-    }
+    setCutMediaVisibility();
     document.querySelectorAll('#capcutDock .capcut-dock-btn').forEach((btn) => {
         const videoOnly = btn.dataset.videoOnly === '1';
         btn.disabled = cutMediaKind === 'image' && videoOnly;
@@ -117,12 +128,24 @@ function syncCutModeUI() {
 }
 
 function applyCutVisuals() {
-    const el = getCutPreviewEl();
-    if (!el) return;
+    const targets = [
+        document.getElementById('cutPreview'),
+        document.getElementById('cutImagePreview'),
+    ].filter(Boolean);
     const base = CUT_FILTER_MAP[cutState.filter] || '';
     const adj = `brightness(${cutState.bright}) contrast(${cutState.contrast}) saturate(${cutState.saturate})`;
-    el.style.filter = `${base} ${adj}`.trim();
-    el.className = 'capcut-filter-preview' + (cutState.filter !== 'none' ? ` filter-${cutState.filter}` : '');
+    const filterCss = `${base} ${adj}`.trim();
+    targets.forEach((el) => {
+        el.style.filter = filterCss;
+        el.classList.add('capcut-filter-preview');
+        el.classList.toggle('filter-gold', cutState.filter === 'gold');
+        el.classList.toggle('filter-neon', cutState.filter === 'neon');
+        el.classList.toggle('filter-heat', cutState.filter === 'heat');
+        el.classList.toggle('filter-ice', cutState.filter === 'ice');
+        el.classList.toggle('filter-cinema', cutState.filter === 'cinema');
+        el.classList.toggle('filter-retro', cutState.filter === 'retro');
+        el.classList.toggle('filter-glow', cutState.filter === 'glow');
+    });
 }
 
 function applyCutCaption() {
@@ -237,46 +260,83 @@ function handleCutImport(e) {
     cutObjectUrl = URL.createObjectURL(file);
     cutMediaKind = asImage ? 'image' : 'video';
     cutDuration = 0;
-    syncCutModeUI();
 
     document.getElementById('cutMediaName').textContent = `${file.name} · ${cutMediaKind}`;
     const project = document.getElementById('cutProjectName');
     if (project && !project.value.trim()) {
         project.value = file.name.replace(/\.[^.]+$/, '');
     }
-    if (hint) hint.classList.add('hidden');
+    if (hint) {
+        hint.classList.add('hidden');
+        hint.style.display = 'none';
+    }
 
     if (cutMediaKind === 'image') {
         const image = document.getElementById('cutImagePreview');
-        image.src = cutObjectUrl;
-        image.onload = () => {
-            const label = document.getElementById('cutTimeLabel');
-            if (label) label.textContent = 'IMAGE';
-            const head = document.getElementById('cutPlayhead');
-            if (head) head.style.left = '0%';
-            updateCutTrimUI();
-        };
+        const video = document.getElementById('cutPreview');
+        if (video) {
+            video.pause?.();
+            video.removeAttribute('src');
+            video.style.display = 'none';
+            video.classList.remove('is-shown');
+            video.setAttribute('hidden', '');
+        }
+        if (image) {
+            image.onload = () => {
+                const label = document.getElementById('cutTimeLabel');
+                if (label) label.textContent = 'IMAGE';
+                const head = document.getElementById('cutPlayhead');
+                if (head) head.style.left = '0%';
+                updateCutTrimUI();
+                applyCutVisuals();
+            };
+            image.onerror = () => {
+                setCutStatus('Could not load this image. Try JPG or PNG.');
+                notify('Could not load this image. Try JPG or PNG.', true);
+            };
+            // Set visibility before src so the frame paints as soon as bytes arrive
+            image.removeAttribute('hidden');
+            image.classList.add('is-shown', 'capcut-filter-preview');
+            image.style.display = 'block';
+            image.style.visibility = 'visible';
+            image.style.opacity = '1';
+            image.src = cutObjectUrl;
+        }
+        syncCutModeUI();
         setCutStatus(typeof tx === 'function' ? tx('cut.readyImage') : 'Image imported — edit with MAGNOMCUT tools.');
     } else {
         const video = document.getElementById('cutPreview');
-        video.src = cutObjectUrl;
-        video.load();
-        video.onloadedmetadata = () => {
-            cutDuration = video.duration || 0;
-            cutState.trimStart = 0;
-            cutState.trimEnd = cutDuration;
-            const start = document.getElementById('cutTrimStart');
-            const end = document.getElementById('cutTrimEnd');
-            if (start) {
-                start.max = String(cutDuration);
-                start.value = '0';
-            }
-            if (end) {
-                end.max = String(cutDuration);
-                end.value = String(cutDuration);
-            }
-            updateCutTrimUI();
-        };
+        const image = document.getElementById('cutImagePreview');
+        if (image) {
+            image.removeAttribute('src');
+            image.style.display = 'none';
+            image.classList.remove('is-shown');
+            image.setAttribute('hidden', '');
+        }
+        if (video) {
+            video.removeAttribute('hidden');
+            video.classList.add('is-shown', 'capcut-filter-preview');
+            video.style.display = 'block';
+            video.src = cutObjectUrl;
+            video.load();
+            video.onloadedmetadata = () => {
+                cutDuration = video.duration || 0;
+                cutState.trimStart = 0;
+                cutState.trimEnd = cutDuration;
+                const start = document.getElementById('cutTrimStart');
+                const end = document.getElementById('cutTrimEnd');
+                if (start) {
+                    start.max = String(cutDuration);
+                    start.value = '0';
+                }
+                if (end) {
+                    end.max = String(cutDuration);
+                    end.value = String(cutDuration);
+                }
+                updateCutTrimUI();
+            };
+        }
+        syncCutModeUI();
         cutRaf = requestAnimationFrame(syncCutTransport);
         setCutStatus(typeof tx === 'function' ? tx('cut.ready') : 'Video imported — use the MAGNOMCUT tool dock.');
     }
