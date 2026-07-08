@@ -90,13 +90,31 @@ function populateMagnomCutLibrary() {
             `<button type="button" class="capcut-chip" onclick="setCutCaptionPreset('${p.replace(/'/g, "\\'")}')">${p}</button>`
         ).join('');
     }
+    const templateHost = document.getElementById('cutTemplateGrid');
+    if (templateHost) {
+        const cats = [...new Set((window.CUT_TEMPLATE_CATALOG || []).map((t) => t.cat))];
+        templateHost.innerHTML = (window.CUT_TEMPLATE_CATALOG || []).map((t) => `
+            <button type="button" class="capcut-template-card" data-template="${t.id}" data-cat="${t.cat}" onclick="applyMagnomCutTemplate('${t.id}')">
+                <span class="capcut-template-emoji">${t.emoji || '🎬'}</span>
+                <span class="capcut-template-name">${t.name}</span>
+                <span class="capcut-template-cat">${t.cat}</span>
+            </button>
+        `).join('');
+        const filterHost = document.getElementById('cutTemplateFilters');
+        if (filterHost) {
+            filterHost.innerHTML = ['All', ...cats].map((c) =>
+                `<button type="button" class="capcut-chip${c === 'All' ? ' active' : ''}" data-template-cat="${c}" onclick="filterMagnomCutTemplates('${c}')">${c}</button>`
+            ).join('');
+        }
+    }
     const counts = document.getElementById('cutLibraryCounts');
     if (counts) {
         const m = (window.CUT_MUSIC_CATALOG || []).length - 1;
         const e = (window.CUT_EFFECT_CATALOG || []).length - 1;
         const f = (window.CUT_FILTER_CATALOG || []).length - 1;
         const s = (window.CUT_STICKER_CATALOG || []).length - 1;
-        counts.textContent = `${m}+ sounds · ${e}+ effects · ${f}+ filters · ${s}+ stickers`;
+        const tpl = (window.CUT_TEMPLATE_CATALOG || []).length;
+        counts.textContent = `${tpl} templates · ${m}+ sounds · ${e}+ effects · ${f}+ filters · ${s}+ stickers`;
     }
 }
 
@@ -311,6 +329,7 @@ function openCapcutPanel(name) {
     const title = document.getElementById('capcutSideTitle');
     const labels = {
         media: 'Media',
+        templates: 'Templates',
         audio: 'Audio',
         text: 'Text',
         stickers: 'Stickers',
@@ -452,6 +471,71 @@ function setCutCaptionPreset(text) {
     if (input) input.value = text;
     applyCutCaption();
     pushCutHistory();
+}
+
+function filterMagnomCutTemplates(cat) {
+    document.querySelectorAll('#cutTemplateFilters .capcut-chip').forEach((c) => {
+        c.classList.toggle('active', c.dataset.templateCat === cat);
+    });
+    document.querySelectorAll('#cutTemplateGrid .capcut-template-card').forEach((card) => {
+        const show = cat === 'All' || card.dataset.cat === cat;
+        card.style.display = show ? '' : 'none';
+    });
+}
+
+function applyMagnomCutTemplate(id) {
+    const tpl = (window.CUT_TEMPLATE_CATALOG || []).find((t) => t.id === id);
+    if (!tpl) {
+        notify('Template not found', true);
+        return;
+    }
+    if (!cutImportedFile) {
+        notify(cutNeedMediaMsg(), true);
+        openCapcutPanel('media');
+        return;
+    }
+
+    cutState.filter = tpl.filter || 'none';
+    cutState.effect = tpl.effect || 'none';
+    cutState.music = tpl.music || 'none';
+    cutState.textStyle = tpl.textStyle || 'gold';
+    cutState.sticker = tpl.sticker || '';
+    cutState.bright = tpl.bright ?? 1;
+    cutState.contrast = tpl.contrast ?? 1;
+    cutState.saturate = tpl.saturate ?? 1;
+    cutState.ratio = tpl.ratio || cutState.ratio || '9x16';
+    cutState.fit = tpl.fit || cutState.fit || 'contain';
+    cutState.photoDuration = tpl.photoDuration || cutState.photoDuration || 8;
+    cutState.captionX = 50;
+    cutState.captionY = 82;
+    cutState.stickerX = 82;
+    cutState.stickerY = 16;
+
+    const caption = document.getElementById('cutCaption');
+    if (caption) caption.value = tpl.caption || '';
+    cutState.captionText = tpl.caption || '';
+
+    const project = document.getElementById('cutProjectName');
+    if (project && !project.value.trim()) project.value = tpl.name;
+
+    syncControlsFromState();
+    applyAllCutVisuals();
+    document.querySelectorAll('#cutTemplateGrid .capcut-template-card').forEach((c) => {
+        c.classList.toggle('active', c.dataset.template === id);
+    });
+    pushCutHistory();
+    setCutStatus(`Template applied: ${tpl.name}`);
+    notify(`Template: ${tpl.name}`);
+
+    if (tpl.effect && tpl.effect !== 'none') {
+        setTimeout(() => previewCutEffect(), 40);
+    }
+    if (tpl.music && tpl.music !== 'none') {
+        startCutMusic();
+    } else {
+        stopCutMusic();
+    }
+    openCapcutPanel('templates');
 }
 
 function updateTimelineLabels() {
@@ -1535,6 +1619,8 @@ window.exportMagnomCutProject = exportMagnomCutProject;
 window.toggleCutPlayback = toggleCutPlayback;
 window.toggleCutMusicPreview = toggleCutMusicPreview;
 window.setCutCaptionPreset = setCutCaptionPreset;
+window.applyMagnomCutTemplate = applyMagnomCutTemplate;
+window.filterMagnomCutTemplates = filterMagnomCutTemplates;
 window.setCutSpeed = setCutSpeed;
 window.previewCutEffect = previewCutEffect;
 window.applyCutTrimToPlayhead = applyCutTrimToPlayhead;

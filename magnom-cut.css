@@ -360,11 +360,60 @@
 .capcut-text-overlay.s-boxed { background: #fff; }
 .capcut-text-overlay.s-banner { background: #F0B429; border-radius: 999px; }
 
-.capcut-chip-scroll {
-    max-height: 220px;
+.capcut-template-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    max-height: 420px;
     overflow-y: auto;
-    padding-right: 4px;
-    scrollbar-width: thin;
+    margin-top: 10px;
+    padding-right: 2px;
+}
+
+.capcut-template-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    border: 1px solid var(--cc-line);
+    background: linear-gradient(160deg, #1A1B22, #12131A);
+    color: var(--cc-text);
+    border-radius: 14px;
+    padding: 10px;
+    cursor: pointer;
+    text-align: left;
+    transition: 0.18s ease;
+    min-height: 92px;
+}
+
+.capcut-template-card:hover {
+    border-color: rgba(254, 44, 85, 0.45);
+    transform: translateY(-1px);
+}
+
+.capcut-template-card.active {
+    border-color: var(--cc-pink);
+    box-shadow: 0 0 0 1px rgba(254, 44, 85, 0.35), 0 10px 24px rgba(0,0,0,0.35);
+}
+
+.capcut-template-emoji {
+    font-size: 1.35rem;
+    line-height: 1;
+}
+
+.capcut-template-name {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 0.82em;
+    letter-spacing: 0.02em;
+}
+
+.capcut-template-cat {
+    color: var(--cc-muted);
+    font-size: 0.68em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
 }
 
 .capcut-chip-scroll::-webkit-scrollbar { width: 6px; }
