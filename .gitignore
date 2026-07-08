@@ -1,5 +1,6 @@
 node_modules/
-data/
+data/*
+!data/seed_roster.json
 .env
 bin/cloudflared
 __pycache__/

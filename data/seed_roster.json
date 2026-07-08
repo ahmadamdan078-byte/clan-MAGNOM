@@ -1,0 +1,43 @@
+{
+  "members": [
+    {
+      "username": "MAGBASIL",
+      "passwordHash": "079429eea8421de25b82b00802a33d587128d9643fc7ea124f0b8b2fb005d4e2",
+      "salt": "b37a873436cd0d3f5420214876e45ca7",
+      "level": 250,
+      "rank": "Champion II",
+      "clanRole": "pro player"
+    },
+    {
+      "username": "MAG Natus-98",
+      "passwordHash": "160a8916d9c51c7b6be664abbb4a7a5bd921763471af461c6c9df10b3e2eb409",
+      "salt": "343db35b7f2f8fc79eceb568b35d6a8e",
+      "level": 61,
+      "rank": "Champion II",
+      "clanRole": "pro player"
+    },
+    {
+      "username": "عبد المجيد",
+      "passwordHash": "eddb8598e3974de54a5ffbe244aef21096767020f95e9a483e7be3b28b15eb3a",
+      "salt": "ae16c671fe76e96e6f1fb414a6983ea8",
+      "level": 1150,
+      "rank": "Platinum II",
+      "clanRole": "pro player"
+    },
+    {
+      "username": "MAGAKRAM99",
+      "passwordHash": "c1ffadc85dd99cda5f7af90f1d7d5bdb7beda6ec607f0da5e8caeb6d2db09950",
+      "salt": "636f7abd3245498640f4077782212f2b",
+      "level": 900,
+      "rank": "Champion I",
+      "clanRole": "pro player"
+    }
+  ],
+  "admins": [
+    {
+      "username": "MAG ASAD",
+      "passwordHash": "ae882de0b9ade98c6ae0709f200bd8cf5c9eb4fac7085b72eff399d6cd9a4569",
+      "salt": "a240104c0073ea8336641e7c8ab23886"
+    }
+  ]
+}

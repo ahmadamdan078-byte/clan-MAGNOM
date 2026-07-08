@@ -547,6 +547,94 @@ def seed_bootstrap_admin() -> bool:
     return True
 
 
+def _seed_roster_path() -> Path:
+    env = os.environ.get('SEED_ROSTER_PATH', '').strip()
+    if env:
+        return Path(env)
+    return Path(__file__).resolve().parent / 'data' / 'seed_roster.json'
+
+
+def upsert_user_with_hash(
+    username: str,
+    password_hash: str,
+    salt: str,
+    role: str = 'member',
+    status: str = 'approved',
+):
+    """Create or refresh a user using an existing password hash (for deploy seeding)."""
+    existing = find_user_by_username(username)
+    with get_connection() as conn:
+        if existing:
+            conn.execute(
+                '''UPDATE users
+                   SET password_hash = ?, salt = ?, role = ?, status = ?
+                   WHERE id = ?''',
+                (password_hash, salt, role, status, existing['id']),
+            )
+            conn.commit()
+            return find_user_by_id(existing['id'])
+        cursor = conn.execute(
+            'INSERT INTO users (username, password_hash, salt, role, status) VALUES (?, ?, ?, ?, ?)',
+            (username, password_hash, salt, role, status),
+        )
+        conn.commit()
+        return find_user_by_id(cursor.lastrowid)
+
+
+def seed_clan_roster_from_file(force: bool = False) -> dict:
+    """
+    Seed clan roster + member accounts from data/seed_roster.json.
+    On Render free tier the DB resets often — this re-applies the known roster
+    whenever clan_members is empty (or force=True).
+    """
+    path = _seed_roster_path()
+    if not path.is_file():
+        return {'ok': False, 'reason': 'missing-seed-file', 'added': 0}
+
+    with get_connection() as conn:
+        member_count = conn.execute('SELECT COUNT(*) as c FROM clan_members').fetchone()['c']
+    if member_count > 0 and not force:
+        return {'ok': True, 'reason': 'already-populated', 'added': 0, 'existing': member_count}
+
+    try:
+        payload = json.loads(path.read_text(encoding='utf-8'))
+    except (OSError, json.JSONDecodeError) as exc:
+        return {'ok': False, 'reason': f'invalid-seed-file: {exc}', 'added': 0}
+
+    added = 0
+    for admin in payload.get('admins') or []:
+        username = (admin.get('username') or '').strip()
+        password_hash = (admin.get('passwordHash') or '').strip()
+        salt = (admin.get('salt') or '').strip()
+        if not username or not password_hash or not salt:
+            continue
+        upsert_user_with_hash(username, password_hash, salt, 'admin', 'approved')
+
+    for item in payload.get('members') or []:
+        username = (item.get('username') or '').strip()
+        password_hash = (item.get('passwordHash') or '').strip()
+        salt = (item.get('salt') or '').strip()
+        if not username or not password_hash or not salt:
+            continue
+        level = int(item.get('level') or 1)
+        rank = (item.get('rank') or 'Bronze I').strip()
+        clan_role = (item.get('clanRole') or 'pro player').strip()
+        if clan_role not in ('pro player', 'coach', 'leader'):
+            clan_role = 'pro player'
+
+        user = upsert_user_with_hash(username, password_hash, salt, 'member', 'approved')
+        if not user:
+            continue
+        if find_clan_member_by_user_id(user['id']):
+            continue
+        create_clan_member(user['id'], user['username'], level, rank, clan_role)
+        added += 1
+
+    with get_connection() as conn:
+        total = conn.execute('SELECT COUNT(*) as c FROM clan_members').fetchone()['c']
+    return {'ok': True, 'reason': 'seeded', 'added': added, 'total': total}
+
+
 def get_public_stats():
     with get_connection() as conn:
         members = conn.execute('SELECT COUNT(*) as c FROM clan_members').fetchone()['c']

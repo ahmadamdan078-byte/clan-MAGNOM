@@ -42,6 +42,7 @@ from database import (
     delete_remember_token,
     get_public_stats,
     seed_bootstrap_admin,
+    seed_clan_roster_from_file,
     list_announcements,
     create_announcement,
     delete_announcement,
@@ -656,6 +657,25 @@ def clear_clan_members_route():
     _activity('member', 'Roster cleared', 'All clan members removed', request.current_user['username'],
               request.current_user['id'])
     return jsonify({'message': 'All clan members cleared'})
+
+
+@app.route('/api/clan/seed-roster', methods=['POST'])
+@admin_required
+def seed_clan_roster_route():
+    """Admin: re-apply roster from data/seed_roster.json onto this server DB."""
+    data = request.get_json(silent=True) or {}
+    force = bool(data.get('force'))
+    result = seed_clan_roster_from_file(force=force)
+    if not result.get('ok'):
+        return jsonify({'error': result.get('reason') or 'Seed failed', **result}), 400
+    _activity(
+        'member',
+        'Roster seeded',
+        f"Added {result.get('added', 0)} · total {result.get('total', result.get('existing', 0))}",
+        request.current_user['username'],
+        request.current_user['id'],
+    )
+    return jsonify(result)
 
 
 def public_chat_message(row):
@@ -1426,6 +1446,9 @@ def index():
 
 init_db()
 seed_bootstrap_admin()
+_seed_result = seed_clan_roster_from_file(force=False)
+if _seed_result.get('added'):
+    print(f"Seeded clan roster: +{_seed_result['added']} (total {_seed_result.get('total')})")
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 3000))
