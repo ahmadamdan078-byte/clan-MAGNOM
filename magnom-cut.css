@@ -884,6 +884,17 @@
     cursor: pointer;
 }
 
+.capcut-sticker-grid button.active {
+    outline: 2px solid var(--cc-accent);
+    outline-offset: 2px;
+    background: rgba(240, 180, 41, 0.18);
+}
+
+#cutExportProgress.warn {
+    color: #f97316;
+    font-weight: 700;
+}
+
 .capcut-val {
     color: var(--cc-gold);
     font-size: 0.78em;

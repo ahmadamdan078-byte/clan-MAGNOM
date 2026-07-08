@@ -384,6 +384,7 @@ window.CUT_TEMPLATE_TABS = [
     { id: 'beatsync', name: 'Beat Sync' },
     { id: 'aesthetic', name: 'Aesthetic' },
     { id: 'gaming', name: 'Gaming' },
+    { id: 'magnom', name: 'MAGNOM' },
     { id: 'all', name: 'All' },
 ];
 

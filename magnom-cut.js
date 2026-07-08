@@ -14,6 +14,8 @@ let cutMusicNodes = null;
 let cutMusicTimer = null;
 let cutDragTarget = null;
 let cutDragOffset = { x: 0, y: 0 };
+let cutVideoAudioNodes = null;
+let cutPhotoPreviewTimer = null;
 
 const CUT_FILTER_MAP = window.CUT_FILTER_MAP || { none: '' };
 
@@ -144,6 +146,7 @@ function getFilteredMagnomTemplates() {
         beatsync: 'Beat Sync',
         aesthetic: 'Aesthetic',
         gaming: 'Gaming',
+        magnom: 'MAGNOM',
     };
     return (window.CUT_TEMPLATE_CATALOG || []).filter((t) => {
         if (cutTemplateTab === 'trending' && !t.trending) return false;
@@ -175,6 +178,7 @@ function renderMagnomCutTemplates() {
             { id: 'beatsync', name: 'Beat Sync' },
             { id: 'aesthetic', name: 'Aesthetic' },
             { id: 'gaming', name: 'Gaming' },
+            { id: 'magnom', name: 'MAGNOM' },
             { id: 'all', name: 'All' },
         ]).map((tab) =>
             `<button type="button" class="capcut-template-tab${tab.id === cutTemplateTab ? ' active' : ''}" data-tab="${tab.id}" onclick="setMagnomTemplateTab('${tab.id}')">${tab.name}</button>`
@@ -233,11 +237,179 @@ function setCutStatus(msg) {
     if (el) el.textContent = msg;
 }
 
-function formatCutTime(sec) {
-    if (!Number.isFinite(sec) || sec < 0) sec = 0;
-    const m = Math.floor(sec / 60);
-    const s = Math.floor(sec % 60);
-    return `${m}:${String(s).padStart(2, '0')}`;
+function getCutFilterCss() {
+    const base = CUT_FILTER_MAP[cutState.filter] || '';
+    const adj = `brightness(${cutState.bright}) contrast(${cutState.contrast}) saturate(${cutState.saturate})`;
+    return `${base} ${adj}`.trim();
+}
+
+function resetCutVideoAudio() {
+    if (cutVideoAudioNodes) {
+        try { cutVideoAudioNodes.source.disconnect(); } catch (_) {}
+        try { cutVideoAudioNodes.previewGain.disconnect(); } catch (_) {}
+        cutVideoAudioNodes = null;
+    }
+    cutAudioBound = false;
+}
+
+function ensureVideoPreviewAudio(video) {
+    const ctx = ensureCutAudio();
+    if (!ctx || !video) return null;
+    if (!cutVideoAudioNodes) {
+        const source = ctx.createMediaElementSource(video);
+        const previewGain = ctx.createGain();
+        previewGain.gain.value = cutState.videoVol;
+        source.connect(previewGain);
+        previewGain.connect(ctx.destination);
+        cutVideoAudioNodes = { source, previewGain };
+        cutAudioBound = true;
+    }
+    cutVideoAudioNodes.previewGain.gain.value = cutState.videoVol;
+    return cutVideoAudioNodes;
+}
+
+function mixAudioForExport(canvasStream, video) {
+    const tracks = [...canvasStream.getVideoTracks()];
+    const ctx = ensureCutAudio();
+    if (!ctx) return { stream: new MediaStream(tracks), cleanup: () => {} };
+
+    const dest = ctx.createMediaStreamDestination();
+    const cleanupNodes = [];
+
+    const nodes = video ? ensureVideoPreviewAudio(video) : null;
+    if (nodes && cutState.videoVol > 0) {
+        const exportGain = ctx.createGain();
+        exportGain.gain.value = cutState.videoVol;
+        nodes.source.connect(exportGain);
+        exportGain.connect(dest);
+        cleanupNodes.push(exportGain);
+    }
+    if (cutState.music !== 'none') {
+        startCutMusic(dest);
+    }
+
+    dest.stream.getAudioTracks().forEach((t) => tracks.push(t));
+    return {
+        stream: new MediaStream(tracks),
+        cleanup: () => {
+            cleanupNodes.forEach((n) => { try { n.disconnect(); } catch (_) {} });
+            stopCutMusic();
+        },
+    };
+}
+
+function getExportMotion(progress, effectId) {
+    const fx = cutEffectById(effectId);
+    const t = Math.min(1, Math.max(0, progress));
+    if (!fx || fx.kind === 'none') return { scale: 1, dx: 0, dy: 0 };
+
+    if (fx.kind === 'kenburns' || fx.kind === 'rise' || fx.kind === 'pushIn' || fx.kind === 'drift') {
+        return { scale: 1 + t * 0.08, dx: 0, dy: -t * 0.02 };
+    }
+    if (fx.kind === 'float') {
+        return { scale: 1, dx: 0, dy: Math.sin(t * Math.PI * 4) * 0.02 };
+    }
+    if (fx.kind === 'heartbeat' || fx.kind === 'pop') {
+        const beat = Math.sin(t * Math.PI * 10);
+        return { scale: 1 + beat * 0.035, dx: 0, dy: 0 };
+    }
+    if (fx.kind === 'zoom' || fx.kind === 'impact' || fx.kind === 'snap' || fx.kind === 'hypeCut') {
+        const s = (fx.scale || 1.12) - 1;
+        const pulse = Math.max(0, Math.sin(t * Math.PI * 6) * 0.5 + 0.5);
+        return { scale: 1 + s * pulse * 0.45, dx: 0, dy: 0 };
+    }
+    if (fx.kind === 'shake' || fx.kind === 'demoFx' || fx.kind === 'arenaBoom') {
+        const a = (fx.amp || 8) / 280;
+        return { scale: 1, dx: Math.sin(t * 80) * a, dy: Math.cos(t * 64) * a };
+    }
+    if (fx.kind === 'wobble' || fx.kind === 'swing' || fx.kind === 'elastic') {
+        return { scale: 1, dx: Math.sin(t * Math.PI * 8) * 0.015, dy: 0 };
+    }
+    if (fx.kind === 'spin' || fx.kind === 'rewindFeel') {
+        return { scale: 1 + Math.sin(t * Math.PI * 2) * 0.03, dx: 0, dy: 0 };
+    }
+    return { scale: 1, dx: 0, dy: 0 };
+}
+
+function drawMagnomBrandMark(ctx, w, h) {
+    const user = typeof currentUser !== 'undefined' ? currentUser : null;
+    const rank = user?.rank ? String(user.rank) : '';
+    const line1 = 'MAGNOMEDITS';
+    const line2 = rank ? `${rank} · MAGNOM` : 'MAGNOM CLAN';
+    const pad = Math.round(w * 0.028);
+    ctx.save();
+    ctx.font = `700 ${Math.max(10, Math.round(w * 0.022))}px Oxanium, sans-serif`;
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'bottom';
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    const tw = Math.max(ctx.measureText(line1).width, ctx.measureText(line2).width) + 16;
+    const th = Math.round(w * 0.055);
+    const bx = w - pad;
+    const by = h - pad;
+    if (ctx.roundRect) {
+        ctx.beginPath();
+        ctx.roundRect(bx - tw, by - th, tw, th, 6);
+        ctx.fill();
+    } else {
+        ctx.fillRect(bx - tw, by - th, tw, th);
+    }
+    ctx.fillStyle = 'rgba(240,180,41,0.95)';
+    ctx.fillText(line1, bx - 8, by - 8);
+    ctx.font = `600 ${Math.max(9, Math.round(w * 0.018))}px Oxanium, sans-serif`;
+    ctx.fillStyle = 'rgba(255,255,255,0.88)';
+    ctx.fillText(line2, bx - 8, by - th + 14);
+    ctx.restore();
+}
+
+function applySmartImportHints(fileName) {
+    const n = String(fileName || '').toLowerCase();
+    if (!/rocket|rl|goal|save|rank|ssl|tournament|replay|magnom|clutch|flip|demo|musty|aerial|kickoff/.test(n)) return;
+    cutState.ratio = '9x16';
+    cutState.fit = 'cover';
+    setCutStatus(typeof tx === 'function' ? tx('cut.smartImport') : 'RL clip detected — 9:16 layout applied.');
+}
+
+function updatePlayButtonState() {
+    const btn = document.getElementById('cutPlayBtn');
+    if (!btn) return;
+    if (cutMediaKind === 'image') {
+        const playing = !!cutMusicNodes || !!cutPhotoPreviewTimer;
+        btn.textContent = typeof tx === 'function'
+            ? (playing ? tx('cut.pause') : tx('cut.play'))
+            : (playing ? 'Pause' : 'Play');
+        return;
+    }
+    const video = document.getElementById('cutPreview');
+    const playing = video && !video.paused && !video.ended;
+    btn.textContent = typeof tx === 'function'
+        ? (playing ? tx('cut.pause') : tx('cut.play'))
+        : (playing ? 'Pause' : 'Play');
+}
+
+function syncStickerChips() {
+    document.querySelectorAll('#cutStickers [data-sticker]').forEach((c) => {
+        c.classList.toggle('active', c.dataset.sticker === (cutState.sticker || ''));
+    });
+}
+
+function initCutKeyboardShortcuts() {
+    document.addEventListener('keydown', (e) => {
+        const studio = document.getElementById('magnomCutStudio');
+        if (!studio || !document.getElementById('sectionClips')?.classList.contains('active')) return;
+        const tag = (e.target?.tagName || '').toLowerCase();
+        if (tag === 'input' || tag === 'textarea' || e.target?.isContentEditable) return;
+
+        if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+            e.preventDefault();
+            cutUndo();
+        } else if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+            e.preventDefault();
+            cutRedo();
+        } else if (e.code === 'Space' && cutMediaKind) {
+            e.preventDefault();
+            toggleCutPlayback();
+        }
+    });
 }
 
 function getCutPreviewEl() {
@@ -329,6 +501,7 @@ function syncControlsFromState() {
     document.querySelectorAll('#cutFitModes .capcut-chip').forEach((c) => {
         c.classList.toggle('active', c.dataset.fit === cutState.fit);
     });
+    syncStickerChips();
     applyCutAdjustLabels();
     applyCutSpeed();
     applyCutVolumes();
@@ -454,9 +627,7 @@ function applyCutVisuals() {
         document.getElementById('cutPreview'),
         document.getElementById('cutImagePreview'),
     ].filter(Boolean);
-    const base = CUT_FILTER_MAP[cutState.filter] || '';
-    const adj = `brightness(${cutState.bright}) contrast(${cutState.contrast}) saturate(${cutState.saturate})`;
-    const filterCss = `${base} ${adj}`.trim();
+    const filterCss = getCutFilterCss();
     targets.forEach((el) => {
         el.style.filter = filterCss;
         el.classList.add('capcut-filter-preview');
@@ -727,15 +898,20 @@ function handleCutImport(e) {
 
     if (cutObjectUrl) URL.revokeObjectURL(cutObjectUrl);
     stopCutMusic();
+    if (cutPhotoPreviewTimer) {
+        clearInterval(cutPhotoPreviewTimer);
+        cutPhotoPreviewTimer = null;
+    }
     cancelAnimationFrame(cutRaf);
+    resetCutVideoAudio();
     cutImportedFile = file;
     cutObjectUrl = URL.createObjectURL(file);
     cutMediaKind = asImage ? 'image' : 'video';
     cutDuration = 0;
-    cutAudioBound = false;
     cutState = CUT_DEFAULT_STATE();
     cutHistory = [];
     cutHistoryIndex = -1;
+    applySmartImportHints(file.name);
 
     const nameEl = document.getElementById('cutMediaName');
     if (nameEl) nameEl.textContent = `${file.name} · ${cutMediaKind}`;
@@ -809,6 +985,7 @@ function handleCutImport(e) {
     applyAllCutVisuals();
     openCapcutPanel('media');
     pushCutHistory();
+    updatePlayButtonState();
 }
 
 function toggleCutMusicPreview() {
@@ -824,10 +1001,12 @@ function toggleCutMusicPreview() {
     if (cutMusicNodes) {
         stopCutMusic();
         setCutStatus(typeof tx === 'function' ? tx('cut.musicStopped') : 'Music stopped');
+        updatePlayButtonState();
         return;
     }
     startCutMusic();
     setCutStatus(typeof tx === 'function' ? tx('cut.musicPlaying') : 'Playing music preview…');
+    updatePlayButtonState();
 }
 
 function toggleCutPlayback() {
@@ -835,14 +1014,36 @@ function toggleCutPlayback() {
         notify(cutNeedMediaMsg(), true);
         return;
     }
-    // Photos: Play toggles music preview (CapCut photo+sound style)
     if (cutMediaKind === 'image') {
-        if (cutState.music === 'none') {
-            openCapcutPanel('audio');
-            notify(typeof tx === 'function' ? tx('cut.pickMusic') : 'Pick a music bed for this photo', true);
+        if (cutPhotoPreviewTimer || cutMusicNodes) {
+            if (cutPhotoPreviewTimer) {
+                clearInterval(cutPhotoPreviewTimer);
+                cutPhotoPreviewTimer = null;
+            }
+            stopCutMusic();
+            applyCutMediaTransform();
+            updatePlayButtonState();
             return;
         }
-        toggleCutMusicPreview();
+        if (cutState.music !== 'none') {
+            startCutMusic();
+            setCutStatus(typeof tx === 'function' ? tx('cut.musicPlaying') : 'Playing music preview…');
+            updatePlayButtonState();
+            return;
+        }
+        const inner = document.getElementById('cutPreviewInner');
+        const image = document.getElementById('cutImagePreview');
+        if (!inner || !image) return;
+        let step = 0;
+        cutPhotoPreviewTimer = setInterval(() => {
+            step += 1;
+            const t = (step % 120) / 120;
+            const motion = getExportMotion(t, cutState.effect || 'kenburns');
+            const sx = cutState.flipX ? -1 : 1;
+            const rot = cutState.rotate || 0;
+            image.style.transform = `scaleX(${sx}) rotate(${rot}deg) scale(${motion.scale}) translate(${motion.dx * 100}%, ${motion.dy * 100}%)`;
+        }, 50);
+        updatePlayButtonState();
         return;
     }
     const video = document.getElementById('cutPreview');
@@ -854,12 +1055,14 @@ function toggleCutPlayback() {
         if (video.currentTime < cutState.trimStart || (cutState.trimEnd && video.currentTime >= cutState.trimEnd)) {
             video.currentTime = cutState.trimStart;
         }
+        ensureVideoPreviewAudio(video);
         video.play().catch(() => {});
         startCutMusic();
     } else {
         video.pause();
         stopCutMusic();
     }
+    updatePlayButtonState();
 }
 
 function ensureCutAudio() {
@@ -939,17 +1142,8 @@ async function exportCutImageWithMusic() {
     canvas.height = h;
     const ctx = canvas.getContext('2d');
     const stream = canvas.captureStream(30);
-    let mediaStream = stream;
-    try {
-        const audioCtx = ensureCutAudio();
-        if (audioCtx) {
-            const dest = audioCtx.createMediaStreamDestination();
-            startCutMusic(dest);
-            mediaStream = new MediaStream([...stream.getVideoTracks(), ...dest.stream.getAudioTracks()]);
-        }
-    } catch (_) {
-        mediaStream = stream;
-    }
+    const { stream: mediaStream, cleanup } = mixAudioForExport(stream, null);
+    const filterCss = getCutFilterCss();
 
     const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
         ? 'video/webm;codecs=vp9'
@@ -958,10 +1152,13 @@ async function exportCutImageWithMusic() {
     const chunks = [];
     recorder.ondataavailable = (ev) => { if (ev.data?.size) chunks.push(ev.data); };
 
+    const startMs = performance.now();
     let drawing = true;
     const draw = () => {
         if (!drawing) return;
-        drawCutMediaFrame(ctx, image, w, h, image.style.filter || 'none');
+        const progress = Math.min(1, (performance.now() - startMs) / (seconds * 1000));
+        const motion = getExportMotion(progress, cutState.effect);
+        drawCutMediaFrame(ctx, image, w, h, filterCss, motion);
         drawCutOverlays(ctx, w, h);
         requestAnimationFrame(draw);
     };
@@ -974,7 +1171,7 @@ async function exportCutImageWithMusic() {
     draw();
     await new Promise((r) => setTimeout(r, seconds * 1000));
     drawing = false;
-    stopCutMusic();
+    cleanup();
     if (recorder.state !== 'inactive') recorder.stop();
     const blob = await recorded;
     if (!blob.size) throw new Error('Empty export');
@@ -1320,15 +1517,18 @@ function drawCutOverlays(ctx, w, h) {
         ctx.shadowBlur = 0;
         ctx.fillText(cutState.sticker, sx, sy);
     }
+    drawMagnomBrandMark(ctx, w, h);
 }
 
-function drawCutMediaFrame(ctx, source, w, h, filterCss) {
+function drawCutMediaFrame(ctx, source, w, h, filterCss, motion) {
+    const m = motion || { scale: 1, dx: 0, dy: 0 };
     ctx.save();
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, w, h);
-    ctx.translate(w / 2, h / 2);
+    ctx.translate(w / 2 + w * m.dx, h / 2 + h * m.dy);
     if (cutState.flipX) ctx.scale(-1, 1);
     if (cutState.rotate) ctx.rotate((cutState.rotate * Math.PI) / 180);
+    if (m.scale !== 1) ctx.scale(m.scale, m.scale);
 
     const sw = source.videoWidth || source.naturalWidth || w;
     const sh = source.videoHeight || source.naturalHeight || h;
@@ -1368,7 +1568,8 @@ async function exportCutImage() {
     canvas.width = w;
     canvas.height = h;
     const ctx = canvas.getContext('2d');
-    drawCutMediaFrame(ctx, image, w, h, image.style.filter || 'none');
+    const filterCss = getCutFilterCss();
+    drawCutMediaFrame(ctx, image, w, h, filterCss);
     drawCutOverlays(ctx, w, h);
     const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
     if (!blob?.size) throw new Error('Empty image export');
@@ -1379,7 +1580,11 @@ async function exportCutVideo() {
     const video = document.getElementById('cutPreview');
     const start = cutState.trimStart || 0;
     const end = cutState.trimEnd > start ? cutState.trimEnd : cutDuration || video.duration || 0;
-    const exportSeconds = Math.min(45, Math.max(1, end - start));
+    const rawSeconds = Math.max(1, end - start);
+    const exportSeconds = Math.min(45, rawSeconds);
+    if (rawSeconds > 45) {
+        setCutStatus(typeof tx === 'function' ? tx('cut.trimCapped') : 'Export capped at 45s — adjust trim for shorter clips.');
+    }
 
     video.pause();
     stopCutMusic();
@@ -1396,26 +1601,8 @@ async function exportCutVideo() {
     canvas.height = h;
     const ctx = canvas.getContext('2d');
     const stream = canvas.captureStream(30);
-    let mediaStream = stream;
-
-    try {
-        const audioCtx = ensureCutAudio();
-        if (audioCtx && !cutAudioBound) {
-            const dest = audioCtx.createMediaStreamDestination();
-            const source = audioCtx.createMediaElementSource(video);
-            cutAudioBound = true;
-            const g = audioCtx.createGain();
-            g.gain.value = cutState.videoVol;
-            source.connect(g);
-            g.connect(dest);
-            g.connect(audioCtx.destination);
-            mediaStream = new MediaStream([...stream.getVideoTracks(), ...dest.stream.getAudioTracks()]);
-        } else {
-            mediaStream = stream;
-        }
-    } catch (_) {
-        mediaStream = stream;
-    }
+    const { stream: mediaStream, cleanup } = mixAudioForExport(stream, video);
+    const filterCss = getCutFilterCss();
 
     const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
         ? 'video/webm;codecs=vp9'
@@ -1424,10 +1611,13 @@ async function exportCutVideo() {
     const chunks = [];
     recorder.ondataavailable = (ev) => { if (ev.data?.size) chunks.push(ev.data); };
 
+    const exportStart = performance.now();
     let drawing = true;
     const draw = () => {
         if (!drawing || video.paused || video.ended || video.currentTime >= end) return;
-        drawCutMediaFrame(ctx, video, w, h, video.style.filter || 'none');
+        const progress = Math.min(1, (performance.now() - exportStart) / (exportSeconds * 1000));
+        const motion = getExportMotion(progress, cutState.effect);
+        drawCutMediaFrame(ctx, video, w, h, filterCss, motion);
         drawCutOverlays(ctx, w, h);
         requestAnimationFrame(draw);
     };
@@ -1437,12 +1627,14 @@ async function exportCutVideo() {
         recorder.onerror = () => reject(new Error('Recorder failed'));
     });
     recorder.start(100);
+    ensureVideoPreviewAudio(video);
     video.playbackRate = cutState.speed;
     await video.play();
     draw();
     await new Promise((r) => setTimeout(r, (exportSeconds * 1000) / Math.max(0.25, cutState.speed)));
     drawing = false;
     video.pause();
+    cleanup();
     if (recorder.state !== 'inactive') recorder.stop();
     const blob = await recorded;
     if (!blob.size) throw new Error('Empty export');
@@ -1468,13 +1660,17 @@ async function exportMagnomCutProject() {
     const safeName = projectName.replace(/\s+/g, '_');
 
     try {
-        if (progress) progress.textContent = cutMediaKind === 'image' ? 'Rendering image…' : 'Rendering video…';
+        if (progress) {
+            progress.textContent = cutMediaKind === 'image'
+                ? (typeof tx === 'function' ? tx('cut.renderImage') : 'Rendering image…')
+                : (typeof tx === 'function' ? tx('cut.renderVideo') : 'Rendering video…');
+        }
         setCutStatus(typeof tx === 'function' ? tx('cut.exporting') : 'Exporting MAGNOMEDITS project…');
 
         let outFile;
         if (cutMediaKind === 'image') {
             if (cutState.music !== 'none') {
-                if (progress) progress.textContent = 'Rendering photo + music…';
+                if (progress) progress.textContent = typeof tx === 'function' ? tx('cut.renderPhotoMusic') : 'Rendering photo + music…';
                 const blob = await exportCutImageWithMusic();
                 outFile = new File([blob], `${safeName}.webm`, { type: 'video/webm' });
             } else {
@@ -1487,13 +1683,19 @@ async function exportMagnomCutProject() {
         }
 
         fillClipFormFromExport(outFile, projectName);
-        if (progress) progress.textContent = typeof tx === 'function' ? tx('cut.exported') : 'Export ready — press Post Clip';
+        if (progress) {
+            progress.textContent = typeof tx === 'function' ? tx('cut.exported') : 'Export ready — press Post Clip';
+            progress.classList.remove('warn');
+        }
         setCutStatus(typeof tx === 'function' ? tx('cut.exported') : 'Ready to post');
         notify(typeof tx === 'function' ? tx('cut.exported') : 'Export ready');
         openCapcutPanel('export');
     } catch (err) {
         fillClipFormFromExport(cutImportedFile, projectName);
-        if (progress) progress.textContent = typeof tx === 'function' ? tx('cut.exportFallback') : 'Fallback export (original file)';
+        if (progress) {
+            progress.textContent = typeof tx === 'function' ? tx('cut.exportFallback') : 'Fallback export (original file)';
+            progress.classList.add('warn');
+        }
         setCutStatus(
             typeof tx === 'function'
                 ? tx('cut.exportFail')
@@ -1604,6 +1806,7 @@ function initMagnomCut() {
         const btn = e.target.closest('[data-sticker]');
         if (!btn) return;
         cutState.sticker = btn.dataset.sticker || '';
+        syncStickerChips();
         applyCutSticker();
         updateTimelineLabels();
         pushCutHistory();
@@ -1700,6 +1903,7 @@ function initMagnomCut() {
     showCutEmpty();
     applyAllCutVisuals();
     updateCutHistoryButtons();
+    initCutKeyboardShortcuts();
 }
 
 window.initMagnomCut = initMagnomCut;

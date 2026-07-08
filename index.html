@@ -16,10 +16,10 @@
     <meta property="og:image" content="photos/magnom-bg.jpeg">
     <meta property="og:type" content="website">
     <title>MAGNOM Clan — Elite Rocket League Community</title>
-    <link rel="stylesheet" href="site.css?v=20260708r">
-    <link rel="stylesheet" href="magnom-cut.css?v=20260708r">
-    <link rel="preload" href="site.css?v=20260708r" as="style">
-    <link rel="preload" href="i18n.js?v=20260708r" as="script">
+    <link rel="stylesheet" href="site.css?v=20260708s">
+    <link rel="stylesheet" href="magnom-cut.css?v=20260708s">
+    <link rel="preload" href="site.css?v=20260708s" as="style">
+    <link rel="preload" href="i18n.js?v=20260708s" as="script">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&family=Oxanium:wght@500;600;700;800&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -3244,8 +3244,8 @@
                             </div>
                         </div>
                         <div class="capcut-top-actions">
-                            <button type="button" class="capcut-btn icon-btn" id="cutUndoBtn" onclick="cutUndo()" title="Undo" disabled>↶</button>
-                            <button type="button" class="capcut-btn icon-btn" id="cutRedoBtn" onclick="cutRedo()" title="Redo" disabled>↷</button>
+                            <button type="button" class="capcut-btn icon-btn" id="cutUndoBtn" onclick="cutUndo()" data-i18n-title="cut.undo" title="Undo" disabled>↶</button>
+                            <button type="button" class="capcut-btn icon-btn" id="cutRedoBtn" onclick="cutRedo()" data-i18n-title="cut.redo" title="Redo" disabled>↷</button>
                             <label class="capcut-btn ghost" for="cutImport" data-i18n="cut.import">Import</label>
                             <input type="file" id="cutImport" accept="image/*,video/mp4,video/webm,video/quicktime,.jpg,.jpeg,.png,.gif,.webp,.mp4,.webm,.mov,.m4v" hidden>
                             <button type="button" class="capcut-btn" id="cutPlayBtn" onclick="toggleCutPlayback()" data-i18n="cut.play">Play</button>
@@ -3415,9 +3415,9 @@
                                 </div>
                                 <label data-i18n="cut.fit">Fit mode</label>
                                 <div class="capcut-chip-row" id="cutFitModes">
-                                    <button type="button" class="capcut-chip active" data-fit="contain" onclick="setCutFit('contain')">Fit</button>
-                                    <button type="button" class="capcut-chip" data-fit="cover" onclick="setCutFit('cover')">Fill</button>
-                                    <button type="button" class="capcut-chip" data-fit="fill" onclick="setCutFit('fill')">Stretch</button>
+                                    <button type="button" class="capcut-chip active" data-fit="contain">Fit</button>
+                                    <button type="button" class="capcut-chip" data-fit="cover">Fill</button>
+                                    <button type="button" class="capcut-chip" data-fit="fill">Stretch</button>
                                 </div>
                             </div>
 
@@ -3440,7 +3440,7 @@
                                 <label data-i18n="cut.trimEnd">End (sec)</label>
                                 <input type="range" id="cutTrimEnd" min="0" max="100" step="0.1" value="100">
                                 <div class="capcut-val"><span id="cutTrimEndVal">0.0s</span></div>
-                                <button type="button" class="capcut-btn" style="width:100%;margin-top:10px" onclick="applyCutTrimToPlayhead()" data-i18n="cut.jumpStart">Jump to start</button>
+                                <button type="button" class="capcut-btn" style="width:100%;margin-top:10px" onclick="applyCutTrimToPlayhead()" data-i18n="cut.jumpTrim">Jump to trim start</button>
                             </div>
 
                             <div class="capcut-panel" data-panel="export">
@@ -3711,14 +3711,14 @@
         </div>
     </div>
 
-    <script src="i18n.js?v=20260708r"></script>
+    <script src="i18n.js?v=20260708s"></script>
     <script src="notifications.js"></script>
     <script src="push.js"></script>
     <script src="support_queue.js"></script>
     <script src="support_call.js"></script>
-    <script src="magnom-cut-catalog.js?v=20260708r"></script>
-    <script src="magnom-cut.js?v=20260708r"></script>
-    <script src="site.js?v=20260708r"></script>
+    <script src="magnom-cut-catalog.js?v=20260708s"></script>
+    <script src="magnom-cut.js?v=20260708s"></script>
+    <script src="site.js?v=20260708s"></script>
     <script>
         const RL_TIERS = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Champion', 'Grand Champion'];
         const RL_DIVISIONS = ['I', 'II', 'III'];

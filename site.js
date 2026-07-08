@@ -752,6 +752,7 @@ function refreshLanguageContent() {
     if (typeof renderSupportQueueSection === 'function') renderSupportQueueSection();
     if (typeof updateSupportVoiceBar === 'function') updateSupportVoiceBar();
     if (typeof updatePushSettingsUI === 'function') updatePushSettingsUI();
+    if (typeof refreshMagnomCutLibrary === 'function') refreshMagnomCutLibrary();
 }
 
 document.addEventListener('languagechange', refreshLanguageContent);
