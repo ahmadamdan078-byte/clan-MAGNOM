@@ -16,10 +16,10 @@
     <meta property="og:image" content="photos/magnom-bg.jpeg">
     <meta property="og:type" content="website">
     <title>MAGNOM Clan — Elite Rocket League Community</title>
-    <link rel="stylesheet" href="site.css?v=20260708f">
-    <link rel="stylesheet" href="magnom-cut.css?v=20260708f">
-    <link rel="preload" href="site.css?v=20260708f" as="style">
-    <link rel="preload" href="i18n.js?v=20260708f" as="script">
+    <link rel="stylesheet" href="site.css?v=20260708g">
+    <link rel="stylesheet" href="magnom-cut.css?v=20260708g">
+    <link rel="preload" href="site.css?v=20260708g" as="style">
+    <link rel="preload" href="i18n.js?v=20260708g" as="script">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&family=Oxanium:wght@500;600;700;800&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -3232,7 +3232,7 @@
 
             <div class="site-section" data-section="clips" id="sectionClips">
                 <h2 class="section-title" data-i18n="section.clips">🎬 MAGNOMCUT</h2>
-                <p class="section-sub clips-intro" data-i18n="clips.intro">MAGNOMCUT — full editor for MAGNOM: timeline, text, stickers, effects, trim, then post to the clan.</p>
+                <p class="section-sub clips-intro" data-i18n="clips.intro">MAGNOMCUT — edit photos and videos for MAGNOM: filters, text, stickers, effects, then post to the clan.</p>
 
                 <div class="capcut-app" id="magnomCutStudio">
                     <div class="capcut-topbar">
@@ -3240,13 +3240,13 @@
                             <img class="capcut-logo" src="photos/magnom-bg.jpeg" alt="">
                             <div class="capcut-brand-text">
                                 <strong>MAGNOMCUT</strong>
-                                <span data-i18n="cut.sub">Video editor for MAGNOM</span>
+                                <span data-i18n="cut.sub">Photo &amp; video editor for MAGNOM</span>
                             </div>
                         </div>
                         <div class="capcut-top-actions">
                             <label class="capcut-btn ghost" for="cutImport" data-i18n="cut.import">Import</label>
-                            <input type="file" id="cutImport" accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov,.m4v" hidden>
-                            <button type="button" class="capcut-btn" onclick="toggleCutPlayback()" data-i18n="cut.play">Play</button>
+                            <input type="file" id="cutImport" accept="image/*,video/mp4,video/webm,video/quicktime,.jpg,.jpeg,.png,.gif,.webp,.mp4,.webm,.mov,.m4v" hidden>
+                            <button type="button" class="capcut-btn" id="cutPlayBtn" onclick="toggleCutPlayback()" data-i18n="cut.play">Play</button>
                             <button type="button" class="capcut-btn primary" onclick="exportMagnomCutProject()" data-i18n="cut.export">Export &amp; Post</button>
                         </div>
                     </div>
@@ -3254,22 +3254,23 @@
                     <div class="capcut-stage">
                         <nav class="capcut-dock" id="capcutDock" aria-label="MAGNOMCUT tools">
                             <button type="button" class="capcut-dock-btn active" data-panel="media"><span>📁</span>Media</button>
-                            <button type="button" class="capcut-dock-btn" data-panel="audio"><span>🎵</span>Audio</button>
+                            <button type="button" class="capcut-dock-btn" data-panel="audio" data-video-only="1"><span>🎵</span>Audio</button>
                             <button type="button" class="capcut-dock-btn" data-panel="text"><span>Tt</span>Text</button>
                             <button type="button" class="capcut-dock-btn" data-panel="stickers"><span>✨</span>Stickers</button>
                             <button type="button" class="capcut-dock-btn" data-panel="effects"><span>🪄</span>Effects</button>
                             <button type="button" class="capcut-dock-btn" data-panel="filters"><span>🎞</span>Filters</button>
                             <button type="button" class="capcut-dock-btn" data-panel="adjust"><span>⚙</span>Adjust</button>
                             <button type="button" class="capcut-dock-btn" data-panel="canvas"><span>🖼</span>Canvas</button>
-                            <button type="button" class="capcut-dock-btn" data-panel="speed"><span>⏱</span>Speed</button>
-                            <button type="button" class="capcut-dock-btn" data-panel="trim"><span>✂</span>Trim</button>
+                            <button type="button" class="capcut-dock-btn" data-panel="speed" data-video-only="1"><span>⏱</span>Speed</button>
+                            <button type="button" class="capcut-dock-btn" data-panel="trim" data-video-only="1"><span>✂</span>Trim</button>
                             <button type="button" class="capcut-dock-btn" data-panel="export"><span>⬆</span>Export</button>
                         </nav>
 
                         <div class="capcut-preview-col">
                             <div class="capcut-preview-frame">
                                 <div class="capcut-preview-inner ratio-9x16" id="cutPreviewInner">
-                                    <video id="cutPreview" class="capcut-filter-preview" playsinline></video>
+                                    <video id="cutPreview" class="capcut-filter-preview" playsinline hidden></video>
+                                    <img id="cutImagePreview" class="capcut-filter-preview" alt="" hidden>
                                     <canvas id="cutCanvas" hidden></canvas>
                                     <div class="capcut-overlay-layer">
                                         <div class="capcut-sticker-overlay" id="cutStickerOverlay" style="top:12%;right:10%"></div>
@@ -3279,7 +3280,7 @@
                                     <div class="capcut-empty" id="cutEmptyHint">
                                         <div>
                                             <strong>MAGNOMCUT</strong>
-                                            <span data-i18n="cut.empty">Import a video to start editing</span>
+                                            <span data-i18n="cut.empty">Import an image or video to start editing</span>
                                         </div>
                                     </div>
                                 </div>
@@ -3299,7 +3300,7 @@
                             <div class="capcut-side-title" id="capcutSideTitle">Media</div>
 
                             <div class="capcut-panel active" data-panel="media">
-                                <label data-i18n="cut.import">Import video</label>
+                                <label data-i18n="cut.import">Import photo or video</label>
                                 <button type="button" class="capcut-btn primary" style="width:100%" onclick="document.getElementById('cutImport').click()" data-i18n="cut.import">Import</button>
                                 <p class="capcut-val" id="cutMediaName" style="margin-top:10px;color:var(--cc-muted)">—</p>
                                 <label>Project name</label>
@@ -3426,13 +3427,13 @@
                             </div>
 
                             <div class="capcut-panel" data-panel="export">
-                                <p style="color:var(--cc-muted);font-size:0.85em;line-height:1.45;margin-bottom:10px" data-i18n="cut.hint">Export burns filter + caption into a WebM, then fills the post form.</p>
+                                <p style="color:var(--cc-muted);font-size:0.85em;line-height:1.45;margin-bottom:10px" data-i18n="cut.hint">Export burns filter + caption into PNG (photo) or WebM (video), then fills the post form.</p>
                                 <button type="button" class="capcut-btn primary" style="width:100%" onclick="exportMagnomCutProject()" data-i18n="cut.export">Export &amp; Post</button>
                                 <p class="capcut-val" id="cutExportProgress" style="margin-top:10px"></p>
                             </div>
                         </aside>
                     </div>
-                    <div class="capcut-status" id="cutStatus" data-i18n="cut.hint">Import a clip, edit in MAGNOMCUT, then Export &amp; Post.</div>
+                    <div class="capcut-status" id="cutStatus" data-i18n="cut.hint">Import a photo or video, edit in MAGNOMCUT, then Export &amp; Post.</div>
                 </div>
 
                 <div class="admin-post-form" id="clipCreateFormWrap">
@@ -3447,8 +3448,8 @@
                             <input type="url" id="clipUrl" maxlength="500" data-i18n-placeholder="clips.urlPh" placeholder="https://youtube.com/... or medal.tv/...">
                         </div>
                         <div class="form-group">
-                            <label for="clipFile" data-i18n="clips.file">Or upload video</label>
-                            <input type="file" id="clipFile" accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov,.m4v">
+                            <label for="clipFile" data-i18n="clips.file">Or upload photo / video</label>
+                            <input type="file" id="clipFile" accept="image/*,video/mp4,video/webm,video/quicktime,.jpg,.jpeg,.png,.gif,.webp,.mp4,.webm,.mov,.m4v">
                         </div>
                         <button type="submit" class="btn-primary" data-i18n="clips.post">Post Clip</button>
                     </form>
@@ -3693,13 +3694,13 @@
         </div>
     </div>
 
-    <script src="i18n.js?v=20260708f"></script>
+    <script src="i18n.js?v=20260708g"></script>
     <script src="notifications.js"></script>
     <script src="push.js"></script>
     <script src="support_queue.js"></script>
     <script src="support_call.js"></script>
-    <script src="magnom-cut.js?v=20260708f"></script>
-    <script src="site.js?v=20260708f"></script>
+    <script src="magnom-cut.js?v=20260708g"></script>
+    <script src="site.js?v=20260708g"></script>
     <script>
         const RL_TIERS = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Champion', 'Grand Champion'];
         const RL_DIVISIONS = ['I', 'II', 'III'];

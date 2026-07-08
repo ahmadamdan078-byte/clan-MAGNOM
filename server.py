@@ -1210,18 +1210,24 @@ def post_clip():
 
     if upload and upload.filename:
         # size check after save is simpler; reject extension first
-        filename, err = save_upload(upload, ALLOWED_VIDEO_EXT)
+        original_name = upload.filename.lower()
+        ext = Path(original_name).suffix.lower()
+        allowed = ALLOWED_VIDEO_EXT | ALLOWED_IMAGE_EXT
+        filename, err = save_upload(upload, allowed)
         if err:
             return jsonify({'error': err}), 400
         saved = UPLOAD_DIR / filename
+        is_image = ext in ALLOWED_IMAGE_EXT or Path(filename).suffix.lower() in ALLOWED_IMAGE_EXT
+        max_mb = 25 if is_image else MAX_CLIP_UPLOAD_MB
         try:
-            if saved.stat().st_size > MAX_CLIP_UPLOAD_MB * 1024 * 1024:
+            if saved.stat().st_size > max_mb * 1024 * 1024:
                 saved.unlink(missing_ok=True)
-                return jsonify({'error': f'Video must be under {MAX_CLIP_UPLOAD_MB}MB'}), 400
+                kind = 'Image' if is_image else 'Video'
+                return jsonify({'error': f'{kind} must be under {max_mb}MB'}), 400
         except OSError:
             pass
         file_path = filename
-        platform = 'upload'
+        platform = 'image' if is_image else 'upload'
     elif url:
         if not (url.startswith('http://') or url.startswith('https://')):
             return jsonify({'error': 'Clip URL must start with http:// or https://'}), 400
@@ -1229,12 +1235,12 @@ def post_clip():
             return jsonify({'error': 'URL is too long'}), 400
         platform = _detect_clip_platform(url)
     else:
-        return jsonify({'error': 'Add a clip link or upload a video'}), 400
+        return jsonify({'error': 'Add a clip link or upload a photo/video'}), 400
 
     if len(title) > 120:
         title = title[:120]
     if not title:
-        title = 'MAGNOM Clip'
+        title = 'MAGNOM Clip' if platform != 'image' else 'MAGNOM Photo'
 
     clip = create_clip(title, url if not file_path else '', file_path, platform, user['username'], user['id'])
     _activity('clip', f'New clip: {title}', platform, user['username'], user['id'], clip['id'])

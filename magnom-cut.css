@@ -158,12 +158,23 @@
 .capcut-preview-inner.ratio-9x16 { aspect-ratio: 9 / 16; width: min(100%, 360px); }
 
 .capcut-preview-inner video,
+.capcut-preview-inner img,
 .capcut-preview-inner canvas {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
     background: #000;
+}
+
+.capcut-dock-btn.disabled,
+.capcut-dock-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.capcut-app.is-image .capcut-transport {
+    pointer-events: none;
 }
 
 .capcut-overlay-layer {

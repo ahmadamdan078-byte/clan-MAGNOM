@@ -537,7 +537,10 @@ async function loadClipsSection(force = false) {
             if (clip.embedUrl) {
                 media = `<div class="clip-frame"><iframe src="${escapeHtml(clip.embedUrl)}" title="${escapeHtml(clip.title)}" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`;
             } else if (clip.fileUrl) {
-                media = `<video class="clip-video" src="${escapeHtml(clip.fileUrl)}" controls playsinline preload="metadata"></video>`;
+                const isImage = clip.platform === 'image' || /\.(jpe?g|png|gif|webp)$/i.test(clip.fileUrl);
+                media = isImage
+                    ? `<img class="clip-image" src="${escapeHtml(clip.fileUrl)}" alt="${escapeHtml(clip.title || '')}" loading="lazy">`
+                    : `<video class="clip-video" src="${escapeHtml(clip.fileUrl)}" controls playsinline preload="metadata"></video>`;
             } else if (clip.url) {
                 media = `<a class="clip-link-card" href="${escapeHtml(clip.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(tx('clips.open'))} →</a>`;
             }
