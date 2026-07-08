@@ -15,16 +15,7 @@ let cutMusicTimer = null;
 let cutDragTarget = null;
 let cutDragOffset = { x: 0, y: 0 };
 
-const CUT_FILTER_MAP = {
-    none: '',
-    gold: 'saturate(1.25) contrast(1.08) sepia(0.28) hue-rotate(-8deg)',
-    neon: 'saturate(1.45) contrast(1.15) brightness(1.05) hue-rotate(150deg)',
-    heat: 'saturate(1.4) contrast(1.2) sepia(0.35) hue-rotate(-25deg)',
-    ice: 'saturate(0.85) contrast(1.1) brightness(1.08) hue-rotate(180deg)',
-    cinema: 'contrast(1.25) saturate(0.9) brightness(0.92)',
-    retro: 'sepia(0.45) contrast(1.15) saturate(1.2)',
-    glow: 'brightness(1.15) contrast(1.2) saturate(1.35)',
-};
+const CUT_FILTER_MAP = window.CUT_FILTER_MAP || { none: '' };
 
 const CUT_DEFAULT_STATE = () => ({
     filter: 'none',
@@ -53,6 +44,62 @@ const CUT_DEFAULT_STATE = () => ({
 });
 
 let cutState = CUT_DEFAULT_STATE();
+
+function cutMusicById(id) {
+    return (window.CUT_MUSIC_CATALOG || []).find((m) => m.id === id) || null;
+}
+
+function cutEffectById(id) {
+    return (window.CUT_EFFECT_CATALOG || []).find((e) => e.id === id) || { id: 'none', kind: 'none' };
+}
+
+function populateMagnomCutLibrary() {
+    const musicHost = document.getElementById('cutMusicChips');
+    if (musicHost) {
+        musicHost.innerHTML = (window.CUT_MUSIC_CATALOG || []).map((m) =>
+            `<button type="button" class="capcut-chip${m.id === 'none' ? ' active' : ''}" data-music="${m.id}">${m.name}</button>`
+        ).join('');
+    }
+    const fxHost = document.getElementById('cutEffects');
+    if (fxHost) {
+        fxHost.innerHTML = (window.CUT_EFFECT_CATALOG || []).map((e) =>
+            `<button type="button" class="capcut-chip${e.id === 'none' ? ' active' : ''}" data-fx="${e.id}">${e.name}</button>`
+        ).join('');
+    }
+    const filterHost = document.getElementById('cutFilters');
+    if (filterHost) {
+        filterHost.innerHTML = (window.CUT_FILTER_CATALOG || []).map((f) =>
+            `<button type="button" class="capcut-chip gold-active${f.id === 'none' ? ' active' : ''}" data-filter="${f.id}">${f.name}</button>`
+        ).join('');
+    }
+    const stickerHost = document.getElementById('cutStickers');
+    if (stickerHost) {
+        stickerHost.innerHTML = (window.CUT_STICKER_CATALOG || []).map((s) =>
+            `<button type="button" data-sticker="${s}">${s || '✖'}</button>`
+        ).join('');
+    }
+    const styleHost = document.getElementById('cutTextStyles');
+    if (styleHost) {
+        styleHost.innerHTML = (window.CUT_TEXT_STYLE_CATALOG || []).map((s) =>
+            `<button type="button" class="capcut-chip${s.id === 'gold' ? ' active' : ''}" data-style="${s.id}">${s.name}</button>`
+        ).join('');
+    }
+    const presetHost = document.getElementById('cutCaptionPresets');
+    if (presetHost) {
+        presetHost.innerHTML = (window.CUT_CAPTION_PRESETS || []).map((p) =>
+            `<button type="button" class="capcut-chip" onclick="setCutCaptionPreset('${p.replace(/'/g, "\\'")}')">${p}</button>`
+        ).join('');
+    }
+    const counts = document.getElementById('cutLibraryCounts');
+    if (counts) {
+        const m = (window.CUT_MUSIC_CATALOG || []).length - 1;
+        const e = (window.CUT_EFFECT_CATALOG || []).length - 1;
+        const f = (window.CUT_FILTER_CATALOG || []).length - 1;
+        const s = (window.CUT_STICKER_CATALOG || []).length - 1;
+        counts.textContent = `${m}+ sounds · ${e}+ effects · ${f}+ filters · ${s}+ stickers`;
+    }
+}
+
 
 function isCutImageFile(file) {
     if (!file) return false;
@@ -670,22 +717,22 @@ function startCutMusic(destNode) {
     if (cutState.music === 'none') return null;
     const ctx = ensureCutAudio();
     if (!ctx) return null;
+    const bed = cutMusicById(cutState.music);
+    if (!bed?.freqs?.length) return null;
     const gain = ctx.createGain();
     gain.gain.value = cutState.musicVol;
     gain.connect(ctx.destination);
     if (destNode) gain.connect(destNode);
-    const beds = {
-        pulse: [110, 165, 220],
-        boost: [98, 147, 196, 294],
-        clutch: [82, 123, 164, 246],
-    };
-    const freqs = beds[cutState.music] || beds.pulse;
+    const freqs = bed.freqs;
+    const wave = bed.wave || 'sine';
+    const stepMs = bed.stepMs || 280;
     const osc = freqs.map((f, i) => {
         const o = ctx.createOscillator();
         const g = ctx.createGain();
-        o.type = i % 2 ? 'triangle' : 'sine';
+        const waves = [wave, 'triangle', 'sine', 'sawtooth'];
+        o.type = waves[i % waves.length];
         o.frequency.value = f;
-        g.gain.value = 0.05 / freqs.length;
+        g.gain.value = 0.045 / freqs.length;
         o.connect(g);
         g.connect(gain);
         o.start();
@@ -699,7 +746,7 @@ function startCutMusic(destNode) {
         cutMusicNodes.osc.forEach((o, i) => {
             o.frequency.setTargetAtTime(freqs[(step + i) % freqs.length], ctx.currentTime, 0.05);
         });
-    }, 280);
+    }, stepMs);
     return cutMusicNodes;
 }
 
@@ -770,40 +817,197 @@ function previewCutEffect() {
         notify(cutNeedMediaMsg(), true);
         return;
     }
-    if (cutState.effect === 'none') {
+    const fx = cutEffectById(cutState.effect);
+    if (!fx || fx.kind === 'none') {
         notify(typeof tx === 'function' ? tx('cut.pickEffect') : 'Pick an effect first', true);
         return;
     }
-    if (cutState.effect === 'flash' && flash) {
+    const dur = fx.fast ? 220 : 420;
+    if (fx.kind === 'flash' && flash) {
+        flash.style.background = fx.color || '#fff';
         flash.classList.remove('pulse');
         void flash.offsetWidth;
         flash.classList.add('pulse');
     }
-    if (cutState.effect === 'zoom' && inner) {
+    if (fx.kind === 'zoom' && inner) {
+        const s = fx.scale || 1.08;
         inner.animate(
-            [{ transform: 'scale(1)' }, { transform: 'scale(1.08)' }, { transform: 'scale(1)' }],
-            { duration: 420, easing: 'ease-out' },
+            [{ transform: 'scale(1)' }, { transform: `scale(${s})` }, { transform: 'scale(1)' }],
+            { duration: dur, easing: 'ease-out' },
         );
     }
-    if (cutState.effect === 'shake' && inner) {
-        inner.animate(
-            [
+    if (fx.kind === 'shake' && inner) {
+        const a = fx.amp || 6;
+        const frames = fx.fast
+            ? [
                 { transform: 'translateX(0)' },
-                { transform: 'translateX(-6px)' },
-                { transform: 'translateX(6px)' },
+                { transform: `translateX(${-a}px)` },
+                { transform: `translateX(${a}px)` },
+                { transform: `translateX(${-a / 2}px)` },
                 { transform: 'translateX(0)' },
-            ],
-            { duration: 280 },
-        );
+            ]
+            : [
+                { transform: 'translateX(0)' },
+                { transform: `translateX(${-a}px)` },
+                { transform: `translateX(${a}px)` },
+                { transform: 'translateX(0)' },
+            ];
+        inner.animate(frames, { duration: fx.fast ? 180 : 280 });
     }
-    if (cutState.effect === 'glitch' && media) {
+    if (fx.kind === 'glitch' && media) {
+        const hue = fx.hue || 80;
         media.animate(
             [
                 { filter: media.style.filter },
-                { filter: `${media.style.filter} hue-rotate(80deg)` },
+                { filter: `${media.style.filter} hue-rotate(${hue}deg)` },
+                { filter: `${media.style.filter} hue-rotate(${-hue / 2}deg)` },
                 { filter: media.style.filter },
             ],
             { duration: 320 },
+        );
+    }
+    if (fx.kind === 'blur' && media) {
+        const px = fx.px || 8;
+        media.animate(
+            [
+                { filter: media.style.filter },
+                { filter: `${media.style.filter} blur(${px}px)` },
+                { filter: media.style.filter },
+            ],
+            { duration: 500 },
+        );
+    }
+    if (fx.kind === 'spin' && inner) {
+        const deg = fx.deg || 8;
+        inner.animate(
+            [{ transform: 'rotate(0deg)' }, { transform: `rotate(${deg}deg)` }, { transform: 'rotate(0deg)' }],
+            { duration: Math.abs(deg) > 90 ? 700 : 360, easing: 'ease-in-out' },
+        );
+    }
+    if (fx.kind === 'bounce' && inner) {
+        const y = fx.big ? -28 : -14;
+        inner.animate(
+            [
+                { transform: 'translateY(0)' },
+                { transform: `translateY(${y}px)` },
+                { transform: 'translateY(0)' },
+                { transform: `translateY(${y / 2}px)` },
+                { transform: 'translateY(0)' },
+            ],
+            { duration: 520, easing: 'ease-out' },
+        );
+    }
+    if (fx.kind === 'fade' && media) {
+        media.animate([{ opacity: 1 }, { opacity: 0.15 }, { opacity: 1 }], { duration: 420 });
+    }
+    if (fx.kind === 'tilt' && inner) {
+        const deg = fx.deg || -6;
+        inner.animate(
+            [{ transform: 'rotate(0)' }, { transform: `rotate(${deg}deg)` }, { transform: 'rotate(0)' }],
+            { duration: 400 },
+        );
+    }
+    if (fx.kind === 'kenburns' && inner) {
+        inner.animate(
+            [{ transform: 'scale(1)' }, { transform: 'scale(1.12) translateY(-2%)' }, { transform: 'scale(1)' }],
+            { duration: 900, easing: 'ease-in-out' },
+        );
+    }
+    if (fx.kind === 'heartbeat' && inner) {
+        inner.animate(
+            [
+                { transform: 'scale(1)' },
+                { transform: 'scale(1.06)' },
+                { transform: 'scale(1)' },
+                { transform: 'scale(1.1)' },
+                { transform: 'scale(1)' },
+            ],
+            { duration: 700 },
+        );
+    }
+    if (fx.kind === 'drift' && inner) {
+        inner.animate(
+            [{ transform: 'translateX(0)' }, { transform: 'translateX(18px)' }, { transform: 'translateX(0)' }],
+            { duration: 500 },
+        );
+    }
+    if (fx.kind === 'rise' && inner) {
+        inner.animate(
+            [{ transform: 'translateY(12%)', opacity: 0.6 }, { transform: 'translateY(0)', opacity: 1 }],
+            { duration: 450 },
+        );
+    }
+    if (fx.kind === 'drop' && inner) {
+        inner.animate(
+            [{ transform: 'translateY(-12%)', opacity: 0.6 }, { transform: 'translateY(0)', opacity: 1 }],
+            { duration: 450 },
+        );
+    }
+    if (fx.kind === 'swing' && inner) {
+        inner.animate(
+            [
+                { transform: 'rotate(0deg)' },
+                { transform: 'rotate(5deg)' },
+                { transform: 'rotate(-5deg)' },
+                { transform: 'rotate(0deg)' },
+            ],
+            { duration: 480 },
+        );
+    }
+    if (fx.kind === 'elastic' && inner) {
+        inner.animate(
+            [
+                { transform: 'scale(1)' },
+                { transform: 'scale(1.2)' },
+                { transform: 'scale(0.92)' },
+                { transform: 'scale(1.05)' },
+                { transform: 'scale(1)' },
+            ],
+            { duration: 650 },
+        );
+    }
+    if (fx.kind === 'pop' && inner) {
+        inner.animate(
+            [{ transform: 'scale(0.7)', opacity: 0.4 }, { transform: 'scale(1.08)' }, { transform: 'scale(1)', opacity: 1 }],
+            { duration: 380 },
+        );
+    }
+    if (fx.kind === 'wobble' && inner) {
+        inner.animate(
+            [
+                { transform: 'rotate(0) scaleX(1)' },
+                { transform: 'rotate(3deg) scaleX(1.04)' },
+                { transform: 'rotate(-3deg) scaleX(0.96)' },
+                { transform: 'rotate(0) scaleX(1)' },
+            ],
+            { duration: 450 },
+        );
+    }
+    if (fx.kind === 'strobe' && flash) {
+        flash.style.background = '#fff';
+        [0, 80, 160].forEach((d) => {
+            setTimeout(() => {
+                flash.classList.remove('pulse');
+                void flash.offsetWidth;
+                flash.classList.add('pulse');
+            }, d);
+        });
+    }
+    if (fx.kind === 'ripple' && inner) {
+        inner.animate(
+            [
+                { transform: 'scale(1)', offset: 0 },
+                { transform: 'scale(1.04)', offset: 0.35 },
+                { transform: 'scale(0.98)', offset: 0.7 },
+                { transform: 'scale(1)', offset: 1 },
+            ],
+            { duration: 560 },
+        );
+    }
+    if (fx.kind === 'float' && inner) {
+        inner.animate(
+            [{ transform: 'translateY(0)' }, { transform: 'translateY(-10px)' }, { transform: 'translateY(0)' }],
+            { duration: 900, easing: 'ease-in-out' },
         );
     }
 }
@@ -826,52 +1030,114 @@ function cutCanvasSize() {
     return { w, h };
 }
 
+function drawCutCaptionStyled(ctx, caption, cx, cy, w) {
+    const style = cutState.textStyle || 'gold';
+    const size = Math.round(w * 0.06);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowBlur = 0;
+    ctx.lineWidth = 0;
+
+    const drawBubble = (bg, fg) => {
+        ctx.font = `800 ${size}px Oxanium, sans-serif`;
+        const metrics = ctx.measureText(caption);
+        const bw = metrics.width + 36;
+        const bh = Math.round(w * 0.08);
+        ctx.fillStyle = bg;
+        ctx.beginPath();
+        if (ctx.roundRect) {
+            ctx.roundRect(cx - bw / 2, cy - bh / 2, bw, bh, style === 'sticky' ? 8 : 999);
+            ctx.fill();
+        } else {
+            ctx.fillRect(cx - bw / 2, cy - bh / 2, bw, bh);
+        }
+        ctx.fillStyle = fg;
+        ctx.fillText(caption, cx, cy);
+    };
+
+    if (style === 'gold') {
+        ctx.font = `800 ${size}px Oxanium, sans-serif`;
+        ctx.fillStyle = '#F0B429';
+        ctx.shadowColor = 'rgba(0,0,0,0.8)';
+        ctx.shadowBlur = 8;
+        ctx.fillText(caption, cx, cy);
+    } else if (style === 'neon' || style === 'glowCyan' || style === 'iceText') {
+        ctx.font = `800 ${size}px Oxanium, sans-serif`;
+        ctx.fillStyle = style === 'iceText' ? '#B8F0FF' : '#5EEAD4';
+        ctx.shadowColor = 'rgba(94,234,212,0.9)';
+        ctx.shadowBlur = 18;
+        ctx.fillText(caption, cx, cy);
+    } else if (style === 'impact' || style === 'comic') {
+        ctx.font = `900 ${size}px Oxanium, Impact, sans-serif`;
+        const text = style === 'impact' ? caption.toUpperCase() : caption;
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = '#111';
+        ctx.fillStyle = '#fff';
+        ctx.strokeText(text, cx, cy);
+        ctx.fillText(text, cx, cy);
+    } else if (style === 'bubble' || style === 'banner') {
+        drawBubble('#F0B429', '#111');
+    } else if (style === 'pink' || style === 'glowPink') {
+        ctx.font = `800 ${size}px Oxanium, sans-serif`;
+        ctx.fillStyle = '#FE2C55';
+        ctx.shadowColor = 'rgba(254,44,85,0.85)';
+        ctx.shadowBlur = 16;
+        ctx.fillText(caption, cx, cy);
+    } else if (style === 'outline') {
+        ctx.font = `800 ${size}px Oxanium, sans-serif`;
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#fff';
+        ctx.fillStyle = 'transparent';
+        ctx.strokeText(caption, cx, cy);
+    } else if (style === 'shadow') {
+        ctx.font = `800 ${size}px Oxanium, sans-serif`;
+        ctx.fillStyle = '#fff';
+        ctx.shadowColor = 'rgba(0,0,0,0.95)';
+        ctx.shadowBlur = 18;
+        ctx.shadowOffsetX = 4;
+        ctx.shadowOffsetY = 6;
+        ctx.fillText(caption, cx, cy);
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+    } else if (style === 'typewriter' || style === 'chalk' || style === 'minimal') {
+        ctx.font = `600 ${size}px "Courier New", monospace`;
+        ctx.fillStyle = style === 'chalk' ? '#E8E8E8' : '#fff';
+        ctx.shadowColor = 'rgba(0,0,0,0.7)';
+        ctx.shadowBlur = 6;
+        ctx.fillText(caption, cx, cy);
+    } else if (style === 'gradient' || style === 'fireText') {
+        ctx.font = `800 ${size}px Oxanium, sans-serif`;
+        const g = ctx.createLinearGradient(cx - 80, cy, cx + 80, cy);
+        if (style === 'fireText') {
+            g.addColorStop(0, '#FF2D55');
+            g.addColorStop(0.5, '#FF8A3D');
+            g.addColorStop(1, '#F0B429');
+        } else {
+            g.addColorStop(0, '#F0B429');
+            g.addColorStop(1, '#FFE08A');
+        }
+        ctx.fillStyle = g;
+        ctx.fillText(caption, cx, cy);
+    } else if (style === 'sticky') {
+        drawBubble('#FFE08A', '#222');
+    } else if (style === 'boxed') {
+        drawBubble('#fff', '#111');
+    } else {
+        ctx.font = `800 ${size}px Oxanium, sans-serif`;
+        ctx.fillStyle = '#fff';
+        ctx.shadowColor = 'rgba(0,0,0,0.85)';
+        ctx.shadowBlur = 10;
+        ctx.fillText(caption, cx, cy);
+    }
+    ctx.shadowBlur = 0;
+}
+
 function drawCutOverlays(ctx, w, h) {
     const caption = cutState.captionText || document.getElementById('cutCaption')?.value.trim() || '';
     if (caption) {
         const cx = (cutState.captionX / 100) * w;
         const cy = (cutState.captionY / 100) * h;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.font = `800 ${Math.round(w * 0.06)}px Oxanium, sans-serif`;
-        if (cutState.textStyle === 'gold') {
-            ctx.fillStyle = '#F0B429';
-            ctx.shadowColor = 'rgba(0,0,0,0.8)';
-            ctx.shadowBlur = 8;
-            ctx.fillText(caption, cx, cy);
-        } else if (cutState.textStyle === 'neon') {
-            ctx.fillStyle = '#5EEAD4';
-            ctx.shadowColor = 'rgba(94,234,212,0.8)';
-            ctx.shadowBlur = 16;
-            ctx.fillText(caption, cx, cy);
-        } else if (cutState.textStyle === 'impact') {
-            ctx.fillStyle = '#fff';
-            ctx.lineWidth = 4;
-            ctx.strokeStyle = '#111';
-            ctx.strokeText(caption.toUpperCase(), cx, cy);
-            ctx.fillText(caption.toUpperCase(), cx, cy);
-        } else if (cutState.textStyle === 'bubble') {
-            const metrics = ctx.measureText(caption);
-            const bw = metrics.width + 36;
-            const bh = Math.round(w * 0.08);
-            ctx.fillStyle = '#F0B429';
-            ctx.beginPath();
-            if (ctx.roundRect) {
-                ctx.roundRect(cx - bw / 2, cy - bh / 2, bw, bh, 999);
-                ctx.fill();
-            } else {
-                ctx.fillRect(cx - bw / 2, cy - bh / 2, bw, bh);
-            }
-            ctx.fillStyle = '#111';
-            ctx.shadowBlur = 0;
-            ctx.fillText(caption, cx, cy);
-        } else {
-            ctx.fillStyle = '#fff';
-            ctx.shadowColor = 'rgba(0,0,0,0.85)';
-            ctx.shadowBlur = 10;
-            ctx.fillText(caption, cx, cy);
-        }
-        ctx.shadowBlur = 0;
+        drawCutCaptionStyled(ctx, caption, cx, cy, w);
     }
     if (cutState.sticker) {
         const sx = (cutState.stickerX / 100) * w;
@@ -1128,6 +1394,7 @@ function seekCutTimeline(e) {
 
 function initMagnomCut() {
     if (!document.getElementById('magnomCutStudio')) return;
+    populateMagnomCutLibrary();
 
     const canvas = document.getElementById('cutCanvas');
     if (canvas) {

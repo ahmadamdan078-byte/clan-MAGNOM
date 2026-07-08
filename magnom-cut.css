@@ -337,6 +337,47 @@
     font-size: clamp(0.85rem, 3vw, 1.15rem);
 }
 
+.capcut-text-overlay.s-pink,
+.capcut-text-overlay.s-glowPink { color: #FE2C55; text-shadow: 0 0 16px rgba(254,44,85,0.85); }
+.capcut-text-overlay.s-outline { color: transparent; -webkit-text-stroke: 2px #fff; text-shadow: none; }
+.capcut-text-overlay.s-shadow { color: #fff; text-shadow: 4px 6px 18px rgba(0,0,0,0.95); }
+.capcut-text-overlay.s-comic { color: #fff; text-shadow: 3px 3px 0 #FE2C55, -2px 0 #111; font-weight: 900; }
+.capcut-text-overlay.s-typewriter,
+.capcut-text-overlay.s-chalk,
+.capcut-text-overlay.s-minimal { color: #fff; font-family: "Courier New", monospace; text-shadow: 0 2px 8px rgba(0,0,0,0.75); letter-spacing: 0.04em; }
+.capcut-text-overlay.s-gradient { color: #F0B429; background: linear-gradient(90deg,#F0B429,#FFE08A); -webkit-background-clip: text; background-clip: text; }
+.capcut-text-overlay.s-iceText,
+.capcut-text-overlay.s-glowCyan { color: #B8F0FF; text-shadow: 0 0 16px rgba(94,234,212,0.9); }
+.capcut-text-overlay.s-fireText { color: #FF8A3D; text-shadow: 0 0 14px rgba(255,45,85,0.8); }
+.capcut-text-overlay.s-banner,
+.capcut-text-overlay.s-boxed,
+.capcut-text-overlay.s-sticky {
+    color: #111;
+    background: #FFE08A;
+    padding: 6px 14px;
+    border-radius: 10px;
+}
+.capcut-text-overlay.s-boxed { background: #fff; }
+.capcut-text-overlay.s-banner { background: #F0B429; border-radius: 999px; }
+
+.capcut-chip-scroll {
+    max-height: 220px;
+    overflow-y: auto;
+    padding-right: 4px;
+    scrollbar-width: thin;
+}
+
+.capcut-chip-scroll::-webkit-scrollbar { width: 6px; }
+.capcut-chip-scroll::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.18);
+    border-radius: 99px;
+}
+
+.capcut-sticker-grid {
+    max-height: 280px;
+    overflow-y: auto;
+}
+
 .capcut-sticker-overlay {
     position: absolute;
     top: 12%;

@@ -16,10 +16,10 @@
     <meta property="og:image" content="photos/magnom-bg.jpeg">
     <meta property="og:type" content="website">
     <title>MAGNOM Clan — Elite Rocket League Community</title>
-    <link rel="stylesheet" href="site.css?v=20260708j">
-    <link rel="stylesheet" href="magnom-cut.css?v=20260708j">
-    <link rel="preload" href="site.css?v=20260708j" as="style">
-    <link rel="preload" href="i18n.js?v=20260708j" as="script">
+    <link rel="stylesheet" href="site.css?v=20260708k">
+    <link rel="stylesheet" href="magnom-cut.css?v=20260708k">
+    <link rel="preload" href="site.css?v=20260708k" as="style">
+    <link rel="preload" href="i18n.js?v=20260708k" as="script">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&family=Oxanium:wght@500;600;700;800&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -3326,14 +3326,10 @@
                             </div>
 
                             <div class="capcut-panel" data-panel="audio">
+                                <p class="capcut-val" id="cutLibraryCounts" style="margin:0 0 8px;color:var(--cc-accent);font-weight:700">50+ sounds · 50+ effects · 50+ filters</p>
                                 <p class="capcut-val" id="cutAudioPhotoHint" style="margin:0 0 10px;color:var(--cc-muted);font-weight:500" data-i18n="cut.photoMusicHint">Works on photos and videos. Photo + music exports as a short video.</p>
                                 <label data-i18n="cut.music">Music / SFX</label>
-                                <div class="capcut-chip-row" id="cutMusicChips">
-                                    <button type="button" class="capcut-chip active" data-music="none">Mute</button>
-                                    <button type="button" class="capcut-chip" data-music="pulse">Arena Pulse</button>
-                                    <button type="button" class="capcut-chip" data-music="boost">Boost Drop</button>
-                                    <button type="button" class="capcut-chip" data-music="clutch">Clutch Rise</button>
-                                </div>
+                                <div class="capcut-chip-row capcut-chip-scroll" id="cutMusicChips"></div>
                                 <label data-i18n="cut.musicVol">Music volume</label>
                                 <input type="range" id="cutMusicVol" min="0" max="1" step="0.05" value="0.35">
                                 <div class="capcut-val"><span id="cutMusicVolVal">35%</span></div>
@@ -3354,61 +3350,26 @@
                                 <label data-i18n="cut.caption">Caption</label>
                                 <input type="text" id="cutCaption" maxlength="80" data-i18n-placeholder="cut.captionPh" placeholder="MAGNOM · clutch">
                                 <label data-i18n="cut.template">Style</label>
-                                <div class="capcut-chip-row" id="cutTextStyles">
-                                    <button type="button" class="capcut-chip active" data-style="gold">Gold</button>
-                                    <button type="button" class="capcut-chip" data-style="impact">Impact</button>
-                                    <button type="button" class="capcut-chip" data-style="neon">Neon</button>
-                                    <button type="button" class="capcut-chip" data-style="clean">Clean</button>
-                                    <button type="button" class="capcut-chip" data-style="bubble">Bubble</button>
-                                </div>
+                                <div class="capcut-chip-row capcut-chip-scroll" id="cutTextStyles"></div>
                                 <label data-i18n="cut.templates">Templates</label>
-                                <div class="capcut-chip-row">
-                                    <button type="button" class="capcut-chip" onclick="setCutCaptionPreset('MAGNOM CLUTCH')">MAGNOM CLUTCH</button>
-                                    <button type="button" class="capcut-chip" onclick="setCutCaptionPreset('SSL PATH')">SSL PATH</button>
-                                    <button type="button" class="capcut-chip" onclick="setCutCaptionPreset('W TEAM')">W TEAM</button>
-                                </div>
+                                <div class="capcut-chip-row capcut-chip-scroll" id="cutCaptionPresets"></div>
                                 <p class="capcut-val" style="margin-top:10px;color:var(--cc-muted);font-weight:500" data-i18n="cut.dragHint">Drag text on the preview to reposition</p>
                             </div>
 
                             <div class="capcut-panel" data-panel="stickers">
                                 <label data-i18n="cut.stickers">Stickers</label>
-                                <div class="capcut-sticker-grid" id="cutStickers">
-                                    <button type="button" data-sticker="🔥">🔥</button>
-                                    <button type="button" data-sticker="⚡">⚡</button>
-                                    <button type="button" data-sticker="🏆">🏆</button>
-                                    <button type="button" data-sticker="🚀">🚀</button>
-                                    <button type="button" data-sticker="😎">😎</button>
-                                    <button type="button" data-sticker="💯">💯</button>
-                                    <button type="button" data-sticker="🎯">🎯</button>
-                                    <button type="button" data-sticker="💪">💪</button>
-                                    <button type="button" data-sticker="">✖</button>
-                                </div>
+                                <div class="capcut-sticker-grid" id="cutStickers"></div>
                             </div>
 
                             <div class="capcut-panel" data-panel="effects">
                                 <label data-i18n="cut.effects">Effects</label>
-                                <div class="capcut-chip-row" id="cutEffects">
-                                    <button type="button" class="capcut-chip active" data-fx="none">None</button>
-                                    <button type="button" class="capcut-chip" data-fx="flash">Flash In</button>
-                                    <button type="button" class="capcut-chip" data-fx="zoom">Zoom Punch</button>
-                                    <button type="button" class="capcut-chip" data-fx="shake">Shake</button>
-                                    <button type="button" class="capcut-chip" data-fx="glitch">Glitch</button>
-                                </div>
+                                <div class="capcut-chip-row capcut-chip-scroll" id="cutEffects"></div>
                                 <button type="button" class="capcut-btn" style="width:100%;margin-top:12px" onclick="previewCutEffect()" data-i18n="cut.previewFx">Preview effect</button>
                             </div>
 
                             <div class="capcut-panel" data-panel="filters">
                                 <label data-i18n="cut.filter">Filters</label>
-                                <div class="capcut-chip-row" id="cutFilters">
-                                    <button type="button" class="capcut-chip active gold-active" data-filter="none" data-i18n="cut.filter.none">Original</button>
-                                    <button type="button" class="capcut-chip gold-active" data-filter="gold" data-i18n="cut.filter.gold">MAGNOM Gold</button>
-                                    <button type="button" class="capcut-chip gold-active" data-filter="neon" data-i18n="cut.filter.neon">Arena Neon</button>
-                                    <button type="button" class="capcut-chip gold-active" data-filter="heat" data-i18n="cut.filter.heat">Clutch Heat</button>
-                                    <button type="button" class="capcut-chip gold-active" data-filter="ice" data-i18n="cut.filter.ice">SSL Ice</button>
-                                    <button type="button" class="capcut-chip gold-active" data-filter="cinema" data-i18n="cut.filter.cinema">Cinema</button>
-                                    <button type="button" class="capcut-chip gold-active" data-filter="retro">Retro</button>
-                                    <button type="button" class="capcut-chip gold-active" data-filter="glow">Glow Up</button>
-                                </div>
+                                <div class="capcut-chip-row capcut-chip-scroll" id="cutFilters"></div>
                             </div>
 
                             <div class="capcut-panel" data-panel="adjust">
@@ -3732,13 +3693,14 @@
         </div>
     </div>
 
-    <script src="i18n.js?v=20260708j"></script>
+    <script src="i18n.js?v=20260708k"></script>
     <script src="notifications.js"></script>
     <script src="push.js"></script>
     <script src="support_queue.js"></script>
     <script src="support_call.js"></script>
-    <script src="magnom-cut.js?v=20260708j"></script>
-    <script src="site.js?v=20260708j"></script>
+    <script src="magnom-cut-catalog.js?v=20260708k"></script>
+    <script src="magnom-cut.js?v=20260708k"></script>
+    <script src="site.js?v=20260708k"></script>
     <script>
         const RL_TIERS = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Champion', 'Grand Champion'];
         const RL_DIVISIONS = ['I', 'II', 'III'];
