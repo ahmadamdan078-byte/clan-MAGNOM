@@ -125,7 +125,6 @@ function cutTemplateCardHtml(t) {
         <span class="capcut-template-cover" style="background-image:${t.cover}"></span>
         ${badge}
         <span class="capcut-template-body">
-          <span class="capcut-template-emoji">${t.emoji || '🎬'}</span>
           <span class="capcut-template-name">${t.name}</span>
           <span class="capcut-template-meta">
             <span>${t.cat}</span>
@@ -576,7 +575,7 @@ function applyMagnomCutTemplate(id) {
     cutState.effect = tpl.effect || 'none';
     cutState.music = tpl.music || 'none';
     cutState.textStyle = tpl.textStyle || 'gold';
-    cutState.sticker = tpl.sticker || '';
+    cutState.sticker = '';
     cutState.bright = tpl.bright ?? 1;
     cutState.contrast = tpl.contrast ?? 1;
     cutState.saturate = tpl.saturate ?? 1;

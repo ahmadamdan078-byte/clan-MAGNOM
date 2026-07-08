@@ -223,7 +223,7 @@ window.CUT_CAPTION_PRESETS = [
     'PRO PATH', 'ELITE MECHS', 'FULL SEND', 'CLUTCH GENIUS', 'TEAM FIGHT',
 ];
 
-/* CapCut-style full look packs: one tap applies filter + music + text + sticker + effect */
+/* CapCut-style full look packs: one tap applies filter + music + text + effect (no emoji stickers) */
 window.CUT_TEMPLATE_CATALOG = [
     { id: 'magnomGold', name: 'MAGNOM Gold', cat: 'Brand', emoji: '👑', filter: 'gold', effect: 'goalBurst', music: 'magnomAnthem', textStyle: 'gold', caption: 'MAGNOM CLUTCH', sticker: '👑', bright: 1.05, contrast: 1.1, saturate: 1.2, ratio: '9x16', fit: 'cover', photoDuration: 8 },
     { id: 'sslPath', name: 'SSL Path', cat: 'Rank', emoji: '💎', filter: 'ice', effect: 'iceFx', music: 'sslGrind', textStyle: 'iceText', caption: 'SSL PATH', sticker: '💎', bright: 1.05, contrast: 1.15, saturate: 0.95, ratio: '9x16', fit: 'cover', photoDuration: 9 },
@@ -309,6 +309,8 @@ window.CUT_TEMPLATE_CATALOG = (window.CUT_TEMPLATE_CATALOG || []).map((t, i) => 
     }
     t.trending = t.trending != null ? t.trending : (i < 12 || i % 5 === 0);
     t.forYou = t.forYou != null ? t.forYou : (i % 2 === 0 || i < 10);
+    t.emoji = '';
+    t.sticker = '';
     return t;
 });
 
