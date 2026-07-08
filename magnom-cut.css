@@ -529,22 +529,6 @@
 .capcut-template-badge.new { background: #22C55E; color: #06240f; }
 .capcut-template-badge.pro { background: #F0B429; color: #1a1200; }
 
-.capcut-template-source {
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    z-index: 3;
-    padding: 2px 7px;
-    border-radius: 4px;
-    font-size: 0.62rem;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    background: rgba(0, 0, 0, 0.55);
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
 .capcut-template-body {
     position: relative;
     z-index: 2;

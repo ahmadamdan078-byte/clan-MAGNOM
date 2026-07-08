@@ -121,13 +121,9 @@ function cutTemplateCardHtml(t) {
     const badge = t.badge
         ? `<span class="capcut-template-badge ${String(t.badge).toLowerCase()}">${t.badge}</span>`
         : '';
-    const source = t.source === 'capcut'
-        ? '<span class="capcut-template-source">CapCut</span>'
-        : '';
     return `
       <button type="button" class="capcut-template-card" data-template="${t.id}" data-cat="${t.cat}" onclick="applyMagnomCutTemplate('${t.id}')">
         <span class="capcut-template-cover" style="background-image:${t.cover}"></span>
-        ${source}
         ${badge}
         <span class="capcut-template-body">
           <span class="capcut-template-name">${t.name}</span>
