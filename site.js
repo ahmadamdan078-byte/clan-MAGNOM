@@ -594,6 +594,103 @@ async function deleteClip(id) {
     }
 }
 
+let cutObjectUrl = null;
+let cutImportedFile = null;
+
+function setCutStatus(msg) {
+    const el = document.getElementById('cutStatus');
+    if (el) el.textContent = msg;
+}
+
+function applyCutFilter() {
+    const video = document.getElementById('cutPreview');
+    const filter = document.getElementById('cutFilter')?.value || 'none';
+    if (!video) return;
+    video.className = 'magnom-cut-preview' + (filter !== 'none' ? ` filter-${filter}` : '');
+}
+
+function applyCutCaption() {
+    const overlay = document.getElementById('cutCaptionOverlay');
+    const text = document.getElementById('cutCaption')?.value.trim() || '';
+    const style = document.getElementById('cutTemplate')?.value || 'gold';
+    if (!overlay) return;
+    overlay.textContent = text;
+    overlay.className = 'magnom-cut-caption-overlay style-' + style;
+    overlay.style.display = text ? 'block' : 'none';
+}
+
+function applyCutSpeed() {
+    const video = document.getElementById('cutPreview');
+    const speed = parseFloat(document.getElementById('cutSpeed')?.value || '1') || 1;
+    const label = document.getElementById('cutSpeedVal');
+    if (label) label.textContent = `${speed.toFixed(1)}x`;
+    if (video) video.playbackRate = speed;
+}
+
+function handleCutImport(e) {
+    const file = e.target.files?.[0];
+    const video = document.getElementById('cutPreview');
+    const hint = document.getElementById('cutEmptyHint');
+    if (!file || !video) return;
+    if (cutObjectUrl) URL.revokeObjectURL(cutObjectUrl);
+    cutImportedFile = file;
+    cutObjectUrl = URL.createObjectURL(file);
+    video.src = cutObjectUrl;
+    video.load();
+    if (hint) hint.classList.add('hidden');
+    applyCutFilter();
+    applyCutSpeed();
+    applyCutCaption();
+    setCutStatus(tx('cut.ready'));
+}
+
+function toggleCutPlayback() {
+    const video = document.getElementById('cutPreview');
+    if (!video?.src) {
+        notify(tx('cut.needVideo'), true);
+        return;
+    }
+    if (video.paused) video.play().catch(() => {});
+    else video.pause();
+}
+
+async function exportMagnomCut() {
+    const video = document.getElementById('cutPreview');
+    if (!cutImportedFile || !video?.src) {
+        notify(tx('cut.needVideo'), true);
+        return;
+    }
+    const titleInput = document.getElementById('clipTitle');
+    const caption = document.getElementById('cutCaption')?.value.trim() || '';
+    const fileInput = document.getElementById('clipFile');
+    if (titleInput && !titleInput.value.trim()) {
+        titleInput.value = caption || cutImportedFile.name.replace(/\.[^.]+$/, '') || 'MAGNOM Clip';
+    }
+
+    // Put the imported file into the post form so members can one-click post.
+    try {
+        const dt = new DataTransfer();
+        dt.items.add(cutImportedFile);
+        if (fileInput) fileInput.files = dt.files;
+    } catch {
+        /* Safari older fallback: user can still reselect file */
+    }
+
+    document.getElementById('clipCreateFormWrap')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setCutStatus(tx('cut.exported'));
+    notify(tx('cut.exported'));
+}
+
+function initMagnomCut() {
+    document.getElementById('cutImport')?.addEventListener('change', handleCutImport);
+    document.getElementById('cutFilter')?.addEventListener('change', applyCutFilter);
+    document.getElementById('cutSpeed')?.addEventListener('input', applyCutSpeed);
+    document.getElementById('cutCaption')?.addEventListener('input', applyCutCaption);
+    document.getElementById('cutTemplate')?.addEventListener('change', applyCutCaption);
+    applyCutCaption();
+    applyCutSpeed();
+}
+
 function initSiteNav() {
     document.querySelectorAll('.site-nav-link').forEach(btn => {
         btn.addEventListener('click', () => navigateSiteSection(btn.dataset.section));
@@ -602,6 +699,7 @@ function initSiteNav() {
     document.getElementById('eventForm')?.addEventListener('submit', postEvent);
     document.getElementById('galleryForm')?.addEventListener('submit', postGallery);
     document.getElementById('clipForm')?.addEventListener('submit', postClip);
+    initMagnomCut();
 }
 
 function updateSiteAdminForms() {
