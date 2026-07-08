@@ -42,6 +42,7 @@ const CUT_DEFAULT_STATE = () => ({
     trimEnd: 0,
     musicVol: 0.35,
     videoVol: 1,
+    photoDuration: 8,
     flipX: false,
     rotate: 0,
     captionX: 50,
@@ -142,6 +143,7 @@ function syncControlsFromState() {
         ['cutSpeed', 'speed'],
         ['cutMusicVol', 'musicVol'],
         ['cutVideoVol', 'videoVol'],
+        ['cutPhotoDuration', 'photoDuration'],
         ['cutTrimStart', 'trimStart'],
         ['cutTrimEnd', 'trimEnd'],
     ];
@@ -149,6 +151,8 @@ function syncControlsFromState() {
         const el = document.getElementById(id);
         if (el) el.value = String(cutState[key]);
     });
+    const pdv = document.getElementById('cutPhotoDurationVal');
+    if (pdv) pdv.textContent = `${Math.round(cutState.photoDuration || 8)}s`;
     document.querySelectorAll('#cutFilters .capcut-chip').forEach((c) => {
         c.classList.toggle('active', c.dataset.filter === cutState.filter);
     });
@@ -171,6 +175,7 @@ function syncControlsFromState() {
     applyCutSpeed();
     applyCutVolumes();
     updateCutTrimUI();
+    syncCutModeUI();
 }
 
 function applyCutAdjustLabels() {
@@ -237,13 +242,18 @@ function syncCutModeUI() {
         btn.classList.toggle('disabled', btn.disabled);
     });
     const playTop = document.getElementById('cutPlayBtn');
-    if (playTop) playTop.style.display = cutMediaKind === 'image' ? 'none' : '';
+    // Photos can still preview music via Play
+    if (playTop) playTop.style.display = '';
+    const videoAudioWrap = document.getElementById('cutVideoAudioWrap');
+    const photoDurWrap = document.getElementById('cutPhotoDurationWrap');
+    if (videoAudioWrap) videoAudioWrap.style.display = cutMediaKind === 'image' ? 'none' : '';
+    if (photoDurWrap) photoDurWrap.style.display = cutMediaKind === 'image' ? '' : 'none';
 }
 
 function openCapcutPanel(name) {
-    if (cutMediaKind === 'image' && (name === 'audio' || name === 'speed' || name === 'trim')) {
+    if (cutMediaKind === 'image' && (name === 'speed' || name === 'trim')) {
         name = 'media';
-        setCutStatus(typeof tx === 'function' ? tx('cut.imageModeHint') : 'Audio, speed, and trim are for videos.');
+        setCutStatus(typeof tx === 'function' ? tx('cut.imageModeHint') : 'Speed and trim are for videos. Use Audio for photo music.');
     }
     document.querySelectorAll('#capcutDock .capcut-dock-btn').forEach((btn) => {
         btn.classList.toggle('active', btn.dataset.panel === name);
@@ -582,9 +592,38 @@ function handleCutImport(e) {
     pushCutHistory();
 }
 
+function toggleCutMusicPreview() {
+    if (!cutImportedFile) {
+        notify(cutNeedMediaMsg(), true);
+        return;
+    }
+    if (cutState.music === 'none') {
+        notify(typeof tx === 'function' ? tx('cut.pickMusic') : 'Pick a music bed first', true);
+        openCapcutPanel('audio');
+        return;
+    }
+    if (cutMusicNodes) {
+        stopCutMusic();
+        setCutStatus(typeof tx === 'function' ? tx('cut.musicStopped') : 'Music stopped');
+        return;
+    }
+    startCutMusic();
+    setCutStatus(typeof tx === 'function' ? tx('cut.musicPlaying') : 'Playing music preview…');
+}
+
 function toggleCutPlayback() {
+    if (!cutImportedFile) {
+        notify(cutNeedMediaMsg(), true);
+        return;
+    }
+    // Photos: Play toggles music preview (CapCut photo+sound style)
     if (cutMediaKind === 'image') {
-        notify(typeof tx === 'function' ? tx('cut.imageModeHint') : 'Playback is for videos. Export the image when ready.', true);
+        if (cutState.music === 'none') {
+            openCapcutPanel('audio');
+            notify(typeof tx === 'function' ? tx('cut.pickMusic') : 'Pick a music bed for this photo', true);
+            return;
+        }
+        toggleCutMusicPreview();
         return;
     }
     const video = document.getElementById('cutPreview');
@@ -626,14 +665,15 @@ function stopCutMusic() {
     }
 }
 
-function startCutMusic() {
+function startCutMusic(destNode) {
     stopCutMusic();
-    if (cutState.music === 'none' || cutMediaKind !== 'video') return;
+    if (cutState.music === 'none') return null;
     const ctx = ensureCutAudio();
-    if (!ctx) return;
+    if (!ctx) return null;
     const gain = ctx.createGain();
     gain.gain.value = cutState.musicVol;
     gain.connect(ctx.destination);
+    if (destNode) gain.connect(destNode);
     const beds = {
         pulse: [110, 165, 220],
         boost: [98, 147, 196, 294],
@@ -651,7 +691,7 @@ function startCutMusic() {
         o.start();
         return o;
     });
-    cutMusicNodes = { gain, osc };
+    cutMusicNodes = { gain, osc, dest: destNode || null };
     let step = 0;
     cutMusicTimer = setInterval(() => {
         if (!cutMusicNodes) return;
@@ -660,6 +700,66 @@ function startCutMusic() {
             o.frequency.setTargetAtTime(freqs[(step + i) % freqs.length], ctx.currentTime, 0.05);
         });
     }, 280);
+    return cutMusicNodes;
+}
+
+async function exportCutImageWithMusic() {
+    const image = document.getElementById('cutImagePreview');
+    if (!image?.src) throw new Error('No image');
+    if (!image.complete) {
+        await new Promise((resolve, reject) => {
+            const t = setTimeout(resolve, 1200);
+            image.onload = () => { clearTimeout(t); resolve(); };
+            image.onerror = () => { clearTimeout(t); reject(new Error('Image failed to load')); };
+        });
+    }
+    const seconds = Math.min(20, Math.max(3, cutState.photoDuration || 8));
+    const { w, h } = cutCanvasSize();
+    const canvas = document.getElementById('cutCanvas') || document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    const stream = canvas.captureStream(30);
+    let mediaStream = stream;
+    try {
+        const audioCtx = ensureCutAudio();
+        if (audioCtx) {
+            const dest = audioCtx.createMediaStreamDestination();
+            startCutMusic(dest);
+            mediaStream = new MediaStream([...stream.getVideoTracks(), ...dest.stream.getAudioTracks()]);
+        }
+    } catch (_) {
+        mediaStream = stream;
+    }
+
+    const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+        ? 'video/webm;codecs=vp9'
+        : 'video/webm';
+    const recorder = new MediaRecorder(mediaStream, { mimeType: mime, videoBitsPerSecond: 3500000 });
+    const chunks = [];
+    recorder.ondataavailable = (ev) => { if (ev.data?.size) chunks.push(ev.data); };
+
+    let drawing = true;
+    const draw = () => {
+        if (!drawing) return;
+        drawCutMediaFrame(ctx, image, w, h, image.style.filter || 'none');
+        drawCutOverlays(ctx, w, h);
+        requestAnimationFrame(draw);
+    };
+
+    const recorded = new Promise((resolve, reject) => {
+        recorder.onstop = () => resolve(new Blob(chunks, { type: 'video/webm' }));
+        recorder.onerror = () => reject(new Error('Recorder failed'));
+    });
+    recorder.start(100);
+    draw();
+    await new Promise((r) => setTimeout(r, seconds * 1000));
+    drawing = false;
+    stopCutMusic();
+    if (recorder.state !== 'inactive') recorder.stop();
+    const blob = await recorded;
+    if (!blob.size) throw new Error('Empty export');
+    return blob;
 }
 
 function previewCutEffect() {
@@ -935,8 +1035,14 @@ async function exportMagnomCutProject() {
 
         let outFile;
         if (cutMediaKind === 'image') {
-            const blob = await exportCutImage();
-            outFile = new File([blob], `${safeName}.png`, { type: 'image/png' });
+            if (cutState.music !== 'none') {
+                if (progress) progress.textContent = 'Rendering photo + music…';
+                const blob = await exportCutImageWithMusic();
+                outFile = new File([blob], `${safeName}.webm`, { type: 'video/webm' });
+            } else {
+                const blob = await exportCutImage();
+                outFile = new File([blob], `${safeName}.png`, { type: 'image/png' });
+            }
         } else {
             const blob = await exportCutVideo();
             outFile = new File([blob], `${safeName}.webm`, { type: 'video/webm' });
@@ -1079,7 +1185,13 @@ function initMagnomCut() {
         document.querySelectorAll('#cutMusicChips .capcut-chip').forEach((c) => c.classList.toggle('active', c === btn));
         updateTimelineLabels();
         const video = document.getElementById('cutPreview');
-        if (video && !video.paused && cutMediaKind === 'video') startCutMusic();
+        if (cutMediaKind === 'video' && video && !video.paused) {
+            startCutMusic();
+        } else if (cutMediaKind === 'image') {
+            // CapCut-style: selecting a bed starts preview on photos
+            if (cutState.music === 'none') stopCutMusic();
+            else startCutMusic();
+        }
         pushCutHistory();
     });
 
@@ -1127,6 +1239,7 @@ function initMagnomCut() {
     bindRange('cutSaturate', 'saturate', 'cutSaturateVal', (v) => v.toFixed(2));
     bindRange('cutMusicVol', 'musicVol', 'cutMusicVolVal', (v) => `${Math.round(v * 100)}%`);
     bindRange('cutVideoVol', 'videoVol', 'cutVideoVolVal', (v) => `${Math.round(v * 100)}%`);
+    bindRange('cutPhotoDuration', 'photoDuration', 'cutPhotoDurationVal', (v) => `${Math.round(v)}s`);
     bindRange('cutTrimStart', 'trimStart', 'cutTrimStartVal', (v) => `${v.toFixed(1)}s`);
     bindRange('cutTrimEnd', 'trimEnd', 'cutTrimEndVal', (v) => `${v.toFixed(1)}s`);
 
@@ -1153,6 +1266,7 @@ function initMagnomCut() {
 window.initMagnomCut = initMagnomCut;
 window.exportMagnomCutProject = exportMagnomCutProject;
 window.toggleCutPlayback = toggleCutPlayback;
+window.toggleCutMusicPreview = toggleCutMusicPreview;
 window.setCutCaptionPreset = setCutCaptionPreset;
 window.setCutSpeed = setCutSpeed;
 window.previewCutEffect = previewCutEffect;
