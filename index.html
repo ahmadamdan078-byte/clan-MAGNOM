@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="format-detection" content="telephone=no">
-    <meta name="theme-color" content="#FDBE55">
+    <meta name="theme-color" content="#F0B429">
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="apple-touch-icon" href="photos/magnom-bg.jpeg">
     <meta name="description" content="MAGNOM Clan — Elite Rocket League community. Join the roster, train with coaches, chat, events, and MAGNOM AI.">
@@ -16,12 +16,12 @@
     <meta property="og:image" content="photos/magnom-bg.jpeg">
     <meta property="og:type" content="website">
     <title>MAGNOM Clan — Elite Rocket League Community</title>
-    <link rel="stylesheet" href="site.css">
-    <link rel="preload" href="site.css" as="style">
-    <link rel="preload" href="i18n.js" as="script">
+    <link rel="stylesheet" href="site.css?v=20260708">
+    <link rel="preload" href="site.css?v=20260708" as="style">
+    <link rel="preload" href="i18n.js?v=20260708" as="script">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&family=Orbitron:wght@600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&family=Oxanium:wght@500;600;700;800&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -30,26 +30,32 @@
         }
 
         :root {
-            --primary-color: #FDBE55;
-            --primary-dark: #E5A030;
-            --accent-red: #D80000;
-            --accent-red-dark: #A80000;
-            --bg-slate: #515A6F;
-            --bg-dark: #151A24;
-            --bg-darker: #0D1118;
-            --text-light: #ffffff;
-            --text-muted: #a8b0c0;
-            --primary-rgb: 253, 190, 85;
-            --accent-red-rgb: 216, 0, 0;
+            --primary-color: #F0B429;
+            --primary-dark: #C89214;
+            --accent-red: #E8334A;
+            --accent-red-dark: #B41F35;
+            --neon-cyan: #5EEAD4;
+            --neon-cyan-rgb: 94, 234, 212;
+            --bg-slate: #243044;
+            --bg-dark: #0B0F18;
+            --bg-darker: #06080F;
+            --text-light: #F7F8FC;
+            --text-muted: #9AA3B8;
+            --primary-rgb: 240, 180, 41;
+            --accent-red-rgb: 232, 51, 74;
             --bg-image: url('photos/magnom-bg.jpeg');
-            --panel-bg: rgba(21, 26, 36, 0.72);
-            --panel-border: rgba(253, 190, 85, 0.25);
-            --font-display: 'Orbitron', system-ui, sans-serif;
-            --font-body: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            --glass-blur: blur(16px);
+            --panel-bg: rgba(10, 14, 24, 0.78);
+            --panel-border: rgba(240, 180, 41, 0.22);
+            --font-display: 'Oxanium', system-ui, sans-serif;
+            --font-body: 'Sora', 'Noto Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif;
+            --glass-blur: blur(20px) saturate(1.2);
+            --radius-md: 12px;
             --radius-lg: 16px;
-            --radius-xl: 22px;
-            --shadow-glow: 0 0 40px rgba(var(--primary-rgb), 0.15);
+            --radius-xl: 24px;
+            --shadow-glow: 0 0 40px rgba(var(--primary-rgb), 0.16);
+            --line-glow: linear-gradient(90deg, transparent, rgba(var(--primary-rgb), 0.7), transparent);
+            --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+            --space-section: clamp(64px, 10vw, 112px);
         }
 
         ::selection {
@@ -64,9 +70,11 @@
 
         body {
             font-family: var(--font-body);
-            background-color: var(--bg-dark);
+            background-color: var(--bg-darker);
             background-image:
-                linear-gradient(160deg, rgba(21, 26, 36, 0.92) 0%, rgba(81, 90, 111, 0.65) 45%, rgba(13, 17, 24, 0.95) 100%),
+                radial-gradient(ellipse 80% 50% at 50% -5%, rgba(var(--primary-rgb), 0.14), transparent 55%),
+                radial-gradient(ellipse 45% 35% at 95% 15%, rgba(var(--neon-cyan-rgb), 0.06), transparent 55%),
+                linear-gradient(170deg, rgba(6, 8, 15, 0.96) 0%, rgba(11, 15, 24, 0.9) 45%, rgba(6, 8, 15, 0.97) 100%),
                 var(--bg-image);
             background-position: center center;
             background-size: cover;
@@ -80,11 +88,14 @@
             overflow-x: hidden;
             padding-left: env(safe-area-inset-left);
             padding-right: env(safe-area-inset-right);
+            line-height: 1.5;
         }
 
         h1, h2, h3, .auth-title h1, .panel h2, .chart-container h3 {
             font-family: var(--font-display);
             letter-spacing: 0.04em;
+            font-weight: 700;
+            line-height: 1.15;
         }
 
         .ambient-bg {
@@ -98,53 +109,59 @@
         .ambient-orb {
             position: absolute;
             border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.35;
-            animation: orbFloat 18s ease-in-out infinite;
+            filter: blur(100px);
+            opacity: 0.28;
+            animation: orbFloat 22s ease-in-out infinite;
         }
 
         .ambient-orb.orb-1 {
-            width: 420px;
-            height: 420px;
-            background: radial-gradient(circle, rgba(var(--primary-rgb), 0.5), transparent 70%);
-            top: -120px;
-            right: -80px;
+            width: 520px;
+            height: 520px;
+            background: radial-gradient(circle, rgba(var(--primary-rgb), 0.5), transparent 68%);
+            top: -160px;
+            right: -120px;
         }
 
         .ambient-orb.orb-2 {
-            width: 360px;
-            height: 360px;
-            background: radial-gradient(circle, rgba(var(--accent-red-rgb), 0.35), transparent 70%);
-            bottom: -100px;
-            left: -60px;
-            animation-delay: -6s;
+            width: 380px;
+            height: 380px;
+            background: radial-gradient(circle, rgba(var(--accent-red-rgb), 0.22), transparent 70%);
+            bottom: -140px;
+            left: -100px;
+            animation-delay: -7s;
         }
 
         .ambient-orb.orb-3 {
             width: 280px;
             height: 280px;
-            background: radial-gradient(circle, rgba(81, 90, 111, 0.6), transparent 70%);
-            top: 40%;
-            left: 50%;
+            background: radial-gradient(circle, rgba(var(--neon-cyan-rgb), 0.18), transparent 70%);
+            top: 48%;
+            left: 55%;
             transform: translate(-50%, -50%);
-            animation-delay: -12s;
-            opacity: 0.2;
+            animation-delay: -14s;
+            opacity: 0.18;
         }
 
         .ambient-grid {
             position: absolute;
             inset: 0;
             background-image:
-                linear-gradient(rgba(var(--primary-rgb), 0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(var(--primary-rgb), 0.04) 1px, transparent 1px);
-            background-size: 48px 48px;
-            mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 20%, transparent 75%);
+                linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+            background-size: 64px 64px;
+            mask-image: radial-gradient(ellipse 70% 55% at 50% 30%, black 10%, transparent 70%);
+            opacity: 0.7;
+        }
+
+        .ambient-horizon,
+        .ambient-scan,
+        .ambient-beam {
+            display: none;
         }
 
         @keyframes orbFloat {
             0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(30px, -25px) scale(1.05); }
-            66% { transform: translate(-20px, 20px) scale(0.95); }
+            50% { transform: translate(20px, -18px) scale(1.04); }
         }
 
         .auth-container,
@@ -215,13 +232,13 @@
         }
 
         .auth-box {
-            background: rgba(13, 17, 24, 0.82);
-            border: 1px solid rgba(var(--primary-rgb), 0.35);
+            background: rgba(10, 14, 24, 0.88);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: var(--radius-xl);
-            padding: 40px;
+            padding: 36px 32px;
             max-width: 400px;
             width: 100%;
-            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55), var(--shadow-glow);
+            box-shadow: 0 28px 64px rgba(0, 0, 0, 0.5), var(--shadow-glow);
             position: relative;
             z-index: 1;
             transform: translate3d(0, 0, 0);
@@ -236,23 +253,26 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent-red), var(--primary-color), var(--accent-red));
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-red), var(--primary-color), transparent);
         }
 
         .auth-box::after {
             content: '';
             position: absolute;
-            top: -60%;
-            right: -40%;
-            width: 200px;
-            height: 200px;
+            top: -50%;
+            right: -35%;
+            width: 180px;
+            height: 180px;
             background: radial-gradient(circle, rgba(var(--primary-rgb), 0.12), transparent 70%);
             pointer-events: none;
         }
 
         @media (prefers-reduced-motion: reduce) {
             .ambient-orb,
+            .ambient-grid,
+            .ambient-horizon,
+            .ambient-beam,
             .auth-logo,
             .btn-primary::after,
             .dashboard-container {
@@ -408,28 +428,27 @@
 
         input:focus, select:focus {
             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.3);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 0 1px rgba(var(--neon-cyan-rgb), 0.35), 0 0 16px rgba(var(--primary-rgb), 0.25);
         }
 
         .btn-primary {
-            padding: 12px;
+            padding: 12px 18px;
             border: none;
-            border-radius: 8px;
-            background: linear-gradient(135deg, var(--primary-color) 0%, #ffc870 50%, var(--accent-red) 100%);
-            background-size: 200% auto;
-            color: #151A24;
+            border-radius: 10px;
+            background: var(--primary-color);
+            color: #06080F;
             font-weight: 700;
             cursor: pointer;
-            font-size: 1em;
-            transition: all 0.3s;
+            transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
             margin-top: 10px;
             position: relative;
             overflow: hidden;
             font-family: var(--font-display);
-            letter-spacing: 0.06em;
+            letter-spacing: 0.05em;
             text-transform: uppercase;
-            font-size: 0.9em;
+            font-size: 0.88em;
+            box-shadow: 0 8px 24px rgba(var(--primary-rgb), 0.28);
         }
 
         .btn-primary::after {
@@ -439,8 +458,8 @@
             left: -100%;
             width: 50%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
-            animation: btnShimmer 4s ease-in-out infinite;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+            animation: btnShimmer 5s ease-in-out infinite;
         }
 
         @keyframes btnShimmer {
@@ -536,16 +555,16 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 32px;
+            margin-bottom: 28px;
             flex-wrap: wrap;
             gap: 20px;
-            padding: 22px 28px;
-            background: rgba(13, 17, 24, 0.65);
-            border: 1px solid rgba(var(--primary-rgb), 0.28);
+            padding: 20px 24px;
+            background: rgba(10, 14, 24, 0.72);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: var(--radius-lg);
             -webkit-backdrop-filter: var(--glass-blur);
             backdrop-filter: var(--glass-blur);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+            box-shadow: 0 10px 36px rgba(0, 0, 0, 0.28);
             position: relative;
             overflow: hidden;
         }
@@ -996,12 +1015,12 @@
         }
 
         .stat-card {
-            background: rgba(13, 17, 24, 0.55);
-            border: 1px solid rgba(var(--primary-rgb), 0.35);
+            background: rgba(10, 14, 24, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: var(--radius-lg);
-            padding: 22px 20px;
+            padding: 22px 18px;
             text-align: center;
-            transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+            transition: all 0.3s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
             position: relative;
             overflow: hidden;
             -webkit-backdrop-filter: var(--glass-blur);
@@ -1016,13 +1035,13 @@
             right: 0;
             height: 2px;
             background: linear-gradient(90deg, var(--accent-red), var(--primary-color));
-            opacity: 0.7;
+            opacity: 0.8;
         }
 
         .stat-card:hover {
             transform: translateY(-6px);
-            box-shadow: 0 12px 32px rgba(var(--primary-rgb), 0.2);
-            border-color: var(--primary-color);
+            box-shadow: 0 14px 36px rgba(0, 0, 0, 0.3), var(--shadow-glow);
+            border-color: rgba(var(--primary-rgb), 0.35);
         }
 
         .stat-icon {
@@ -1080,16 +1099,16 @@
         }
 
         .panel {
-            background: rgba(13, 17, 24, 0.62);
-            border: 1px solid rgba(var(--primary-rgb), 0.28);
+            background: rgba(10, 14, 24, 0.72);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: var(--radius-lg);
-            padding: 25px;
+            padding: 24px;
             -webkit-backdrop-filter: var(--glass-blur);
             backdrop-filter: var(--glass-blur);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.28);
             position: relative;
             overflow: hidden;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
         }
 
         .panel::before {
@@ -1099,23 +1118,29 @@
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient(90deg, var(--accent-red), var(--primary-color), transparent);
+            background: linear-gradient(90deg, var(--accent-red), var(--primary-color), transparent 85%);
+        }
+
+        .panel::after {
+            display: none;
         }
 
         .panel:hover {
-            border-color: rgba(var(--primary-rgb), 0.45);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3), var(--shadow-glow);
+            border-color: rgba(var(--primary-rgb), 0.35);
+            box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35), var(--shadow-glow);
+            transform: translateY(-2px);
         }
 
         .panel h2 {
-            margin-bottom: 20px;
-            color: var(--primary-color);
-            font-size: 1.35em;
+            margin-bottom: 18px;
+            color: var(--text-light);
+            font-size: 1.25em;
             display: flex;
             align-items: center;
             gap: 10px;
-            text-transform: uppercase;
+            text-transform: none;
             font-weight: 700;
+            letter-spacing: 0.03em;
         }
 
         .button-group {
@@ -1136,19 +1161,22 @@
         }
 
         .btn-secondary {
-            background: rgba(81, 90, 111, 0.4);
-            color: #c8d0e0;
-            border: 2px solid var(--bg-slate);
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-light);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
             flex: 1;
         }
 
         .btn-secondary:hover {
-            background: rgba(81, 90, 111, 0.65);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(var(--primary-rgb), 0.35);
         }
 
         .btn-danger {
             background: var(--accent-red);
             color: #fff;
+            border-radius: 10px;
             flex: 0.5;
         }
 
@@ -1189,16 +1217,16 @@
         }
 
         .member-card {
-            background: rgba(0, 0, 0, 0.28);
-            border: 1px solid rgba(var(--primary-rgb), 0.22);
-            border-left: 4px solid var(--primary-color);
+            background: rgba(10, 14, 24, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-left: 3px solid var(--primary-color);
             border-radius: var(--radius-lg);
-            padding: 20px 24px;
+            padding: 18px 22px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-            min-height: 96px;
+            transition: all 0.3s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+            min-height: 92px;
             -webkit-backdrop-filter: blur(8px);
             backdrop-filter: blur(8px);
         }
@@ -1217,8 +1245,8 @@
         }
 
         .member-card:hover {
-            border-color: rgba(var(--primary-rgb), 0.5);
-            background: rgba(var(--primary-rgb), 0.08);
+            border-color: rgba(var(--primary-rgb), 0.35);
+            background: rgba(var(--primary-rgb), 0.07);
             transform: translateX(6px);
             box-shadow: -4px 0 20px rgba(var(--primary-rgb), 0.12);
         }
@@ -2767,6 +2795,11 @@
         <div class="ambient-orb orb-2"></div>
         <div class="ambient-orb orb-3"></div>
         <div class="ambient-grid"></div>
+        <div class="ambient-horizon"></div>
+        <div class="ambient-scan"></div>
+        <div class="ambient-beam b1"></div>
+        <div class="ambient-beam b2"></div>
+        <div class="ambient-beam b3"></div>
     </div>
 
     <div class="page-loader" id="pageLoader" aria-hidden="true">
@@ -2840,24 +2873,28 @@
     <div class="landing-page active" id="landingPage">
         <button type="button" class="lang-toggle-float" id="langToggleFloat" onclick="toggleLanguage()" aria-label="Change language"><span class="lang-toggle-label">العربية</span></button>
         <section class="landing-hero">
+            <div class="landing-hero-media" aria-hidden="true"></div>
             <div class="landing-hero-content">
                 <img class="landing-logo" src="photos/magnom-bg.jpeg" alt="MAGNOM Clan">
-                <h1>MAGNOM CLAN</h1>
-                <p class="hero-sub" data-i18n="hero.sub">The ultimate Rocket League clan platform — elite roster, live chat, coaching, events, and MAGNOM AI built for champions.</p>
-                <div class="announcement-ticker" id="announcementTicker" style="display:none">
-                    <span class="ticker-badge" data-i18n="ticker.latest">📢 Latest</span>
-                    <span class="ticker-text" id="tickerText"></span>
-                </div>
+                <h1 class="landing-brand">MAGNOM</h1>
+                <p class="hero-sub" data-i18n="hero.sub">Elite Rocket League clan — train, compete, and climb together.</p>
                 <div class="landing-cta">
                     <button type="button" class="btn-hero btn-hero-primary" onclick="openAuthOverlay('register')" data-i18n="hero.join">Join the Clan</button>
                     <button type="button" class="btn-hero btn-hero-secondary" onclick="openAuthOverlay('login')" data-i18n="hero.login">Member Login</button>
                 </div>
-                <div class="landing-live-stats">
-                    <div class="landing-stat"><span class="landing-stat-num" id="landingStatMembers">0</span><span class="landing-stat-label" data-i18n="stat.roster">Roster</span></div>
-                    <div class="landing-stat"><span class="landing-stat-num" id="landingStatUsers">0</span><span class="landing-stat-label" data-i18n="stat.members">Members</span></div>
-                    <div class="landing-stat"><span class="landing-stat-num" id="landingStatCoaches">0</span><span class="landing-stat-label" data-i18n="stat.coaches">Coaches</span></div>
-                    <div class="landing-stat"><span class="landing-stat-num" id="landingStatEvents">0</span><span class="landing-stat-label" data-i18n="stat.events">Events</span></div>
+                <div class="announcement-ticker" id="announcementTicker" style="display:none">
+                    <span class="ticker-badge" data-i18n="ticker.latest">📢 Latest</span>
+                    <span class="ticker-text" id="tickerText"></span>
                 </div>
+            </div>
+        </section>
+
+        <section class="landing-section landing-stats-section">
+            <div class="landing-live-stats">
+                <div class="landing-stat"><span class="landing-stat-num" id="landingStatMembers">0</span><span class="landing-stat-label" data-i18n="stat.roster">Roster</span></div>
+                <div class="landing-stat"><span class="landing-stat-num" id="landingStatUsers">0</span><span class="landing-stat-label" data-i18n="stat.members">Members</span></div>
+                <div class="landing-stat"><span class="landing-stat-num" id="landingStatCoaches">0</span><span class="landing-stat-label" data-i18n="stat.coaches">Coaches</span></div>
+                <div class="landing-stat"><span class="landing-stat-num" id="landingStatEvents">0</span><span class="landing-stat-label" data-i18n="stat.events">Events</span></div>
             </div>
         </section>
 
@@ -3003,6 +3040,7 @@
                 </div>
             </header>
 
+            <div class="site-sections-stage" id="siteSectionsStage">
             <div class="site-section active" data-section="home" id="sectionHome">
                 <div class="home-welcome" id="homeWelcome"></div>
                 <div class="member-spotlight" id="memberSpotlight" style="display:none"></div>
@@ -3207,6 +3245,7 @@
                         <button type="button" class="btn-primary" style="margin-top:20px" onclick="openSupportModal()" data-i18n="about.askAi">Ask MAGNOM AI →</button>
                     </div>
                 </div>
+            </div>
             </div>
 
             <footer class="site-footer">
@@ -3427,12 +3466,12 @@
         </div>
     </div>
 
-    <script src="i18n.js"></script>
+    <script src="i18n.js?v=20260708"></script>
     <script src="notifications.js"></script>
     <script src="push.js"></script>
     <script src="support_queue.js"></script>
     <script src="support_call.js"></script>
-    <script src="site.js"></script>
+    <script src="site.js?v=20260708"></script>
     <script>
         const RL_TIERS = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Champion', 'Grand Champion'];
         const RL_DIVISIONS = ['I', 'II', 'III'];
@@ -4473,7 +4512,7 @@
             const box = document.getElementById('welcomeConfetti');
             if (!box) return;
             box.innerHTML = '';
-            const colors = ['#FDBE55', '#D80000', '#ffffff', '#4fd1c5', '#c77dff', '#ffe566'];
+            const colors = ['#F0B429', '#E8334A', '#5EEAD4', '#ffffff', '#c77dff', '#ffe566'];
             for (let i = 0; i < 48; i++) {
                 const piece = document.createElement('span');
                 piece.style.left = `${Math.random() * 100}%`;
