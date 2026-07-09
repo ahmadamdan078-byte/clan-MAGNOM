@@ -266,7 +266,7 @@ window.CUT_TEMPLATE_CATALOG = [
     { id: 'cc_btsDump', name: 'Behind The Scenes', cat: 'Photo Dump', filter: 'muted', effect: 'softFocus', music: 'warmup', textStyle: 'typewriter', bright: 1.05, contrast: 1.1, saturate: 1.1, ratio: '9x16', fit: 'contain', photoDuration: 8, uses: 380000, source: 'capcut', cover: 'linear-gradient(160deg,#052e16 0%,#15803d 50%,#86efac 100%)' },
     { id: 'cc_recapHalf', name: '2026 Recap So Far', cat: 'Photo Dump', filter: 'firewatch', effect: 'rise', music: 'comeback', textStyle: 'gradient', caption: '2026 RECAP', bright: 1.05, contrast: 1.1, saturate: 1.1, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 670000, badge: 'New', trending: true, source: 'capcut', cover: 'linear-gradient(160deg,#172554 0%,#1d4ed8 50%,#93c5fd 100%)' },
     { id: 'cc_weekendDump', name: 'Weekend Dump', cat: 'Photo Dump', filter: 'fog', effect: 'fadePulse', music: 'lobby', textStyle: 'sticky', caption: 'WEEKEND', bright: 1.14, contrast: 1.1, saturate: 1.1, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 310000, forYou: true, source: 'capcut', cover: 'linear-gradient(145deg,#0f0c29 0%,#302b63 50%,#24243e 100%)' },
-    { id: 'cc_travelDump', name: 'Travel Dump', cat: 'Photo Dump', filter: 'ocean', effect: 'whipPan', music: 'spaceEcho', textStyle: 'iceText', bright: 1.05, contrast: 1.1, saturate: 1.1, ratio: '9x16', fit: 'cover', photoDuration: 13, uses: 280000, source: 'capcut', cover: 'linear-gradient(145deg,#200122 0%,#6f0000 100%)' },
+    { id: 'cc_travelDump', name: 'Travel Dump', cat: 'Photo Dump', filter: 'polaroid', effect: 'kenBurns', music: 'calmWaves', textStyle: 'typewriter', caption: 'TRAVEL DUMP', bright: 1.08, contrast: 1.05, saturate: 1.05, ratio: '9x16', fit: 'cover', photoDuration: 13, uses: 280000, forYou: true, source: 'capcut', cover: 'linear-gradient(145deg,#200122 0%,#6f0000 100%)' },
     { id: 'cc_beatDrop', name: 'Beat Drop Sync', cat: 'Beat Sync', filter: 'vivid', effect: 'heartbeat', music: 'hypeDrop', textStyle: 'impact', bright: 1.05, contrast: 1.1, saturate: 1.1, ratio: '9x16', fit: 'cover', photoDuration: 5, uses: 1800000, badge: 'Hot', trending: true, forYou: true, source: 'capcut', cover: 'linear-gradient(160deg,#0B1C2C 0%,#1B6CA8 50%,#5EEAD4 100%)' },
     { id: 'cc_phonkSync', name: 'Phonk Beat Sync', cat: 'Beat Sync', filter: 'toxic', effect: 'strobe', music: 'dubstep', textStyle: 'glowPink', bright: 1.05, contrast: 1.1, saturate: 1.1, ratio: '9x16', fit: 'cover', photoDuration: 6, uses: 1200000, trending: true, forYou: true, source: 'capcut', cover: 'linear-gradient(160deg,#2A0612 0%,#FE2C55 50%,#FF8A3D 100%)' },
     { id: 'cc_trapSync', name: 'Trap Beat Sync', cat: 'Beat Sync', filter: 'purple', effect: 'wobble', music: 'trapBeat', textStyle: 'pink', bright: 1.05, contrast: 1.1, saturate: 1.1, ratio: '9x16', fit: 'cover', photoDuration: 7, uses: 940000, trending: true, source: 'capcut', cover: 'linear-gradient(160deg,#12061F 0%,#7C3AED 50%,#FE2C55 100%)' },
@@ -284,7 +284,7 @@ window.CUT_TEMPLATE_CATALOG = [
     { id: 'cc_goldenCine', name: 'Golden Hour Cine', cat: 'Cinematic', filter: 'sunset', effect: 'fadePulse', music: 'goldenHour', textStyle: 'gradient', bright: 1.12, contrast: 1.1, saturate: 1.35, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 510000, forYou: true, source: 'capcut', cover: 'linear-gradient(160deg,#1e1b4b 0%,#4f46e5 50%,#38bdf8 100%)' },
     { id: 'cc_epicTrailer', name: 'Epic Trailer', cat: 'Cinematic', filter: 'drama', effect: 'crashZoom', music: 'thunder', textStyle: 'impact', caption: 'EPIC', bright: 1.05, contrast: 1.1, saturate: 1.1, ratio: '16x9', fit: 'cover', photoDuration: 10, uses: 440000, trending: true, source: 'capcut', cover: 'linear-gradient(160deg,#450a0a 0%,#b91c1c 50%,#fca5a5 100%)' },
     { id: 'cc_dayLife', name: 'Day In My Life', cat: 'Vlog', filter: 'crisp', effect: 'kenBurns', music: 'lobby', textStyle: 'clean', bright: 1.05, contrast: 1.1, saturate: 1.1, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 720000, forYou: true, source: 'capcut', cover: 'linear-gradient(160deg,#052e16 0%,#15803d 50%,#86efac 100%)' },
-    { id: 'cc_travelVlog', name: 'Travel Vlog', cat: 'Vlog', filter: 'ocean', effect: 'whipPan', music: 'spaceEcho', textStyle: 'iceText', bright: 1.05, contrast: 1.1, saturate: 1.1, ratio: '9x16', fit: 'cover', photoDuration: 11, uses: 580000, forYou: true, source: 'capcut', cover: 'linear-gradient(160deg,#172554 0%,#1d4ed8 50%,#93c5fd 100%)' },
+    { id: 'cc_travelVlog', name: 'Travel Vlog', cat: 'Vlog', filter: 'ocean', effect: 'whipPan', music: 'spaceEcho', textStyle: 'iceText', caption: 'TRAVEL VLOG', bright: 1.08, contrast: 1.14, saturate: 1.18, ratio: '9x16', fit: 'cover', photoDuration: 11, uses: 580000, forYou: true, source: 'capcut', cover: 'linear-gradient(160deg,#172554 0%,#1d4ed8 50%,#93c5fd 100%)' },
     { id: 'cc_aestheticVlog', name: 'Aesthetic Vlog', cat: 'Vlog', filter: 'haze', effect: 'float', music: 'lofiLoop', textStyle: 'minimal', bright: 1.14, contrast: 1.1, saturate: 1.1, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 490000, forYou: true, source: 'capcut', cover: 'linear-gradient(145deg,#0f0c29 0%,#302b63 50%,#24243e 100%)' },
     { id: 'cc_morningRoutine', name: 'Morning Routine', cat: 'Vlog', filter: 'bloom', effect: 'rise', music: 'sunrise', textStyle: 'sticky', bright: 1.1, contrast: 1.1, saturate: 1.1, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 410000, source: 'capcut', cover: 'linear-gradient(145deg,#200122 0%,#6f0000 100%)' },
     { id: 'cc_gymVlog', name: 'Gym Vlog', cat: 'Vlog', filter: 'sharp', effect: 'impact', music: 'highEnergy', textStyle: 'impact', bright: 1.05, contrast: 1.25, saturate: 1.1, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 360000, source: 'capcut', cover: 'linear-gradient(160deg,#0B1C2C 0%,#1B6CA8 50%,#5EEAD4 100%)' },
@@ -415,6 +415,52 @@ const CUT_FILTER_ADJUST = {
     crisp: { bright: 1.1, contrast: 1.16, saturate: 1.02 },
     sharp: { bright: 1.04, contrast: 1.24, saturate: 1.15 },
     teal: { bright: 1.05, contrast: 1.12, saturate: 1.22 },
+    retro: { bright: 1.02, contrast: 1.12, saturate: 1.15 },
+    glow: { bright: 1.12, contrast: 1.1, saturate: 1.32 },
+    cold: { bright: 1.03, contrast: 1.14, saturate: 0.95 },
+    warm: { bright: 1.08, contrast: 1.08, saturate: 1.28 },
+    purple: { bright: 1.02, contrast: 1.12, saturate: 1.38 },
+    pink: { bright: 1.06, contrast: 1.1, saturate: 1.45 },
+    lime: { bright: 1.04, contrast: 1.15, saturate: 1.5 },
+    sunset: { bright: 1.08, contrast: 1.12, saturate: 1.32 },
+    vintage: { bright: 0.98, contrast: 1.1, saturate: 0.92 },
+    polaroid: { bright: 1.1, contrast: 1.05, saturate: 1.08 },
+    bleach: { bright: 1.04, contrast: 1.35, saturate: 0.58 },
+    matrix: { bright: 0.96, contrast: 1.22, saturate: 1.42 },
+    infrared: { bright: 1.02, contrast: 1.2, saturate: 1.55 },
+    ember: { bright: 1.0, contrast: 1.18, saturate: 1.42 },
+    arctic: { bright: 1.08, contrast: 1.12, saturate: 0.82 },
+    toxic: { bright: 1.0, contrast: 1.2, saturate: 1.62 },
+    ruby: { bright: 1.02, contrast: 1.16, saturate: 1.52 },
+    sapphire: { bright: 1.0, contrast: 1.14, saturate: 1.45 },
+    dusty: { bright: 1.0, contrast: 1.08, saturate: 0.88 },
+    candy: { bright: 1.1, contrast: 1.1, saturate: 1.75 },
+    silver: { bright: 1.02, contrast: 1.28, saturate: 0.65 },
+    copper: { bright: 1.04, contrast: 1.1, saturate: 1.22 },
+    acid: { bright: 1.02, contrast: 1.22, saturate: 1.85 },
+    fog: { bright: 1.14, contrast: 0.88, saturate: 0.62 },
+    emberglow: { bright: 1.08, contrast: 1.12, saturate: 1.38 },
+    wes: { bright: 1.06, contrast: 1.06, saturate: 1.18 },
+    bleachGlow: { bright: 1.18, contrast: 1.12, saturate: 0.72 },
+    amber: { bright: 1.08, contrast: 1.1, saturate: 1.22 },
+    ocean: { bright: 1.05, contrast: 1.1, saturate: 1.15 },
+    forest: { bright: 0.98, contrast: 1.12, saturate: 1.12 },
+    violet: { bright: 1.02, contrast: 1.1, saturate: 1.32 },
+    steel: { bright: 0.96, contrast: 1.32, saturate: 0.62 },
+    firewatch: { bright: 1.06, contrast: 1.18, saturate: 1.35 },
+    aurora: { bright: 1.06, contrast: 1.12, saturate: 1.38 },
+    none: { bright: 1.0, contrast: 1.0, saturate: 1.0 },
+};
+
+const CUT_CAT_ADJUST = {
+    'Beat Sync': { bright: 1.06, contrast: 1.2, saturate: 1.28 },
+    Transition: { bright: 1.04, contrast: 1.16, saturate: 1.12 },
+    Gaming: { bright: 1.04, contrast: 1.18, saturate: 1.35 },
+    Sports: { bright: 1.05, contrast: 1.2, saturate: 1.25 },
+    Seasonal: { bright: 1.08, contrast: 1.1, saturate: 1.15 },
+    Luxury: { bright: 1.06, contrast: 1.15, saturate: 1.2 },
+    Retro: { bright: 1.04, contrast: 1.12, saturate: 1.28 },
+    Nature: { bright: 1.06, contrast: 1.1, saturate: 1.18 },
 };
 
 const CUT_CAT_CAPTIONS = {
@@ -429,24 +475,30 @@ window.CUT_TEMPLATE_CATALOG = (window.CUT_TEMPLATE_CATALOG || []).map((t, i) => 
     const isGenericAdjust = t.bright === 1.05 && t.contrast === 1.1 && t.saturate === 1.1;
     if (isGenericAdjust && CUT_FILTER_ADJUST[t.filter]) {
         Object.assign(t, CUT_FILTER_ADJUST[t.filter]);
+    } else if (isGenericAdjust && CUT_CAT_ADJUST[t.cat]) {
+        Object.assign(t, CUT_CAT_ADJUST[t.cat]);
     }
 
-    if (t.cat === 'MAGNOM' && isGenericAdjust) {
-        const magnomTune = {
-            magnomGold: { bright: 1.1, contrast: 1.15, saturate: 1.28 },
-            sslPath: { bright: 1.02, contrast: 1.18, saturate: 0.88 },
-            clutchHeat: { bright: 1.04, contrast: 1.28, saturate: 1.42 },
-            whatASave: { bright: 1.08, contrast: 1.2, saturate: 1.35 },
-            flipReset: { bright: 1.02, contrast: 1.22, saturate: 1.45 },
-            demoed: { bright: 0.92, contrast: 1.38, saturate: 1.05 },
-            arenaNeon: { bright: 1.05, contrast: 1.2, saturate: 1.55 },
-            tournament: { bright: 0.94, contrast: 1.3, saturate: 0.95 },
-            mustyPack: { bright: 1.04, contrast: 1.32, saturate: 1.18 },
-            airDribblePack: { bright: 1.06, contrast: 1.12, saturate: 1.25 },
-        };
-        if (magnomTune[t.id]) Object.assign(t, magnomTune[t.id]);
-    }
+    const magnomTune = {
+        magnomGold: { bright: 1.1, contrast: 1.15, saturate: 1.28 },
+        sslPath: { bright: 1.02, contrast: 1.18, saturate: 0.88 },
+        clutchHeat: { bright: 1.04, contrast: 1.28, saturate: 1.42 },
+        whatASave: { bright: 1.08, contrast: 1.2, saturate: 1.35 },
+        flipReset: { bright: 1.02, contrast: 1.22, saturate: 1.45 },
+        demoed: { bright: 0.92, contrast: 1.38, saturate: 1.05 },
+        arenaNeon: { bright: 1.05, contrast: 1.2, saturate: 1.55 },
+        tournament: { bright: 0.94, contrast: 1.3, saturate: 0.95 },
+        mustyPack: { bright: 1.04, contrast: 1.32, saturate: 1.18 },
+        airDribblePack: { bright: 1.06, contrast: 1.12, saturate: 1.25 },
+    };
+    if (t.cat === 'MAGNOM' && magnomTune[t.id]) Object.assign(t, magnomTune[t.id]);
 
+    t.bright = Math.min(1.5, Math.max(0.6, Number(t.bright) || 1));
+    t.contrast = Math.min(1.6, Math.max(0.6, Number(t.contrast) || 1));
+    t.saturate = Math.min(2, Math.max(0.15, Number(t.saturate) || 1));
+    t.photoDuration = Math.min(20, Math.max(3, Math.round(Number(t.photoDuration) || 8)));
+    if (!['9x16', '1x1', '16x9'].includes(t.ratio)) t.ratio = '9x16';
+    if (!['cover', 'contain', 'fill'].includes(t.fit)) t.fit = 'cover';
     t.cover = cutTemplateUniqueCover(t, i);
     t.uses = t.uses || Math.max(12000, 900000 - i * 137);
     t.duration = t.photoDuration || (t.cat === 'Beat Sync' ? 6 : t.cat === 'Transition' ? 4 : 8);
@@ -471,6 +523,32 @@ window.CUT_TEMPLATE_CATALOG = (window.CUT_TEMPLATE_CATALOG || []).map((t, i) => 
     t.sticker = '';
     return t;
 });
+
+window.validateMagnomCutCatalog = function validateMagnomCutCatalog() {
+    const filters = new Set((window.CUT_FILTER_CATALOG || []).map((f) => f.id));
+    const effects = new Set((window.CUT_EFFECT_CATALOG || []).map((e) => e.id));
+    const music = new Set((window.CUT_MUSIC_CATALOG || []).map((m) => m.id));
+    const styles = new Set((window.CUT_TEXT_STYLE_CATALOG || []).map((s) => s.id));
+    const errors = [];
+    const ids = new Set();
+    const names = new Map();
+    const combos = new Map();
+
+    (window.CUT_TEMPLATE_CATALOG || []).forEach((t) => {
+        if (ids.has(t.id)) errors.push(`Duplicate template id: ${t.id}`);
+        ids.add(t.id);
+        if (names.has(t.name)) errors.push(`Duplicate template name: ${t.name}`);
+        names.set(t.name, t.id);
+        if (!filters.has(t.filter)) errors.push(`${t.id}: unknown filter "${t.filter}"`);
+        if (!effects.has(t.effect)) errors.push(`${t.id}: unknown effect "${t.effect}"`);
+        if (!music.has(t.music)) errors.push(`${t.id}: unknown music "${t.music}"`);
+        if (!styles.has(t.textStyle)) errors.push(`${t.id}: unknown text style "${t.textStyle}"`);
+        const combo = [t.filter, t.effect, t.music, t.textStyle, t.ratio, t.bright, t.contrast, t.saturate].join('|');
+        if (!combos.has(combo)) combos.set(combo, t.id);
+        else errors.push(`Duplicate look: ${t.id} matches ${combos.get(combo)}`);
+    });
+    return errors;
+};
 
 window.CUT_TRANSITION_CATALOG = [
     { id: 'fadeIn', name: 'Fade In', effect: 'rise' },

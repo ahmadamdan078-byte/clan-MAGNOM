@@ -136,6 +136,42 @@ function formatCutTime(seconds) {
     return `${m}:${String(s).padStart(2, '0')}`;
 }
 
+function cutEscHtml(s) {
+    return String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+function cutClampTemplateValue(key, val) {
+    const n = Number(val);
+    if (key === 'bright') return Math.min(1.5, Math.max(0.6, n || 1));
+    if (key === 'contrast') return Math.min(1.6, Math.max(0.6, n || 1));
+    if (key === 'saturate') return Math.min(2, Math.max(0.15, n || 1));
+    if (key === 'photoDuration') return Math.min(20, Math.max(3, Math.round(n || 8)));
+    return val;
+}
+
+function cutSanitizeTemplateRefs(tpl) {
+    const safe = { ...tpl };
+    const hasFilter = (window.CUT_FILTER_CATALOG || []).some((f) => f.id === safe.filter);
+    const hasEffect = (window.CUT_EFFECT_CATALOG || []).some((e) => e.id === safe.effect);
+    const hasMusic = (window.CUT_MUSIC_CATALOG || []).some((m) => m.id === safe.music);
+    const hasStyle = (window.CUT_TEXT_STYLE_CATALOG || []).some((s) => s.id === safe.textStyle);
+    if (!hasFilter) safe.filter = 'none';
+    if (!hasEffect) safe.effect = 'none';
+    if (!hasMusic) safe.music = 'none';
+    if (!hasStyle) safe.textStyle = 'gold';
+    if (!['9x16', '1x1', '16x9'].includes(safe.ratio)) safe.ratio = '9x16';
+    if (!['cover', 'contain', 'fill'].includes(safe.fit)) safe.fit = 'cover';
+    safe.bright = cutClampTemplateValue('bright', safe.bright);
+    safe.contrast = cutClampTemplateValue('contrast', safe.contrast);
+    safe.saturate = cutClampTemplateValue('saturate', safe.saturate);
+    safe.photoDuration = cutClampTemplateValue('photoDuration', safe.photoDuration);
+    return safe;
+}
+
 function cutFilterName(id) {
     return (window.CUT_FILTER_CATALOG || []).find((f) => f.id === id)?.name || id || 'Original';
 }
@@ -148,22 +184,25 @@ function cutRatioLabel(ratio) {
 
 function cutTemplateCardHtml(t) {
     const badge = t.badge
-        ? `<span class="capcut-template-badge ${String(t.badge).toLowerCase()}">${t.badge}</span>`
+        ? `<span class="capcut-template-badge ${String(t.badge).toLowerCase()}">${cutEscHtml(t.badge)}</span>`
         : '';
     const ratio = `<span class="capcut-template-ratio">${cutRatioLabel(t.ratio)}</span>`;
     const caption = t.caption
-        ? `<span class="capcut-template-caption">${t.caption}</span>`
+        ? `<span class="capcut-template-caption">${cutEscHtml(t.caption)}</span>`
         : '';
-    const pack = `${cutFilterName(t.filter)} · ${t.duration || t.photoDuration || 8}s`;
+    const pack = `${cutEscHtml(cutFilterName(t.filter))} · ${t.duration || t.photoDuration || 8}s`;
+    const name = cutEscHtml(t.name);
+    const cat = cutEscHtml(t.cat);
+    const id = cutEscHtml(t.id);
     return `
-      <button type="button" class="capcut-template-card" data-template="${t.id}" data-cat="${t.cat}" title="${t.name} — ${pack}" onclick="applyMagnomCutTemplate('${t.id}')">
+      <button type="button" class="capcut-template-card" data-template="${id}" data-cat="${cat}" title="${name} — ${pack}" onclick="applyMagnomCutTemplate('${id}')">
         <span class="capcut-template-cover" style="background:${t.cover}"></span>
         ${badge}
         ${ratio}
         <span class="capcut-template-body">
-          <span class="capcut-template-name">${t.name}</span>
+          <span class="capcut-template-name">${name}</span>
           <span class="capcut-template-meta">
-            <span>${t.cat}</span>
+            <span>${cat}</span>
             <span>${pack} · ${formatCutUses(t.uses)}</span>
           </span>
           ${caption}
@@ -845,28 +884,29 @@ function updatePendingTemplateUI() {
 }
 
 function applyCutTemplateSettings(tpl, id) {
-    cutState.filter = tpl.filter || 'none';
-    cutState.effect = tpl.effect || 'none';
-    cutState.music = tpl.music || 'none';
-    cutState.textStyle = tpl.textStyle || 'gold';
+    const t = cutSanitizeTemplateRefs(tpl);
+    cutState.filter = t.filter || 'none';
+    cutState.effect = t.effect || 'none';
+    cutState.music = t.music || 'none';
+    cutState.textStyle = t.textStyle || 'gold';
     cutState.sticker = '';
-    cutState.bright = tpl.bright ?? 1;
-    cutState.contrast = tpl.contrast ?? 1;
-    cutState.saturate = tpl.saturate ?? 1;
-    cutState.ratio = tpl.ratio || cutState.ratio || '9x16';
-    cutState.fit = tpl.fit || cutState.fit || 'contain';
-    cutState.photoDuration = tpl.photoDuration || cutState.photoDuration || 8;
+    cutState.bright = t.bright;
+    cutState.contrast = t.contrast;
+    cutState.saturate = t.saturate;
+    cutState.ratio = t.ratio || '9x16';
+    cutState.fit = t.fit || 'contain';
+    cutState.photoDuration = t.photoDuration || 8;
     cutState.captionX = 50;
     cutState.captionY = 82;
     cutState.stickerX = 82;
     cutState.stickerY = 16;
 
     const caption = document.getElementById('cutCaption');
-    if (caption) caption.value = tpl.caption || '';
-    cutState.captionText = tpl.caption || '';
+    if (caption) caption.value = t.caption || '';
+    cutState.captionText = t.caption || '';
 
     const project = document.getElementById('cutProjectName');
-    if (project && !project.value.trim()) project.value = tpl.name;
+    if (project && !project.value.trim()) project.value = t.name;
 
     syncControlsFromState();
     applyAllCutVisuals();
@@ -874,13 +914,13 @@ function applyCutTemplateSettings(tpl, id) {
         c.classList.toggle('active', c.dataset.template === id);
     });
     pushCutHistory();
-    setCutStatus(`Template applied: ${tpl.name}`);
-    notify(`Template: ${tpl.name}`);
+    setCutStatus(`Template applied: ${t.name}`);
+    notify(`Template: ${t.name}`);
 
-    if (tpl.effect && tpl.effect !== 'none') {
+    if (t.effect && t.effect !== 'none') {
         setTimeout(() => previewCutEffect(), 40);
     }
-    if (tpl.music && tpl.music !== 'none') {
+    if (t.music && t.music !== 'none') {
         startCutMusic();
     } else {
         stopCutMusic();
@@ -1563,6 +1603,16 @@ function previewCutEffect() {
             { duration: 900, easing: 'ease-in-out' },
         );
     }
+    if (fx.kind === 'whipPan' && inner) {
+        inner.animate(
+            [
+                { transform: 'translateX(-8%) scale(1.02)' },
+                { transform: 'translateX(8%) scale(1.04)' },
+                { transform: 'translateX(0) scale(1)' },
+            ],
+            { duration: 420, easing: 'ease-in-out' },
+        );
+    }
 }
 
 function fillClipFormFromExport(file, title) {
@@ -2059,6 +2109,12 @@ function bindCutTrimHandles() {
 
 function initMagnomCut() {
     if (!document.getElementById('magnomCutStudio')) return;
+    if (typeof window.validateMagnomCutCatalog === 'function') {
+        const catalogErrors = window.validateMagnomCutCatalog();
+        if (catalogErrors.length) {
+            console.error('[MAGNOMEDITS] Template catalog issues:', catalogErrors);
+        }
+    }
     populateMagnomCutLibrary();
 
     const canvas = document.getElementById('cutCanvas');
