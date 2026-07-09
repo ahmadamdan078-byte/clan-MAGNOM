@@ -201,6 +201,8 @@ def init_db():
             "CREATE INDEX IF NOT EXISTS idx_support_signals_entry ON support_call_signals(entry_id, id)"
         )
         _seed_site_content(conn)
+        _wipe_events_history_forever(conn)
+        _purge_past_events(conn)
         conn.commit()
 
 
@@ -223,7 +225,6 @@ def _seed_site_content(conn):
 
     user_count = conn.execute('SELECT COUNT(*) as c FROM users').fetchone()['c']
     announcement_count = conn.execute('SELECT COUNT(*) as c FROM announcements').fetchone()['c']
-    event_count = conn.execute('SELECT COUNT(*) as c FROM events').fetchone()['c']
 
     # Only auto-create demos on a brand-new empty database.
     # If users already exist (production), never re-insert after deletes/resets.
@@ -240,20 +241,47 @@ def _seed_site_content(conn):
             seeds,
         )
 
-    if may_seed_demos and event_count == 0:
-        conn.executemany(
-            'INSERT INTO events (title, description, event_date, event_time, created_by) VALUES (?, ?, ?, ?, ?)',
-            [
-                ('Clan Scrims', '3v3 scrims — focus on rotation and boost management.', '2026-07-12', '20:00', 'MAGNOM Admin'),
-                ('Mechanics Training', 'Air roll + fast aerial drills with coaches.', '2026-07-15', '19:00', 'MAGNOM Coach'),
-                ('Rank Review Night', 'Replay review session — submit your games in chat.', '2026-07-20', '21:00', 'MAGNOM Coach'),
-            ],
-        )
-
     # Mark seed complete so empties after delete stay empty forever on this DB.
     conn.execute(
         "INSERT OR REPLACE INTO app_meta (key, value) VALUES ('site_content_seeded', '1')"
     )
+
+
+def _wipe_events_history_forever(conn):
+    """One-time wipe of all events and event activity — never restored."""
+    conn.execute(
+        '''CREATE TABLE IF NOT EXISTS app_meta (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        )'''
+    )
+    already = conn.execute(
+        "SELECT value FROM app_meta WHERE key = 'events_history_wiped_v1'"
+    ).fetchone()
+    if already:
+        return
+    conn.execute('DELETE FROM events')
+    conn.execute("DELETE FROM activity_log WHERE kind IN ('event', 'training')")
+    conn.execute(
+        "INSERT OR REPLACE INTO app_meta (key, value) VALUES ('events_history_wiped_v1', '1')"
+    )
+
+
+def _purge_past_events(conn):
+    """Drop past events on every boot so event history never accumulates."""
+    conn.execute("DELETE FROM events WHERE event_date < date('now')")
+    conn.execute(
+        "DELETE FROM activity_log WHERE kind IN ('event', 'training') "
+        "AND created_at < datetime('now', '-1 day')"
+    )
+
+
+def clear_all_events() -> int:
+    with get_connection() as conn:
+        deleted = conn.execute('DELETE FROM events').rowcount
+        conn.execute("DELETE FROM activity_log WHERE kind IN ('event', 'training')")
+        conn.commit()
+        return deleted
 
 
 def list_all_users():
@@ -728,19 +756,13 @@ def delete_announcement(announcement_id: int) -> bool:
         return cursor.rowcount > 0
 
 
-def list_events(upcoming_only=False, limit=50):
+def list_events(upcoming_only=True, limit=50):
     with get_connection() as conn:
-        if upcoming_only:
-            return conn.execute(
-                '''SELECT id, title, description, event_date, event_time, created_by, created_at
-                   FROM events WHERE event_date >= date('now')
-                   ORDER BY event_date ASC, event_time ASC LIMIT ?''',
-                (limit,)
-            ).fetchall()
         return conn.execute(
             '''SELECT id, title, description, event_date, event_time, created_by, created_at
-               FROM events ORDER BY event_date DESC LIMIT ?''',
-            (limit,)
+               FROM events WHERE event_date >= date('now')
+               ORDER BY event_date ASC, event_time ASC LIMIT ?''',
+            (limit,),
         ).fetchall()
 
 

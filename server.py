@@ -49,6 +49,7 @@ from database import (
     list_events,
     create_event,
     delete_event,
+    clear_all_events,
     list_gallery,
     create_gallery_item,
     delete_gallery_item,
@@ -1082,9 +1083,8 @@ def remove_announcement(item_id):
 
 @app.route('/api/events', methods=['GET'])
 def get_events():
-    upcoming = request.args.get('upcoming') == '1'
     return jsonify({
-        'events': [_row_event(r) for r in list_events(upcoming_only=upcoming)]
+        'events': [_row_event(r) for r in list_events()]
     })
 
 
@@ -1105,6 +1105,18 @@ def post_event():
     _activity('event', f'New event: {title}', f'{event_date}{" · " + event_time if event_time else ""}',
               user['username'], user['id'], row['id'])
     return jsonify({'event': _row_event(row)}), 201
+
+
+@app.route('/api/events', methods=['DELETE'])
+@login_required
+def clear_events():
+    user = request.current_user
+    if not is_admin(user):
+        return jsonify({'error': 'Admin access required'}), 403
+    deleted = clear_all_events()
+    _activity('event', 'All events cleared', f'{deleted} removed permanently',
+              user['username'], user['id'])
+    return jsonify({'message': 'All events deleted', 'deleted': deleted})
 
 
 @app.route('/api/events/<int:item_id>', methods=['DELETE'])

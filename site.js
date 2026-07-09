@@ -79,7 +79,7 @@ async function loadLandingData() {
         const [stats, news, events, gallery] = await Promise.all([
             fetchCachedJson('/api/site/stats', 60000),
             fetchCachedJson('/api/announcements'),
-            fetchCachedJson('/api/events?upcoming=1'),
+            fetchCachedJson('/api/events'),
             fetchCachedJson('/api/gallery'),
         ]);
         siteDataCache.announcements = news.announcements || [];
@@ -295,7 +295,7 @@ async function loadHomeSection() {
     try {
         const [news, events] = await Promise.all([
             fetchCachedJson('/api/announcements'),
-            fetchCachedJson('/api/events?upcoming=1'),
+            fetchCachedJson('/api/events'),
         ]);
         renderHomeWelcome();
         const el = document.getElementById('homeNewsPreview');
