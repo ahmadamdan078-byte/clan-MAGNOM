@@ -119,7 +119,7 @@ function populateMagnomCutLibrary() {
     }
 }
 
-let cutTemplateTab = 'modern';
+let cutTemplateTab = 'capcut';
 let cutTemplateCat = 'All';
 
 function formatCutUses(n) {
@@ -214,6 +214,7 @@ function cutTemplateCardHtml(t) {
 function getFilteredMagnomTemplates() {
     const q = (document.getElementById('cutTemplateSearch')?.value || '').trim().toLowerCase();
     const tabCat = {
+        capcut: 'CapCut Trends',
         slowmo: 'Slow Motion',
         photodump: 'Photo Dump',
         beatsync: 'Beat Sync',

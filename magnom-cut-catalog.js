@@ -223,7 +223,7 @@ window.CUT_CAPTION_PRESETS = [
     'PRO PATH', 'ELITE MECHS', 'FULL SEND', 'CLUTCH GENIUS', 'TEAM FIGHT',
 ];
 
-/* 129 unique MAGNOMEDITS templates — CapCut-style looks */
+/* 175 unique MAGNOMEDITS templates — includes CapCut trends */
 window.CUT_TEMPLATE_CATALOG = [
     { id: 'cc_slowmoTrend', name: 'New Trending SlowMo', cat: 'Slow Motion', filter: 'soft', effect: 'softFocus', music: 'calmWaves', textStyle: 'minimal', bright: 1.12, contrast: 0.95, saturate: 0.9, ratio: '9x16', fit: 'cover', photoDuration: 12, uses: 5300000, badge: 'Hot', trending: true, forYou: true, source: 'capcut', cover: 'linear-gradient(145deg,#0f0c29 0%,#302b63 50%,#24243e 100%)' },
     { id: 'cc_slowmoClassic', name: 'Slow Motion Template', cat: 'Slow Motion', filter: 'cinema', effect: 'slowReveal', music: 'memories', textStyle: 'clean', bright: 0.95, contrast: 1.25, saturate: 0.88, ratio: '9x16', fit: 'cover', photoDuration: 14, uses: 4800000, badge: 'Hot', trending: true, forYou: true, source: 'capcut', cover: 'linear-gradient(145deg,#200122 0%,#6f0000 100%)' },
@@ -353,6 +353,54 @@ window.CUT_TEMPLATE_CATALOG = [
     { id: 'arenaNeon', name: 'Arena Neon', cat: 'MAGNOM', filter: 'neon', effect: 'neonGlitch', music: 'neonCity', textStyle: 'neon', caption: 'FULL SEND', bright: 1.05, contrast: 1.1, saturate: 1.1, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 33000, trending: true, source: 'magnom', cover: 'linear-gradient(160deg,#312e81 0%,#818cf8 50%,#f0abfc 100%)' },
     { id: 'tournament', name: 'Tournament Mode', cat: 'MAGNOM', filter: 'cinema', effect: 'matchPoint', music: 'tournament', textStyle: 'impact', caption: 'TOURNAMENT MODE', bright: 1.05, contrast: 1.1, saturate: 1.1, ratio: '16x9', fit: 'cover', photoDuration: 8, uses: 25000, source: 'magnom', cover: 'linear-gradient(160deg,#431407 0%,#ea580c 50%,#fde047 100%)' },
     { id: 'mustyPack', name: 'Musty Flick', cat: 'MAGNOM', filter: 'sharp', effect: 'snap', music: 'musty', textStyle: 'outline', caption: 'MUSTY', bright: 1.05, contrast: 1.1, saturate: 1.1, ratio: '9x16', fit: 'cover', photoDuration: 5, uses: 22000, source: 'magnom', cover: 'linear-gradient(160deg,#042f2e 0%,#0d9488 55%,#a7f3d0 100%)' },
+
+    /* —— CapCut trending imports —— */
+    { id: 'cc_healingThailand', name: 'Healing Thailand', cat: 'CapCut Trends', filter: 'haze', effect: 'kenBurns', music: 'calmWaves', textStyle: 'minimal', bright: 1.14, contrast: 0.9, saturate: 0.82, ratio: '9x16', fit: 'cover', photoDuration: 12, uses: 6200000, badge: 'Hot', trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_beat3Anh', name: 'Beat 3 Anh', cat: 'CapCut Trends', filter: 'vivid', effect: 'heartbeat', music: 'hypeDrop', textStyle: 'impact', bright: 1.06, contrast: 1.2, saturate: 1.45, ratio: '9x16', fit: 'cover', photoDuration: 5, uses: 5100000, badge: 'Hot', trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_beat5Anh', name: 'Beat 5 Anh', cat: 'CapCut Trends', filter: 'neon', effect: 'snap', music: 'kickoff', textStyle: 'neon', bright: 1.04, contrast: 1.18, saturate: 1.52, ratio: '9x16', fit: 'cover', photoDuration: 5, uses: 4700000, badge: 'Hot', trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_flashWarning', name: 'Flash Warning', cat: 'CapCut Trends', filter: 'none', effect: 'flash', music: 'sparkBurst', textStyle: 'impact', bright: 1.0, contrast: 1.15, saturate: 1.0, ratio: '9x16', fit: 'cover', photoDuration: 4, uses: 3900000, trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_glowBurst', name: 'Glow Burst Reveal', cat: 'CapCut Trends', filter: 'glow', effect: 'pop', music: 'popHook', textStyle: 'pink', bright: 1.13, contrast: 1.08, saturate: 1.38, ratio: '9x16', fit: 'cover', photoDuration: 6, uses: 3400000, trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_lifeLately', name: 'Life Lately', cat: 'CapCut Trends', filter: 'polaroid', effect: 'fadePulse', music: 'lofiLoop', textStyle: 'typewriter', caption: 'LIFE LATELY', bright: 1.08, contrast: 1.04, saturate: 1.02, ratio: '9x16', fit: 'cover', photoDuration: 11, uses: 4100000, badge: 'Hot', trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_recentlyDump', name: 'Recently Photo Dump', cat: 'CapCut Trends', filter: 'pastel', effect: 'kenBurns', music: 'whisperPad', textStyle: 'sticky', caption: 'RECENTLY', bright: 1.12, contrast: 0.94, saturate: 0.88, ratio: '9x16', fit: 'cover', photoDuration: 10, uses: 3600000, trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_cinematicHook', name: 'Cinematic Text Hook', cat: 'CapCut Trends', filter: 'cinema', effect: 'pushIn', music: 'darkMatter', textStyle: 'clean', caption: 'THE STORY', bright: 0.94, contrast: 1.28, saturate: 0.9, ratio: '9x16', fit: 'cover', photoDuration: 10, uses: 2800000, trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_speedRampTrend', name: 'Speed Ramp Trend', cat: 'CapCut Trends', filter: 'chrome', effect: 'whipPan', music: 'trapBeat', textStyle: 'outline', bright: 1.05, contrast: 1.26, saturate: 1.08, ratio: '9x16', fit: 'cover', photoDuration: 7, uses: 4500000, badge: 'Hot', trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_softZoomBlur', name: 'Soft Zoom Blur', cat: 'CapCut Trends', filter: 'soft', effect: 'blurIn', music: 'whisperPad', textStyle: 'minimal', bright: 1.12, contrast: 0.92, saturate: 0.86, ratio: '9x16', fit: 'contain', photoDuration: 10, uses: 2200000, trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_beforeAfter', name: 'Before After Reveal', cat: 'CapCut Trends', filter: 'bleach', effect: 'hardCut', music: 'drumRoll', textStyle: 'banner', caption: 'BEFORE / AFTER', bright: 1.02, contrast: 1.32, saturate: 0.72, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 1900000, trending: true, source: 'capcut' },
+    { id: 'cc_beatDropFreeze', name: 'Beat Drop Freeze', cat: 'CapCut Trends', filter: 'vivid', effect: 'flash', music: 'hypeDrop', textStyle: 'impact', bright: 1.08, contrast: 1.22, saturate: 1.48, ratio: '9x16', fit: 'cover', photoDuration: 5, uses: 3300000, badge: 'Hot', trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_collageGrid', name: 'Collage Grid Photo', cat: 'CapCut Trends', filter: 'wes', effect: 'kenBurns', music: 'jazzSwing', textStyle: 'minimal', bright: 1.06, contrast: 1.06, saturate: 1.18, ratio: '1x1', fit: 'cover', photoDuration: 9, uses: 1700000, forYou: true, source: 'capcut' },
+    { id: 'cc_villainArc', name: 'Villain Arc', cat: 'CapCut Trends', filter: 'midnight', effect: 'glitchChaos', music: 'darkMatter', textStyle: 'impact', caption: 'VILLAIN ARC', bright: 0.88, contrast: 1.34, saturate: 0.92, ratio: '9x16', fit: 'cover', photoDuration: 7, uses: 2900000, trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_lightGlow', name: 'Light Glow Sparkle', cat: 'CapCut Trends', filter: 'bloom', effect: 'pop', music: 'goldenHour', textStyle: 'gradient', bright: 1.14, contrast: 1.06, saturate: 1.28, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 2400000, trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_oneLineStory', name: 'One Line Story', cat: 'CapCut Trends', filter: 'ink', effect: 'rise', music: 'memories', textStyle: 'typewriter', caption: 'ONE LINE', bright: 0.96, contrast: 1.3, saturate: 0.78, ratio: '9x16', fit: 'cover', photoDuration: 9, uses: 1500000, forYou: true, source: 'capcut' },
+    { id: 'cc_slowZoomEmo', name: 'Slow Zoom Emotional', cat: 'CapCut Trends', filter: 'soft', effect: 'kenBurns', music: 'memories', textStyle: 'clean', bright: 1.1, contrast: 0.96, saturate: 0.9, ratio: '9x16', fit: 'cover', photoDuration: 13, uses: 3800000, badge: 'Hot', trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_glitchPop', name: 'Glitch Pop', cat: 'CapCut Trends', filter: 'pink', effect: 'glitchRGB', music: 'popHook', textStyle: 'bubble', bright: 1.06, contrast: 1.14, saturate: 1.55, ratio: '9x16', fit: 'cover', photoDuration: 6, uses: 2600000, trending: true, source: 'capcut' },
+    { id: 'cc_splitFrame', name: 'Split Frame', cat: 'CapCut Trends', filter: 'vivid', effect: 'whipPan', music: 'houseBeat', textStyle: 'boxed', bright: 1.04, contrast: 1.2, saturate: 1.42, ratio: '9x16', fit: 'cover', photoDuration: 6, uses: 2100000, trending: true, source: 'capcut' },
+    { id: 'cc_retroPop', name: 'Retro Pop', cat: 'CapCut Trends', filter: 'retro', effect: 'vhs', music: 'synthwave', textStyle: 'neon', bright: 1.02, contrast: 1.12, saturate: 1.35, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 1800000, trending: true, source: 'capcut' },
+    { id: 'cc_freezeCam', name: 'Freeze Cam', cat: 'CapCut Trends', filter: 'cold', effect: 'flash', music: 'drumRoll', textStyle: 'impact', bright: 1.03, contrast: 1.18, saturate: 0.95, ratio: '9x16', fit: 'cover', photoDuration: 5, uses: 2300000, badge: 'New', trending: true, source: 'capcut' },
+    { id: 'cc_echoStep', name: 'Echo Step', cat: 'CapCut Trends', filter: 'purple', effect: 'heartbeat', music: 'dubstep', textStyle: 'glowPink', bright: 1.02, contrast: 1.16, saturate: 1.48, ratio: '9x16', fit: 'cover', photoDuration: 6, uses: 2000000, trending: true, source: 'capcut' },
+    { id: 'cc_zoom3dPro', name: '3D Zoom Pro', cat: 'CapCut Trends', filter: 'chrome', effect: 'zoomBig', music: 'cyberPulse', textStyle: 'neon', bright: 1.05, contrast: 1.24, saturate: 1.1, ratio: '9x16', fit: 'cover', photoDuration: 7, uses: 3500000, badge: 'Hot', trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_smoothSlomoBlur', name: 'Smooth Slow-Mo Blur', cat: 'CapCut Trends', filter: 'haze', effect: 'blurPulse', music: 'calmWaves', textStyle: 'minimal', bright: 1.13, contrast: 0.9, saturate: 0.8, ratio: '9x16', fit: 'cover', photoDuration: 12, uses: 4200000, trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_summerMiniVlog', name: 'Summer Mini Vlog', cat: 'CapCut Trends', filter: 'sunset', effect: 'float', music: 'goldenHour', textStyle: 'sticky', caption: 'SUMMER', bright: 1.1, contrast: 1.1, saturate: 1.3, ratio: '9x16', fit: 'cover', photoDuration: 10, uses: 3100000, badge: 'New', trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_memoryRewind', name: 'Memory Rewind', cat: 'CapCut Trends', filter: 'vintage', effect: 'rewindFeel', music: 'memories', textStyle: 'typewriter', caption: 'MEMORIES', bright: 0.98, contrast: 1.15, saturate: 0.88, ratio: '9x16', fit: 'cover', photoDuration: 11, uses: 2700000, trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_flowerName', name: 'Flower Name Aesthetic', cat: 'CapCut Trends', filter: 'pastel', effect: 'float', music: 'lofiLoop', textStyle: 'sticky', bright: 1.14, contrast: 0.92, saturate: 0.84, ratio: '1x1', fit: 'contain', photoDuration: 10, uses: 2400000, trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_tiktokViral', name: 'TikTok Viral Template', cat: 'CapCut Trends', filter: 'vivid', effect: 'zoom', music: 'popHook', textStyle: 'pink', bright: 1.07, contrast: 1.18, saturate: 1.5, ratio: '9x16', fit: 'cover', photoDuration: 6, uses: 5000000, badge: 'Hot', trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_opticalFlow', name: 'Optical Flow SlowMo', cat: 'CapCut Trends', filter: 'bloom', effect: 'softFocus', music: 'whisperPad', textStyle: 'minimal', bright: 1.12, contrast: 0.94, saturate: 0.92, ratio: '9x16', fit: 'cover', photoDuration: 11, uses: 3700000, trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_phonkVelocity26', name: 'Phonk Velocity 2026', cat: 'CapCut Trends', filter: 'matrix', effect: 'strobe', music: 'dubstep', textStyle: 'glowPink', bright: 1.0, contrast: 1.22, saturate: 1.65, ratio: '9x16', fit: 'cover', photoDuration: 6, uses: 4400000, badge: 'Hot', trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_filmBurn', name: 'Film Burn Retro', cat: 'CapCut Trends', filter: 'vintage', effect: 'vhs', music: 'memories', textStyle: 'typewriter', bright: 0.97, contrast: 1.18, saturate: 0.94, ratio: '9x16', fit: 'cover', photoDuration: 9, uses: 1600000, forYou: true, source: 'capcut' },
+    { id: 'cc_neonNightDrive', name: 'Neon Night Drive', cat: 'CapCut Trends', filter: 'cyberpunk', effect: 'neonGlitch', music: 'nightDrive', textStyle: 'neon', bright: 1.03, contrast: 1.2, saturate: 1.45, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 2900000, trending: true, source: 'capcut' },
+    { id: 'cc_outfitCheck', name: 'Outfit Check Velocity', cat: 'CapCut Trends', filter: 'sharp', effect: 'snap', music: 'trapBeat', textStyle: 'outline', caption: 'OOTD', bright: 1.05, contrast: 1.22, saturate: 1.2, ratio: '9x16', fit: 'cover', photoDuration: 6, uses: 3200000, trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_gymTransform', name: 'Gym Transform', cat: 'CapCut Trends', filter: 'heat', effect: 'impact', music: 'highEnergy', textStyle: 'fireText', caption: 'GLOW UP', bright: 1.06, contrast: 1.26, saturate: 1.35, ratio: '9x16', fit: 'cover', photoDuration: 7, uses: 2600000, trending: true, source: 'capcut' },
+    { id: 'cc_carEditNight', name: 'Car Edit Night', cat: 'CapCut Trends', filter: 'midnight', effect: 'drift', music: 'deepBass', textStyle: 'shadow', bright: 0.9, contrast: 1.28, saturate: 1.05, ratio: '16x9', fit: 'cover', photoDuration: 8, uses: 2100000, trending: true, source: 'capcut' },
+    { id: 'cc_aiOneTap', name: 'AI One Tap Viral', cat: 'CapCut Trends', filter: 'vivid', effect: 'hypeCut', music: 'sparkBurst', textStyle: 'boxed', bright: 1.06, contrast: 1.2, saturate: 1.42, ratio: '9x16', fit: 'cover', photoDuration: 6, uses: 3800000, badge: 'New', trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_greenScreen', name: 'Green Screen Story', cat: 'CapCut Trends', filter: 'matrix', effect: 'rise', music: 'whisperPad', textStyle: 'clean', bright: 1.0, contrast: 1.16, saturate: 1.38, ratio: '9x16', fit: 'cover', photoDuration: 9, uses: 1800000, forYou: true, source: 'capcut' },
+    { id: 'cc_multiClipStory', name: 'Multi Clip Story', cat: 'CapCut Trends', filter: 'crisp', effect: 'kenBurns', music: 'lobby', textStyle: 'clean', bright: 1.08, contrast: 1.14, saturate: 1.05, ratio: '9x16', fit: 'cover', photoDuration: 12, uses: 2500000, trending: true, source: 'capcut' },
+    { id: 'cc_soundRemix', name: 'Sound Remix Trend', cat: 'CapCut Trends', filter: 'acid', effect: 'jitter', music: 'pixelHop', textStyle: 'comic', bright: 1.02, contrast: 1.18, saturate: 1.72, ratio: '9x16', fit: 'cover', photoDuration: 5, uses: 2200000, trending: true, source: 'capcut' },
+    { id: 'cc_beatSyncPortrait', name: 'Beat Sync Portrait', cat: 'CapCut Trends', filter: 'pink', effect: 'heartbeat', music: 'popHook', textStyle: 'pink', bright: 1.08, contrast: 1.12, saturate: 1.46, ratio: '9x16', fit: 'cover', photoDuration: 5, uses: 3400000, trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_capcutNew2026', name: 'CapCut New Trend 2026', cat: 'CapCut Trends', filter: 'sharp', effect: 'crashZoom', music: 'sparkBurst', textStyle: 'impact', bright: 1.04, contrast: 1.24, saturate: 1.22, ratio: '9x16', fit: 'cover', photoDuration: 6, uses: 5500000, badge: 'Hot', trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_urbanVelocity', name: 'Urban Velocity ICAL', cat: 'CapCut Trends', filter: 'chrome', effect: 'whipPan', music: 'trapBeat', textStyle: 'outline', bright: 1.03, contrast: 1.3, saturate: 1.12, ratio: '9x16', fit: 'cover', photoDuration: 7, uses: 4800000, badge: 'Hot', trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_openArms', name: 'Open Arms Travel', cat: 'CapCut Trends', filter: 'ocean', effect: 'kenBurns', music: 'calmWaves', textStyle: 'clean', bright: 1.06, contrast: 1.1, saturate: 1.12, ratio: '9x16', fit: 'cover', photoDuration: 12, uses: 3100000, trending: true, forYou: true, source: 'capcut' },
+    { id: 'cc_gradRecap', name: 'Graduation Recap', cat: 'CapCut Trends', filter: 'warm', effect: 'elastic', music: 'comeback', textStyle: 'banner', caption: 'GRAD 2026', bright: 1.1, contrast: 1.08, saturate: 1.22, ratio: '9x16', fit: 'cover', photoDuration: 10, uses: 2700000, badge: 'New', trending: true, source: 'capcut' },
+    { id: 'cc_beachDay', name: 'Beach Day Dump', cat: 'CapCut Trends', filter: 'ocean', effect: 'float', music: 'goldenHour', textStyle: 'gradient', caption: 'BEACH DAY', bright: 1.1, contrast: 1.06, saturate: 1.2, ratio: '9x16', fit: 'cover', photoDuration: 9, uses: 2400000, forYou: true, source: 'capcut' },
+    { id: 'cc_tryTemplate', name: 'Try This Template', cat: 'CapCut Trends', filter: 'vivid', effect: 'zoomBig', music: 'hypeDrop', textStyle: 'boxed', bright: 1.06, contrast: 1.2, saturate: 1.38, ratio: '9x16', fit: 'cover', photoDuration: 6, uses: 6000000, badge: 'Hot', trending: true, forYou: true, source: 'capcut' },
     { id: 'airDribblePack', name: 'Air Dribble', cat: 'MAGNOM', filter: 'teal', effect: 'float', music: 'aerial', textStyle: 'glowCyan', caption: 'AIR DRIBBLE', bright: 1.05, contrast: 1.1, saturate: 1.1, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 20000, source: 'magnom', cover: 'linear-gradient(160deg,#4a044e 0%,#c026d3 50%,#f9a8d4 100%)' },
 ];
 
@@ -380,6 +428,7 @@ function cutTemplateUniqueCover(t, index) {
         Luxury: 38,
         Modern: 248,
         MAGNOM: 45,
+        'CapCut Trends': 12,
     };
     const base = catHue[t.cat] ?? 220;
     const h1 = (base + (hash % 48) - 24 + 360) % 360;
@@ -461,6 +510,7 @@ const CUT_CAT_ADJUST = {
     Luxury: { bright: 1.06, contrast: 1.15, saturate: 1.2 },
     Retro: { bright: 1.04, contrast: 1.12, saturate: 1.28 },
     Nature: { bright: 1.06, contrast: 1.1, saturate: 1.18 },
+    'CapCut Trends': { bright: 1.06, contrast: 1.18, saturate: 1.28 },
 };
 
 const CUT_CAT_CAPTIONS = {
@@ -515,7 +565,7 @@ window.CUT_TEMPLATE_CATALOG = (window.CUT_TEMPLATE_CATALOG || []).map((t, i) => 
         t.trending = t.uses >= 400000 || t.cat === 'Trending' || t.cat === 'Modern' || t.badge === 'Hot';
     }
     if (t.forYou == null) {
-        t.forYou = t.cat === 'Modern' || t.cat === 'MAGNOM' || t.trending || t.badge === 'Hot' || t.uses >= 350000;
+        t.forYou = t.cat === 'Modern' || t.cat === 'MAGNOM' || t.cat === 'CapCut Trends' || t.source === 'capcut' || t.trending || t.badge === 'Hot' || t.uses >= 350000;
     }
 
     t.tags = `${t.name} ${t.cat} ${t.filter} ${t.effect} ${t.music} ${t.caption || ''}`.toLowerCase();
@@ -566,6 +616,7 @@ window.CUT_TRANSITION_CATALOG = [
 ];
 
 window.CUT_TEMPLATE_TABS = [
+    { id: 'capcut', name: 'CapCut' },
     { id: 'foryou', name: 'For you' },
     { id: 'trending', name: 'Trending' },
     { id: 'modern', name: 'Modern' },
