@@ -16,6 +16,9 @@ let cutDragTarget = null;
 let cutDragOffset = { x: 0, y: 0 };
 let cutVideoAudioNodes = null;
 let cutPhotoPreviewTimer = null;
+let cutPendingTemplateId = null;
+let cutPhotoPreviewStep = 0;
+let cutTrimDrag = null;
 
 const CUT_FILTER_MAP = window.CUT_FILTER_MAP || { none: '' };
 
@@ -43,6 +46,7 @@ const CUT_DEFAULT_STATE = () => ({
     stickerX: 82,
     stickerY: 16,
     captionText: '',
+    watermark: true,
 });
 
 let cutState = CUT_DEFAULT_STATE();
@@ -92,6 +96,12 @@ function populateMagnomCutLibrary() {
             `<button type="button" class="capcut-chip" onclick="setCutCaptionPreset('${p.replace(/'/g, "\\'")}')">${p}</button>`
         ).join('');
     }
+    const transHost = document.getElementById('cutTransitions');
+    if (transHost) {
+        transHost.innerHTML = (window.CUT_TRANSITION_CATALOG || []).map((tr) =>
+            `<button type="button" class="capcut-chip capcut-transition-chip" data-transition="${tr.id}" data-fx="${tr.effect}">${tr.name}</button>`
+        ).join('');
+    }
     const templateHost = document.getElementById('cutTemplateGrid');
     if (templateHost) {
         renderMagnomCutTemplates();
@@ -109,7 +119,7 @@ function populateMagnomCutLibrary() {
     }
 }
 
-let cutTemplateTab = 'foryou';
+let cutTemplateTab = 'modern';
 let cutTemplateCat = 'All';
 
 function formatCutUses(n) {
@@ -117,6 +127,13 @@ function formatCutUses(n) {
     if (n >= 1000000) return `${(n / 1000000).toFixed(n >= 10000000 ? 0 : 1)}M uses`;
     if (n >= 1000) return `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}K uses`;
     return `${n} uses`;
+}
+
+function formatCutTime(seconds) {
+    if (!Number.isFinite(seconds) || seconds < 0) return '0:00';
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${String(s).padStart(2, '0')}`;
 }
 
 function cutTemplateCardHtml(t) {
@@ -144,6 +161,7 @@ function getFilteredMagnomTemplates() {
         slowmo: 'Slow Motion',
         photodump: 'Photo Dump',
         beatsync: 'Beat Sync',
+        modern: 'Modern',
         aesthetic: 'Aesthetic',
         gaming: 'Gaming',
         magnom: 'MAGNOM',
@@ -173,6 +191,7 @@ function renderMagnomCutTemplates() {
         tabsHost.innerHTML = (window.CUT_TEMPLATE_TABS || [
             { id: 'foryou', name: 'For you' },
             { id: 'trending', name: 'Trending' },
+            { id: 'modern', name: 'Modern' },
             { id: 'slowmo', name: 'Slow Mo' },
             { id: 'photodump', name: 'Photo Dump' },
             { id: 'beatsync', name: 'Beat Sync' },
@@ -301,37 +320,77 @@ function mixAudioForExport(canvasStream, video) {
 function getExportMotion(progress, effectId) {
     const fx = cutEffectById(effectId);
     const t = Math.min(1, Math.max(0, progress));
-    if (!fx || fx.kind === 'none') return { scale: 1, dx: 0, dy: 0 };
+    const base = { scale: 1, dx: 0, dy: 0, rot: 0, opacity: 1, blur: 0, hue: 0, flash: 0 };
+    if (!fx || fx.kind === 'none') return base;
 
-    if (fx.kind === 'kenburns' || fx.kind === 'rise' || fx.kind === 'pushIn' || fx.kind === 'drift') {
-        return { scale: 1 + t * 0.08, dx: 0, dy: -t * 0.02 };
+    if (fx.kind === 'kenburns' || fx.kind === 'pushIn') {
+        return { ...base, scale: 1 + t * 0.08, dy: -t * 0.02 };
+    }
+    if (fx.kind === 'rise') {
+        return { ...base, scale: 1 + t * 0.06, dy: 0.12 * (1 - Math.min(1, t * 2.5)), opacity: Math.min(1, 0.35 + t * 1.4) };
+    }
+    if (fx.kind === 'drop') {
+        return { ...base, dy: -0.12 * (1 - Math.min(1, t * 2.5)), opacity: Math.min(1, 0.35 + t * 1.4) };
     }
     if (fx.kind === 'float') {
-        return { scale: 1, dx: 0, dy: Math.sin(t * Math.PI * 4) * 0.02 };
+        return { ...base, dy: Math.sin(t * Math.PI * 4) * 0.02 };
     }
     if (fx.kind === 'heartbeat' || fx.kind === 'pop') {
         const beat = Math.sin(t * Math.PI * 10);
-        return { scale: 1 + beat * 0.035, dx: 0, dy: 0 };
+        return { ...base, scale: 1 + beat * 0.035 };
     }
     if (fx.kind === 'zoom' || fx.kind === 'impact' || fx.kind === 'snap' || fx.kind === 'hypeCut') {
         const s = (fx.scale || 1.12) - 1;
         const pulse = Math.max(0, Math.sin(t * Math.PI * 6) * 0.5 + 0.5);
-        return { scale: 1 + s * pulse * 0.45, dx: 0, dy: 0 };
+        return { ...base, scale: 1 + s * pulse * 0.45 };
     }
     if (fx.kind === 'shake' || fx.kind === 'demoFx' || fx.kind === 'arenaBoom') {
         const a = (fx.amp || 8) / 280;
-        return { scale: 1, dx: Math.sin(t * 80) * a, dy: Math.cos(t * 64) * a };
+        return { ...base, dx: Math.sin(t * 80) * a, dy: Math.cos(t * 64) * a };
     }
     if (fx.kind === 'wobble' || fx.kind === 'swing' || fx.kind === 'elastic') {
-        return { scale: 1, dx: Math.sin(t * Math.PI * 8) * 0.015, dy: 0 };
+        return { ...base, dx: Math.sin(t * Math.PI * 8) * 0.015, rot: Math.sin(t * Math.PI * 6) * (fx.deg || 4) };
     }
     if (fx.kind === 'spin' || fx.kind === 'rewindFeel') {
-        return { scale: 1 + Math.sin(t * Math.PI * 2) * 0.03, dx: 0, dy: 0 };
+        return { ...base, scale: 1 + Math.sin(t * Math.PI * 2) * 0.03, rot: Math.sin(t * Math.PI * 4) * (fx.deg || 8) };
     }
-    return { scale: 1, dx: 0, dy: 0 };
+    if (fx.kind === 'drift') {
+        return { ...base, scale: 1 + t * 0.05, dx: Math.sin(t * Math.PI * 2) * 0.02 };
+    }
+    if (fx.kind === 'fade') {
+        return { ...base, opacity: 0.35 + 0.65 * Math.sin(t * Math.PI) };
+    }
+    if (fx.kind === 'blur') {
+        return { ...base, blur: (fx.px || 8) * Math.max(0, Math.sin(t * Math.PI)) };
+    }
+    if (fx.kind === 'glitch') {
+        const hue = (fx.hue || 80) * Math.sin(t * Math.PI * 6);
+        return { ...base, dx: Math.sin(t * 120) * 0.025, hue };
+    }
+    if (fx.kind === 'tilt') {
+        return { ...base, rot: (fx.deg || 6) * Math.sin(t * Math.PI * 2) };
+    }
+    if (fx.kind === 'bounce') {
+        const bounce = Math.abs(Math.sin(t * Math.PI * 4)) * (fx.big ? 0.08 : 0.04);
+        return { ...base, dy: -bounce };
+    }
+    if (fx.kind === 'ripple') {
+        return { ...base, scale: 1 + Math.sin(t * Math.PI * 6) * 0.04 };
+    }
+    if (fx.kind === 'flash') {
+        return { ...base, flash: t < 0.1 ? 1 - t / 0.1 : Math.max(0, Math.sin(t * Math.PI * 8) * 0.35) };
+    }
+    if (fx.kind === 'strobe') {
+        return { ...base, flash: Math.sin(t * Math.PI * 24) > 0.65 ? 0.55 : 0 };
+    }
+    if (fx.kind === 'whipPan') {
+        return { ...base, dx: Math.sin(t * Math.PI * 2) * 0.08, scale: 1 + Math.sin(t * Math.PI) * 0.04 };
+    }
+    return base;
 }
 
 function drawMagnomBrandMark(ctx, w, h) {
+    if (cutState.watermark === false) return;
     const user = typeof currentUser !== 'undefined' ? currentUser : null;
     const rank = user?.rank ? String(user.rank) : '';
     const line1 = 'MAGNOMEDITS';
@@ -507,6 +566,8 @@ function syncControlsFromState() {
     applyCutVolumes();
     updateCutTrimUI();
     syncCutModeUI();
+    const wm = document.getElementById('cutWatermark');
+    if (wm) wm.checked = cutState.watermark !== false;
 }
 
 function applyCutAdjustLabels() {
@@ -592,6 +653,11 @@ function openCapcutPanel(name) {
     document.querySelectorAll('.capcut-panel').forEach((panel) => {
         panel.classList.toggle('active', panel.dataset.panel === name);
     });
+    const studio = document.getElementById('magnomCutStudio');
+    if (studio) {
+        studio.classList.toggle('panel-templates', name === 'templates');
+        studio.classList.toggle('panel-export', name === 'export');
+    }
     const title = document.getElementById('capcutSideTitle');
     const labels = {
         media: 'Media',
@@ -742,18 +808,23 @@ function filterMagnomCutTemplates(cat) {
     renderMagnomCutTemplates();
 }
 
-function applyMagnomCutTemplate(id) {
-    const tpl = (window.CUT_TEMPLATE_CATALOG || []).find((t) => t.id === id);
-    if (!tpl) {
-        notify('Template not found', true);
+function updatePendingTemplateUI() {
+    const el = document.getElementById('cutPendingTemplate');
+    if (!el) return;
+    if (!cutPendingTemplateId) {
+        el.style.display = 'none';
+        el.textContent = '';
         return;
     }
-    if (!cutImportedFile) {
-        notify(cutNeedMediaMsg(), true);
-        openCapcutPanel('media');
-        return;
-    }
+    const tpl = (window.CUT_TEMPLATE_CATALOG || []).find((t) => t.id === cutPendingTemplateId);
+    const name = tpl?.name || cutPendingTemplateId;
+    el.style.display = '';
+    el.textContent = typeof tx === 'function'
+        ? `${tx('cut.templateQueued')}: ${name}`
+        : `Template queued: ${name} — import your clip`;
+}
 
+function applyCutTemplateSettings(tpl, id) {
     cutState.filter = tpl.filter || 'none';
     cutState.effect = tpl.effect || 'none';
     cutState.music = tpl.music || 'none';
@@ -794,6 +865,32 @@ function applyMagnomCutTemplate(id) {
     } else {
         stopCutMusic();
     }
+}
+
+function applyMagnomCutTemplate(id) {
+    const tpl = (window.CUT_TEMPLATE_CATALOG || []).find((t) => t.id === id);
+    if (!tpl) {
+        notify('Template not found', true);
+        return;
+    }
+    if (!cutImportedFile) {
+        cutPendingTemplateId = id;
+        document.querySelectorAll('#cutTemplateGrid .capcut-template-card, #cutTemplateRail .capcut-template-card').forEach((c) => {
+            c.classList.toggle('active', c.dataset.template === id);
+        });
+        const msg = typeof tx === 'function' ? tx('cut.templateQueued') : `Template queued: ${tpl.name} — import your clip`;
+        setCutStatus(msg);
+        notify(msg);
+        updatePendingTemplateUI();
+        openCapcutPanel('media');
+        return;
+    }
+
+    applyCutTemplateSettings(tpl, id);
+    openCapcutPanel('templates');
+}
+
+function openCapcutTemplates() {
     openCapcutPanel('templates');
 }
 
@@ -823,14 +920,20 @@ function updateCutTrimUI() {
     if (startLabel) startLabel.textContent = `${Number(cutState.trimStart).toFixed(1)}s`;
     if (endLabel) endLabel.textContent = `${Number(cutState.trimEnd).toFixed(1)}s`;
     const range = document.getElementById('cutTrimRange');
+    const handleStart = document.getElementById('cutTrimHandleStart');
+    const handleEnd = document.getElementById('cutTrimHandleEnd');
     if (range && cutDuration > 0 && cutMediaKind === 'video') {
         const left = (cutState.trimStart / cutDuration) * 100;
         const right = 100 - (cutState.trimEnd / cutDuration) * 100;
         range.style.left = `${Math.max(0, left)}%`;
         range.style.right = `${Math.max(0, right)}%`;
+        if (handleStart) handleStart.style.left = `${Math.max(0, left)}%`;
+        if (handleEnd) handleEnd.style.left = `${Math.max(0, 100 - right)}%`;
     } else if (range) {
         range.style.left = '0%';
         range.style.right = '0%';
+        if (handleStart) handleStart.style.left = '0%';
+        if (handleEnd) handleEnd.style.left = '100%';
     }
 }
 
@@ -838,6 +941,33 @@ function applyCutTrimToPlayhead() {
     if (cutMediaKind !== 'video') return;
     const video = document.getElementById('cutPreview');
     if (video) video.currentTime = cutState.trimStart;
+}
+
+function applyLiveCutMotion(progress, effectOverride) {
+    const media = getCutPreviewEl();
+    const flash = document.getElementById('cutFxFlash');
+    const effectId = effectOverride || cutState.effect;
+    if (!media || !effectId || effectId === 'none') {
+        applyCutMediaTransform();
+        if (flash) flash.style.opacity = '0';
+        return;
+    }
+    const motion = getExportMotion(progress, effectId);
+    const sx = cutState.flipX ? -1 : 1;
+    const rot = (cutState.rotate || 0) + (motion.rot || 0);
+    media.style.transform =
+        `scaleX(${sx}) rotate(${rot}deg) scale(${motion.scale}) translate(${motion.dx * 100}%, ${motion.dy * 100}%)`;
+    media.style.opacity = String(motion.opacity ?? 1);
+    const filterCss = getCutFilterCss();
+    let extra = '';
+    if (motion.blur) extra += ` blur(${motion.blur}px)`;
+    if (motion.hue) extra += ` hue-rotate(${motion.hue}deg)`;
+    media.style.filter = `${filterCss}${extra}`.trim();
+    if (flash) {
+        const fx = cutEffectById(cutState.effect);
+        flash.style.background = fx.color || '#fff';
+        flash.style.opacity = String((motion.flash || 0) * 0.75);
+    }
 }
 
 function syncCutTransport() {
@@ -848,12 +978,23 @@ function syncCutTransport() {
         video.pause();
         video.currentTime = cutState.trimStart;
         stopCutMusic();
+        updatePlayButtonState();
     }
     const label = document.getElementById('cutTimeLabel');
     if (label) label.textContent = `${formatCutTime(video.currentTime)} / ${formatCutTime(cutDuration)}`;
     const head = document.getElementById('cutPlayhead');
     if (head && cutDuration > 0) {
         head.style.left = `${(video.currentTime / cutDuration) * 100}%`;
+    }
+    if (!video.paused && cutState.effect && cutState.effect !== 'none') {
+        const start = cutState.trimStart || 0;
+        const end = cutState.trimEnd || cutDuration;
+        const span = Math.max(0.001, end - start);
+        const progress = ((video.currentTime - start) / span) % 1;
+        applyLiveCutMotion(progress);
+    } else if (video.paused) {
+        applyCutMediaTransform();
+        applyCutVisuals();
     }
     cutRaf = requestAnimationFrame(syncCutTransport);
 }
@@ -905,6 +1046,7 @@ function handleCutImport(e) {
     cancelAnimationFrame(cutRaf);
     resetCutVideoAudio();
     cutImportedFile = file;
+    const queuedTemplate = cutPendingTemplateId;
     cutObjectUrl = URL.createObjectURL(file);
     cutMediaKind = asImage ? 'image' : 'video';
     cutDuration = 0;
@@ -926,8 +1068,9 @@ function handleCutImport(e) {
         const image = document.getElementById('cutImagePreview');
         if (image) {
             image.onload = () => {
+                const dur = cutState.photoDuration || 8;
                 const label = document.getElementById('cutTimeLabel');
-                if (label) label.textContent = 'IMAGE';
+                if (label) label.textContent = `0:00 / ${formatCutTime(dur)}`;
                 const head = document.getElementById('cutPlayhead');
                 if (head) head.style.left = '0%';
                 updateCutTrimUI();
@@ -986,6 +1129,15 @@ function handleCutImport(e) {
     openCapcutPanel('media');
     pushCutHistory();
     updatePlayButtonState();
+    updateTimelineLabels();
+
+    if (queuedTemplate) {
+        cutPendingTemplateId = null;
+        updatePendingTemplateUI();
+        applyMagnomCutTemplate(queuedTemplate);
+    } else {
+        updatePendingTemplateUI();
+    }
 }
 
 function toggleCutMusicPreview() {
@@ -1022,6 +1174,14 @@ function toggleCutPlayback() {
             }
             stopCutMusic();
             applyCutMediaTransform();
+            applyCutVisuals();
+            const dur = cutState.photoDuration || 8;
+            const label = document.getElementById('cutTimeLabel');
+            if (label) label.textContent = `0:00 / ${formatCutTime(dur)}`;
+            const head = document.getElementById('cutPlayhead');
+            if (head) head.style.left = '0%';
+            const flash = document.getElementById('cutFxFlash');
+            if (flash) flash.style.opacity = '0';
             updatePlayButtonState();
             return;
         }
@@ -1034,14 +1194,18 @@ function toggleCutPlayback() {
         const inner = document.getElementById('cutPreviewInner');
         const image = document.getElementById('cutImagePreview');
         if (!inner || !image) return;
-        let step = 0;
+        const photoDur = cutState.photoDuration || 8;
+        const steps = Math.round(photoDur * 20);
+        cutPhotoPreviewStep = 0;
         cutPhotoPreviewTimer = setInterval(() => {
-            step += 1;
-            const t = (step % 120) / 120;
-            const motion = getExportMotion(t, cutState.effect || 'kenburns');
-            const sx = cutState.flipX ? -1 : 1;
-            const rot = cutState.rotate || 0;
-            image.style.transform = `scaleX(${sx}) rotate(${rot}deg) scale(${motion.scale}) translate(${motion.dx * 100}%, ${motion.dy * 100}%)`;
+            cutPhotoPreviewStep += 1;
+            const t = (cutPhotoPreviewStep % steps) / steps;
+            const fx = cutState.effect && cutState.effect !== 'none' ? cutState.effect : 'kenburns';
+            applyLiveCutMotion(t, fx);
+            const label = document.getElementById('cutTimeLabel');
+            if (label) label.textContent = `${formatCutTime(t * photoDur)} / ${formatCutTime(photoDur)}`;
+            const head = document.getElementById('cutPlayhead');
+            if (head) head.style.left = `${t * 100}%`;
         }, 50);
         updatePlayButtonState();
         return;
@@ -1521,13 +1685,15 @@ function drawCutOverlays(ctx, w, h) {
 }
 
 function drawCutMediaFrame(ctx, source, w, h, filterCss, motion) {
-    const m = motion || { scale: 1, dx: 0, dy: 0 };
+    const m = motion || { scale: 1, dx: 0, dy: 0, rot: 0, opacity: 1, blur: 0, hue: 0, flash: 0 };
     ctx.save();
+    ctx.globalAlpha = m.opacity ?? 1;
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, w, h);
     ctx.translate(w / 2 + w * m.dx, h / 2 + h * m.dy);
     if (cutState.flipX) ctx.scale(-1, 1);
-    if (cutState.rotate) ctx.rotate((cutState.rotate * Math.PI) / 180);
+    const rotDeg = (cutState.rotate || 0) + (m.rot || 0);
+    if (rotDeg) ctx.rotate((rotDeg * Math.PI) / 180);
     if (m.scale !== 1) ctx.scale(m.scale, m.scale);
 
     const sw = source.videoWidth || source.naturalWidth || w;
@@ -1547,10 +1713,20 @@ function drawCutMediaFrame(ctx, source, w, h, filterCss, motion) {
         dw = sw * scale;
         dh = sh * scale;
     }
-    ctx.filter = filterCss || 'none';
+    let filter = filterCss || 'none';
+    if (m.blur) filter += ` blur(${m.blur}px)`;
+    if (m.hue) filter += ` hue-rotate(${m.hue}deg)`;
+    ctx.filter = filter.trim();
     ctx.drawImage(source, -dw / 2, -dh / 2, dw, dh);
     ctx.restore();
     ctx.filter = 'none';
+    ctx.globalAlpha = 1;
+    if (m.flash > 0) {
+        ctx.save();
+        ctx.fillStyle = `rgba(255,255,255,${m.flash * 0.7})`;
+        ctx.fillRect(0, 0, w, h);
+        ctx.restore();
+    }
 }
 
 async function exportCutImage() {
@@ -1641,6 +1817,60 @@ async function exportCutVideo() {
     return blob;
 }
 
+async function renderMagnomCutExportFile() {
+    if (!cutImportedFile || !cutMediaKind) {
+        throw new Error(cutNeedMediaMsg());
+    }
+    const media = getCutPreviewEl();
+    if (!media || (!media.src && !media.currentSrc)) {
+        throw new Error(cutNeedMediaMsg());
+    }
+    const projectName =
+        document.getElementById('cutProjectName')?.value.trim() ||
+        document.getElementById('cutCaption')?.value.trim() ||
+        cutImportedFile.name.replace(/\.[^.]+$/, '') ||
+        'MAGNOMEDITS';
+    const safeName = projectName.replace(/\s+/g, '_');
+
+    if (cutMediaKind === 'image') {
+        if (cutState.music !== 'none') {
+            const blob = await exportCutImageWithMusic();
+            return new File([blob], `${safeName}.webm`, { type: 'video/webm' });
+        }
+        const blob = await exportCutImage();
+        return new File([blob], `${safeName}.png`, { type: 'image/png' });
+    }
+    const blob = await exportCutVideo();
+    return new File([blob], `${safeName}.webm`, { type: 'video/webm' });
+}
+
+async function downloadMagnomCutExport() {
+    const progress = document.getElementById('cutExportProgress');
+    try {
+        if (progress) progress.textContent = typeof tx === 'function' ? tx('cut.renderVideo') : 'Rendering…';
+        setCutStatus(typeof tx === 'function' ? tx('cut.exporting') : 'Exporting…');
+        const outFile = await renderMagnomCutExportFile();
+        const url = URL.createObjectURL(outFile);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = outFile.name;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+        if (progress) {
+            progress.textContent = typeof tx === 'function' ? tx('cut.downloaded') : 'Downloaded to your device';
+            progress.classList.remove('warn');
+        }
+        setCutStatus(typeof tx === 'function' ? tx('cut.downloaded') : 'Downloaded');
+        notify(typeof tx === 'function' ? tx('cut.downloaded') : 'Downloaded');
+    } catch (err) {
+        if (progress) {
+            progress.textContent = err.message || 'Download failed';
+            progress.classList.add('warn');
+        }
+        notify(err.message || 'Download failed', true);
+    }
+}
+
 async function exportMagnomCutProject() {
     if (!cutImportedFile || !cutMediaKind) {
         notify(cutNeedMediaMsg(), true);
@@ -1667,20 +1897,7 @@ async function exportMagnomCutProject() {
         }
         setCutStatus(typeof tx === 'function' ? tx('cut.exporting') : 'Exporting MAGNOMEDITS project…');
 
-        let outFile;
-        if (cutMediaKind === 'image') {
-            if (cutState.music !== 'none') {
-                if (progress) progress.textContent = typeof tx === 'function' ? tx('cut.renderPhotoMusic') : 'Rendering photo + music…';
-                const blob = await exportCutImageWithMusic();
-                outFile = new File([blob], `${safeName}.webm`, { type: 'video/webm' });
-            } else {
-                const blob = await exportCutImage();
-                outFile = new File([blob], `${safeName}.png`, { type: 'image/png' });
-            }
-        } else {
-            const blob = await exportCutVideo();
-            outFile = new File([blob], `${safeName}.webm`, { type: 'video/webm' });
-        }
+        const outFile = await renderMagnomCutExportFile();
 
         fillClipFormFromExport(outFile, projectName);
         if (progress) {
@@ -1757,6 +1974,19 @@ function onCutPointerUp() {
 }
 
 function seekCutTimeline(e) {
+    if (cutMediaKind === 'image') {
+        const dur = cutState.photoDuration || 8;
+        const tl = document.getElementById('cutTimeline');
+        if (!tl) return;
+        const rect = tl.getBoundingClientRect();
+        const ratio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+        const label = document.getElementById('cutTimeLabel');
+        if (label) label.textContent = `${formatCutTime(ratio * dur)} / ${formatCutTime(dur)}`;
+        const head = document.getElementById('cutPlayhead');
+        if (head) head.style.left = `${ratio * 100}%`;
+        applyLiveCutMotion(ratio);
+        return;
+    }
     if (cutMediaKind !== 'video') return;
     const video = document.getElementById('cutPreview');
     const tl = document.getElementById('cutTimeline');
@@ -1764,6 +1994,47 @@ function seekCutTimeline(e) {
     const rect = tl.getBoundingClientRect();
     const ratio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
     video.currentTime = ratio * cutDuration;
+}
+
+function bindCutTrimHandles() {
+    const tl = document.getElementById('cutTimeline');
+    const handleStart = document.getElementById('cutTrimHandleStart');
+    const handleEnd = document.getElementById('cutTrimHandleEnd');
+    if (!tl || !handleStart || !handleEnd) return;
+
+    const onTrimDrag = (edge, ev) => {
+        if (cutMediaKind !== 'video' || !cutDuration) return;
+        ev.preventDefault();
+        ev.stopPropagation();
+        cutTrimDrag = edge;
+        const move = (moveEv) => {
+            if (!cutTrimDrag) return;
+            const rect = tl.getBoundingClientRect();
+            const ratio = Math.min(1, Math.max(0, (moveEv.clientX - rect.left) / rect.width));
+            const time = ratio * cutDuration;
+            if (cutTrimDrag === 'start') {
+                cutState.trimStart = Math.min(time, cutState.trimEnd - 0.3);
+                const start = document.getElementById('cutTrimStart');
+                if (start) start.value = String(cutState.trimStart);
+            } else {
+                cutState.trimEnd = Math.max(time, cutState.trimStart + 0.3);
+                const end = document.getElementById('cutTrimEnd');
+                if (end) end.value = String(cutState.trimEnd);
+            }
+            updateCutTrimUI();
+        };
+        const up = () => {
+            cutTrimDrag = null;
+            window.removeEventListener('pointermove', move);
+            window.removeEventListener('pointerup', up);
+            pushCutHistory();
+        };
+        window.addEventListener('pointermove', move);
+        window.addEventListener('pointerup', up);
+    };
+
+    handleStart.addEventListener('pointerdown', (ev) => onTrimDrag('start', ev));
+    handleEnd.addEventListener('pointerdown', (ev) => onTrimDrag('end', ev));
 }
 
 function initMagnomCut() {
@@ -1817,6 +2088,29 @@ function initMagnomCut() {
         if (!btn) return;
         cutState.effect = btn.dataset.fx;
         document.querySelectorAll('#cutEffects .capcut-chip').forEach((c) => c.classList.toggle('active', c === btn));
+        document.querySelectorAll('#cutTransitions .capcut-chip').forEach((c) => c.classList.remove('active'));
+        pushCutHistory();
+        if (cutState.effect !== 'none' && cutImportedFile) {
+            setTimeout(() => previewCutEffect(), 30);
+        }
+    });
+
+    document.getElementById('cutTransitions')?.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-transition]');
+        if (!btn) return;
+        cutState.effect = btn.dataset.fx || 'none';
+        document.querySelectorAll('#cutTransitions .capcut-chip').forEach((c) => c.classList.toggle('active', c === btn));
+        document.querySelectorAll('#cutEffects .capcut-chip').forEach((c) => {
+            c.classList.toggle('active', c.dataset.fx === cutState.effect);
+        });
+        pushCutHistory();
+        if (cutState.effect !== 'none' && cutImportedFile) {
+            setTimeout(() => previewCutEffect(), 30);
+        }
+    });
+
+    document.getElementById('cutWatermark')?.addEventListener('change', (e) => {
+        cutState.watermark = e.target.checked;
         pushCutHistory();
     });
 
@@ -1892,6 +2186,10 @@ function initMagnomCut() {
     document.getElementById('cutCaption')?.addEventListener('change', () => pushCutHistory());
 
     document.getElementById('cutTimeline')?.addEventListener('click', seekCutTimeline);
+    bindCutTrimHandles();
+
+    const wm = document.getElementById('cutWatermark');
+    if (wm) wm.checked = cutState.watermark !== false;
 
     bindCutOverlayDrag(document.getElementById('cutCaptionOverlay'), 'caption');
     bindCutOverlayDrag(document.getElementById('cutStickerOverlay'), 'sticker');
@@ -1903,11 +2201,14 @@ function initMagnomCut() {
     showCutEmpty();
     applyAllCutVisuals();
     updateCutHistoryButtons();
+    updatePendingTemplateUI();
     initCutKeyboardShortcuts();
 }
 
 window.initMagnomCut = initMagnomCut;
 window.exportMagnomCutProject = exportMagnomCutProject;
+window.downloadMagnomCutExport = downloadMagnomCutExport;
+window.openCapcutTemplates = openCapcutTemplates;
 window.toggleCutPlayback = toggleCutPlayback;
 window.toggleCutMusicPreview = toggleCutMusicPreview;
 window.setCutCaptionPreset = setCutCaptionPreset;

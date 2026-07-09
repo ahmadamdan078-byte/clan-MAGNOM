@@ -176,7 +176,7 @@ window.CUT_EFFECT_CATALOG = [
     { id: 'hardCut', name: 'Hard Cut Flash', kind: 'flash', color: '#000' },
     { id: 'arenaBoom', name: 'Arena Boom', kind: 'shake', amp: 10 },
     { id: 'slowReveal', name: 'Slow Reveal', kind: 'fade' },
-    { id: 'whipPan', name: 'Whip Pan', kind: 'drift' },
+    { id: 'whipPan', name: 'Whip Pan', kind: 'whipPan' },
     { id: 'crashZoom', name: 'Crash Zoom', kind: 'zoom', scale: 1.35, fast: true },
     { id: 'softLanding', name: 'Soft Landing', kind: 'bounce' },
     { id: 'neonGlitch', name: 'Neon Glitch', kind: 'glitch', hue: 300 },
@@ -330,6 +330,20 @@ window.CUT_TEMPLATE_CATALOG = [
     { id: 'cc_dubai', name: 'Dubai Luxury', cat: 'Luxury', filter: 'gold', effect: 'flashGold', music: 'orientalGold', textStyle: 'gold', bright: 1.1, contrast: 1.1, saturate: 1.25, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 510000, forYou: true, source: 'capcut', cover: 'linear-gradient(160deg,#0B1C2C 0%,#1B6CA8 50%,#5EEAD4 100%)' },
     { id: 'cc_paris', name: 'Paris Nights', cat: 'Luxury', filter: 'moonlight', effect: 'drift', music: 'jazzSwing', textStyle: 'gradient', bright: 0.98, contrast: 1.2, saturate: 1.1, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 430000, source: 'capcut', cover: 'linear-gradient(160deg,#2A0612 0%,#FE2C55 50%,#FF8A3D 100%)' },
     { id: 'cc_supercar', name: 'Supercar Edit', cat: 'Luxury', filter: 'chrome', effect: 'whipPan', music: 'deepBass', textStyle: 'impact', bright: 1.05, contrast: 1.3, saturate: 1.1, ratio: '16x9', fit: 'cover', photoDuration: 8, uses: 370000, source: 'capcut', cover: 'linear-gradient(160deg,#12061F 0%,#7C3AED 50%,#FE2C55 100%)' },
+    { id: 'md_iphoneClean', name: 'iPhone Clean', cat: 'Modern', filter: 'crisp', effect: 'softFocus', music: 'whisperPad', textStyle: 'minimal', bright: 1.12, contrast: 0.96, saturate: 0.92, ratio: '9x16', fit: 'cover', photoDuration: 10, uses: 920000, badge: 'Hot', trending: true, forYou: true, source: 'capcut', cover: 'linear-gradient(160deg,#f8fafc 0%,#cbd5e1 45%,#64748b 100%)' },
+    { id: 'md_softMinimal', name: 'Soft Minimal', cat: 'Modern', filter: 'soft', effect: 'fadePulse', music: 'calmWaves', textStyle: 'clean', bright: 1.14, contrast: 0.9, saturate: 0.88, ratio: '9x16', fit: 'contain', photoDuration: 11, uses: 780000, trending: true, forYou: true, source: 'capcut', cover: 'linear-gradient(160deg,#eef2ff 0%,#c7d2fe 50%,#818cf8 100%)' },
+    { id: 'md_darkLuxe', name: 'Dark Luxe', cat: 'Modern', filter: 'midnight', effect: 'pushIn', music: 'darkMatter', textStyle: 'shadow', bright: 0.9, contrast: 1.28, saturate: 0.85, ratio: '9x16', fit: 'cover', photoDuration: 12, uses: 650000, badge: 'Hot', trending: true, source: 'capcut', cover: 'linear-gradient(160deg,#09090b 0%,#27272a 50%,#a1a1aa 100%)' },
+    { id: 'md_neonPulse', name: 'Neon Pulse', cat: 'Modern', filter: 'neon', effect: 'neonGlitch', music: 'cyberPulse', textStyle: 'glowPink', bright: 1.05, contrast: 1.15, saturate: 1.45, ratio: '9x16', fit: 'cover', photoDuration: 7, uses: 840000, trending: true, forYou: true, source: 'capcut', cover: 'linear-gradient(160deg,#2e1065 0%,#7c3aed 45%,#22d3ee 100%)' },
+    { id: 'md_frosted', name: 'Frosted Glass', cat: 'Modern', filter: 'haze', effect: 'float', music: 'whisperPad', textStyle: 'clean', bright: 1.16, contrast: 0.88, saturate: 0.78, ratio: '1x1', fit: 'contain', photoDuration: 10, uses: 510000, forYou: true, source: 'capcut', cover: 'linear-gradient(160deg,#ecfeff 0%,#a5f3fc 50%,#67e8f9 100%)' },
+    { id: 'md_editorial', name: 'Editorial', cat: 'Modern', filter: 'bleach', effect: 'kenBurns', music: 'jazzSwing', textStyle: 'minimal', bright: 1.02, contrast: 1.18, saturate: 0.82, ratio: '16x9', fit: 'cover', photoDuration: 14, uses: 470000, source: 'capcut', cover: 'linear-gradient(160deg,#fafafa 0%,#d4d4d8 50%,#52525b 100%)' },
+    { id: 'md_tiktokClean', name: 'TikTok Clean', cat: 'Modern', filter: 'vivid', effect: 'snap', music: 'popHook', textStyle: 'pink', bright: 1.08, contrast: 1.12, saturate: 1.35, ratio: '9x16', fit: 'cover', photoDuration: 6, uses: 1100000, badge: 'Hot', trending: true, forYou: true, source: 'capcut', cover: 'linear-gradient(160deg,#fdf2f8 0%,#f472b6 50%,#ec4899 100%)' },
+    { id: 'md_moodyPortrait', name: 'Moody Portrait', cat: 'Modern', filter: 'drama', effect: 'softFocus', music: 'memories', textStyle: 'outline', bright: 0.94, contrast: 1.32, saturate: 0.9, ratio: '9x16', fit: 'cover', photoDuration: 11, uses: 560000, trending: true, source: 'capcut', cover: 'linear-gradient(160deg,#1c1917 0%,#57534e 50%,#d6d3d1 100%)' },
+    { id: 'md_chromeFuture', name: 'Chrome Future', cat: 'Modern', filter: 'chrome', effect: 'glitchRGB', music: 'synthwave', textStyle: 'neon', bright: 1.06, contrast: 1.25, saturate: 0.95, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 490000, badge: 'New', source: 'capcut', cover: 'linear-gradient(160deg,#0f172a 0%,#94a3b8 50%,#e2e8f0 100%)' },
+    { id: 'md_pastelDream', name: 'Pastel Dream', cat: 'Modern', filter: 'pastel', effect: 'float', music: 'lofiLoop', textStyle: 'sticky', bright: 1.15, contrast: 0.92, saturate: 0.8, ratio: '1x1', fit: 'contain', photoDuration: 12, uses: 430000, forYou: true, source: 'capcut', cover: 'linear-gradient(160deg,#fce7f3 0%,#fbcfe8 50%,#f9a8d4 100%)' },
+    { id: 'md_sharpMono', name: 'Sharp Mono', cat: 'Modern', filter: 'ink', effect: 'hardCut', music: 'darkMatter', textStyle: 'outline', bright: 1.0, contrast: 1.4, saturate: 0.15, ratio: '9x16', fit: 'cover', photoDuration: 7, uses: 380000, source: 'capcut', cover: 'linear-gradient(160deg,#000 0%,#404040 50%,#fff 100%)' },
+    { id: 'md_glowUp', name: 'Glow Up', cat: 'Modern', filter: 'glow', effect: 'pop', music: 'popHook', textStyle: 'gradient', bright: 1.12, contrast: 1.05, saturate: 1.3, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 720000, badge: 'New', trending: true, forYou: true, source: 'capcut', cover: 'linear-gradient(160deg,#fff7ed 0%,#fdba74 50%,#f97316 100%)' },
+    { id: 'md_velocityPro', name: 'Velocity Pro', cat: 'Modern', filter: 'sharp', effect: 'whipPan', music: 'trapBeat', textStyle: 'impact', bright: 1.04, contrast: 1.22, saturate: 1.2, ratio: '9x16', fit: 'cover', photoDuration: 6, uses: 610000, trending: true, source: 'capcut', cover: 'linear-gradient(160deg,#111827 0%,#4f46e5 50%,#a78bfa 100%)' },
+    { id: 'md_nightStreet', name: 'Night Street', cat: 'Modern', filter: 'moonlight', effect: 'drift', music: 'nightDrive', textStyle: 'iceText', bright: 0.92, contrast: 1.2, saturate: 1.05, ratio: '9x16', fit: 'cover', photoDuration: 10, uses: 540000, forYou: true, source: 'capcut', cover: 'linear-gradient(160deg,#020617 0%,#1e3a8a 50%,#38bdf8 100%)' },
     { id: 'magnomGold', name: 'MAGNOM Gold', cat: 'MAGNOM', filter: 'gold', effect: 'goalBurst', music: 'magnomAnthem', textStyle: 'gold', caption: 'MAGNOM CLUTCH', bright: 1.05, contrast: 1.1, saturate: 1.1, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 45000, forYou: true, source: 'magnom', cover: 'linear-gradient(160deg,#1a1025 0%,#6366f1 50%,#f472b6 100%)' },
     { id: 'sslPath', name: 'SSL Path', cat: 'MAGNOM', filter: 'ice', effect: 'iceFx', music: 'sslGrind', textStyle: 'iceText', caption: 'SSL PATH', bright: 1.05, contrast: 1.1, saturate: 1.1, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 38000, forYou: true, source: 'magnom', cover: 'linear-gradient(160deg,#134e4a 0%,#14b8a6 50%,#fef3c7 100%)' },
     { id: 'clutchHeat', name: 'Clutch Heat', cat: 'MAGNOM', filter: 'heat', effect: 'impact', music: 'clutch', textStyle: 'fireText', caption: 'CLUTCH GENIUS', bright: 1.05, contrast: 1.1, saturate: 1.1, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 42000, trending: true, source: 'magnom', cover: 'linear-gradient(160deg,#3A2A00 0%,#F0B429 45%,#FE2C55 100%)' },
@@ -362,6 +376,7 @@ window.CUT_TEMPLATE_CATALOG = (window.CUT_TEMPLATE_CATALOG || []).map((t, i) => 
         'Retro': 'linear-gradient(160deg,#431407 0%,#ea580c 50%,#fde047 100%)',
         'Nature': 'linear-gradient(160deg,#052e16 0%,#15803d 50%,#86efac 100%)',
         'Luxury': 'linear-gradient(160deg,#3A2A00 0%,#F0B429 45%,#FE2C55 100%)',
+        'Modern': 'linear-gradient(160deg,#0f172a 0%,#6366f1 42%,#ec4899 100%)',
         'MAGNOM': 'linear-gradient(160deg,#3A2A00 0%,#F0B429 45%,#FE2C55 100%)',
     }
     if (!t.cover) t.cover = covers[t.cat] || covers.Trending;
@@ -376,9 +391,25 @@ window.CUT_TEMPLATE_CATALOG = (window.CUT_TEMPLATE_CATALOG || []).map((t, i) => 
     return t;
 });
 
+window.CUT_TRANSITION_CATALOG = [
+    { id: 'fadeIn', name: 'Fade In', effect: 'rise' },
+    { id: 'fadeOut', name: 'Fade Out', effect: 'fade' },
+    { id: 'zoomIn', name: 'Zoom In', effect: 'zoom' },
+    { id: 'zoomOut', name: 'Zoom Out', effect: 'kenburns' },
+    { id: 'slideUp', name: 'Slide Up', effect: 'drop' },
+    { id: 'slideDown', name: 'Slide Down', effect: 'rise' },
+    { id: 'glitchCut', name: 'Glitch', effect: 'glitch' },
+    { id: 'flashCut', name: 'Flash', effect: 'flash' },
+    { id: 'shakeCut', name: 'Shake', effect: 'shake' },
+    { id: 'spinCut', name: 'Spin', effect: 'spin' },
+    { id: 'bounceCut', name: 'Bounce', effect: 'bounce' },
+    { id: 'whipPan', name: 'Whip Pan', effect: 'whipPan' },
+];
+
 window.CUT_TEMPLATE_TABS = [
     { id: 'foryou', name: 'For you' },
     { id: 'trending', name: 'Trending' },
+    { id: 'modern', name: 'Modern' },
     { id: 'slowmo', name: 'Slow Mo' },
     { id: 'photodump', name: 'Photo Dump' },
     { id: 'beatsync', name: 'Beat Sync' },

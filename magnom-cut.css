@@ -1,23 +1,171 @@
-/* MAGNOMEDITS — CapCut-like studio chrome */
+/* MAGNOMEDITS — modern studio chrome */
 
 .capcut-app {
-    --cc-bg: #121212;
-    --cc-panel: #1C1C1E;
-    --cc-panel-2: #232326;
-    --cc-line: rgba(255, 255, 255, 0.08);
-    --cc-gold: #F0B429;
-    --cc-pink: #FE2C55;
-    --cc-text: #F5F5F7;
-    --cc-muted: #8E8E93;
-    --cc-radius: 12px;
+    --cc-bg: #0a0b10;
+    --cc-panel: rgba(22, 24, 32, 0.82);
+    --cc-panel-2: rgba(30, 32, 42, 0.92);
+    --cc-line: rgba(255, 255, 255, 0.09);
+    --cc-gold: #f0b429;
+    --cc-pink: #ec4899;
+    --cc-accent: #818cf8;
+    --cc-cyan: #22d3ee;
+    --cc-text: #f8fafc;
+    --cc-muted: #94a3b8;
+    --cc-radius: 14px;
+    --cc-glow: 0 0 0 1px rgba(129, 140, 248, 0.18), 0 24px 60px rgba(0, 0, 0, 0.55);
     margin: 0 0 28px;
-    border-radius: 14px;
+    border-radius: 18px;
     overflow: hidden;
-    border: 1px solid var(--cc-line);
-    background: var(--cc-bg);
-    box-shadow: 0 20px 56px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(129, 140, 248, 0.16);
+    background:
+        radial-gradient(1200px 500px at 10% -10%, rgba(99, 102, 241, 0.18), transparent 55%),
+        radial-gradient(900px 400px at 100% 0%, rgba(236, 72, 153, 0.12), transparent 50%),
+        var(--cc-bg);
+    box-shadow: var(--cc-glow);
     font-family: var(--font-body);
     color: var(--cc-text);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+}
+
+.capcut-app.magnom-modern .capcut-topbar {
+    background: rgba(15, 17, 24, 0.72);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+}
+
+.capcut-app.magnom-modern .capcut-brand-text strong {
+    background: linear-gradient(90deg, #f8fafc, #c7d2fe 40%, #f0b429);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: 0.14em;
+}
+
+.capcut-app.magnom-modern .capcut-btn.primary {
+    background: linear-gradient(135deg, #6366f1, #ec4899);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
+}
+
+.capcut-app.magnom-modern .capcut-dock {
+    background: rgba(16, 18, 26, 0.88);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+}
+
+.capcut-app.magnom-modern .dock-ico {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0;
+    line-height: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #cbd5e1;
+    transition: 0.18s ease;
+}
+
+.capcut-app.magnom-modern .dock-label {
+    font-size: 0.58em;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.capcut-app.magnom-modern .capcut-dock-btn {
+    gap: 5px;
+    padding: 9px 3px;
+}
+
+.capcut-app.magnom-modern .capcut-dock-btn.active .dock-ico,
+.capcut-app.magnom-modern .capcut-dock-btn:hover .dock-ico {
+    background: linear-gradient(135deg, #6366f1, #ec4899);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
+}
+
+.capcut-app.magnom-modern .capcut-dock-btn.active {
+    color: #e2e8f0;
+    background: rgba(99, 102, 241, 0.12);
+}
+
+.capcut-app.magnom-modern .capcut-preview-frame {
+    background:
+        radial-gradient(ellipse at center, rgba(99, 102, 241, 0.08), transparent 65%),
+        linear-gradient(45deg, #1a1b22 25%, transparent 25%) 0 0 / 14px 14px,
+        linear-gradient(-45deg, #1a1b22 25%, transparent 25%) 0 7px / 14px 14px,
+        #0f1016;
+}
+
+.capcut-app.magnom-modern .capcut-preview-inner {
+    border-radius: 16px;
+    border: 1px solid rgba(129, 140, 248, 0.22);
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.04),
+        0 24px 48px rgba(0, 0, 0, 0.55),
+        0 0 40px rgba(99, 102, 241, 0.12);
+}
+
+.capcut-app.magnom-modern .capcut-side {
+    background: rgba(16, 18, 26, 0.9);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+}
+
+.capcut-app.magnom-modern .capcut-chip.active,
+.capcut-app.magnom-modern .capcut-template-tab.active {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.28), rgba(236, 72, 153, 0.22));
+    border-color: rgba(129, 140, 248, 0.45);
+    color: #f8fafc;
+}
+
+.capcut-app.magnom-modern .capcut-template-card {
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.capcut-app.magnom-modern .capcut-template-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(129, 140, 248, 0.35);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+}
+
+.capcut-app.magnom-modern .capcut-template-card.active {
+    border-color: rgba(236, 72, 153, 0.55);
+    box-shadow: 0 0 0 1px rgba(236, 72, 153, 0.35);
+}
+
+.capcut-app.magnom-modern .capcut-template-use {
+    background: linear-gradient(135deg, #6366f1, #ec4899);
+    color: #fff;
+}
+
+.capcut-app.magnom-modern .capcut-tracks {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.capcut-app.magnom-modern .capcut-playhead {
+    background: linear-gradient(180deg, #22d3ee, #6366f1);
+    box-shadow: 0 0 12px rgba(34, 211, 238, 0.55);
+}
+
+.capcut-app.magnom-modern .capcut-empty strong {
+    background: linear-gradient(90deg, #e2e8f0, #a5b4fc);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.capcut-app.magnom-modern .capcut-status {
+    background: rgba(12, 14, 20, 0.9);
+    color: #94a3b8;
 }
 
 /* —— Top bar —— */
@@ -657,6 +805,28 @@
     letter-spacing: 0.1em;
 }
 
+.capcut-empty-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 14px;
+}
+
+.capcut-check-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82em;
+    color: var(--cc-muted);
+    margin-bottom: 4px;
+    cursor: pointer;
+}
+
+.capcut-check-row input {
+    accent-color: var(--cc-accent);
+}
+
 /* —— CapCut-style bottom timeline —— */
 .capcut-timeline-shell {
     border-top: 1px solid var(--cc-line);
@@ -759,6 +929,35 @@
     z-index: 2;
 }
 
+.capcut-trim-handle {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    width: 10px;
+    margin-left: -5px;
+    border-radius: 4px;
+    z-index: 4;
+    cursor: ew-resize;
+    pointer-events: auto;
+}
+
+.capcut-trim-handle.start {
+    left: 0%;
+    background: linear-gradient(180deg, #5EEAD4, #2dd4bf);
+    box-shadow: 0 0 8px rgba(94, 234, 212, 0.5);
+}
+
+.capcut-trim-handle.end {
+    left: 100%;
+    background: linear-gradient(180deg, #FE2C55, #ec4899);
+    box-shadow: 0 0 8px rgba(254, 44, 85, 0.45);
+}
+
+.capcut-app.is-image .capcut-trim-handle {
+    opacity: 0.35;
+    pointer-events: none;
+}
+
 .capcut-playhead {
     position: absolute;
     top: 0;
@@ -784,7 +983,11 @@
 }
 
 .capcut-app.is-image .capcut-tracks {
-    opacity: 0.55;
+    opacity: 1;
+}
+
+.capcut-app.is-image .capcut-track.video {
+    background: linear-gradient(90deg, #1e293b, #6366f166 40%, #1e293b);
 }
 
 /* —— Right inspector —— */
@@ -910,7 +1113,17 @@
     background: #161618;
 }
 
+.capcut-transition-chip.active {
+    border-color: rgba(34, 211, 238, 0.5);
+    background: rgba(34, 211, 238, 0.12);
+}
+
 .capcut-tool-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
@@ -927,7 +1140,15 @@
         grid-column: 1 / -1;
         border-left: none;
         border-top: 1px solid var(--cc-line);
-        max-height: 300px;
+        max-height: 42vh;
+    }
+
+    .capcut-app.panel-templates .capcut-side {
+        max-height: 58vh;
+    }
+
+    .capcut-app.panel-export .capcut-side {
+        max-height: 38vh;
     }
 }
 
