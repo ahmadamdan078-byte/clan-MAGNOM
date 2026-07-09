@@ -136,21 +136,38 @@ function formatCutTime(seconds) {
     return `${m}:${String(s).padStart(2, '0')}`;
 }
 
+function cutFilterName(id) {
+    return (window.CUT_FILTER_CATALOG || []).find((f) => f.id === id)?.name || id || 'Original';
+}
+
+function cutRatioLabel(ratio) {
+    if (ratio === '16x9') return '16:9';
+    if (ratio === '1x1') return '1:1';
+    return '9:16';
+}
+
 function cutTemplateCardHtml(t) {
     const badge = t.badge
         ? `<span class="capcut-template-badge ${String(t.badge).toLowerCase()}">${t.badge}</span>`
         : '';
+    const ratio = `<span class="capcut-template-ratio">${cutRatioLabel(t.ratio)}</span>`;
+    const caption = t.caption
+        ? `<span class="capcut-template-caption">${t.caption}</span>`
+        : '';
+    const pack = `${cutFilterName(t.filter)} · ${t.duration || t.photoDuration || 8}s`;
     return `
-      <button type="button" class="capcut-template-card" data-template="${t.id}" data-cat="${t.cat}" onclick="applyMagnomCutTemplate('${t.id}')">
-        <span class="capcut-template-cover" style="background-image:${t.cover}"></span>
+      <button type="button" class="capcut-template-card" data-template="${t.id}" data-cat="${t.cat}" title="${t.name} — ${pack}" onclick="applyMagnomCutTemplate('${t.id}')">
+        <span class="capcut-template-cover" style="background:${t.cover}"></span>
         ${badge}
+        ${ratio}
         <span class="capcut-template-body">
           <span class="capcut-template-name">${t.name}</span>
           <span class="capcut-template-meta">
             <span>${t.cat}</span>
-            <span>${t.duration || 8}s · ${formatCutUses(t.uses)}</span>
+            <span>${pack} · ${formatCutUses(t.uses)}</span>
           </span>
-          <span class="capcut-template-use">Use</span>
+          ${caption}
+          <span class="capcut-template-use">Use template</span>
         </span>
       </button>`;
 }
@@ -172,7 +189,7 @@ function getFilteredMagnomTemplates() {
         if (cutTemplateTab === 'foryou' && !t.forYou) return false;
         if (cutTemplateCat !== 'All' && t.cat !== cutTemplateCat) return false;
         if (q) {
-            const hay = `${t.name} ${t.cat} ${t.caption || ''} ${t.filter || ''} ${t.music || ''}`.toLowerCase();
+            const hay = (t.tags || `${t.name} ${t.cat} ${t.caption || ''} ${t.filter || ''} ${t.music || ''}`).toLowerCase();
             if (!hay.includes(q)) return false;
         }
         return true;
@@ -218,7 +235,10 @@ function renderMagnomCutTemplates() {
     }
 
     if (rail) {
-        const trending = (window.CUT_TEMPLATE_CATALOG || []).filter((t) => t.trending).slice(0, 10);
+        const trending = (window.CUT_TEMPLATE_CATALOG || [])
+            .filter((t) => t.trending)
+            .sort((a, b) => (b.uses || 0) - (a.uses || 0))
+            .slice(0, 12);
         rail.innerHTML = trending.map(cutTemplateCardHtml).join('');
         rail.style.display = cutTemplateTab === 'all' || cutTemplateTab === 'foryou' ? '' : 'none';
     }
@@ -2223,3 +2243,12 @@ window.cutRedo = cutRedo;
 window.cutFlip = cutFlip;
 window.cutRotate = cutRotate;
 window.setCutFit = setCutFit;
+
+function refreshMagnomCutLibrary() {
+    const tabsHost = document.getElementById('cutTemplateTabs');
+    if (tabsHost) delete tabsHost.dataset.ready;
+    populateMagnomCutLibrary();
+    updatePendingTemplateUI();
+}
+
+window.refreshMagnomCutLibrary = refreshMagnomCutLibrary;

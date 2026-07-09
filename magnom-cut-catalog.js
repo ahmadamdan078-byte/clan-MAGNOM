@@ -223,16 +223,16 @@ window.CUT_CAPTION_PRESETS = [
     'PRO PATH', 'ELITE MECHS', 'FULL SEND', 'CLUTCH GENIUS', 'TEAM FIGHT',
 ];
 
-/* 115 unique MAGNOMEDITS templates — CapCut + varied looks */
+/* 129 unique MAGNOMEDITS templates — CapCut-style looks */
 window.CUT_TEMPLATE_CATALOG = [
     { id: 'cc_slowmoTrend', name: 'New Trending SlowMo', cat: 'Slow Motion', filter: 'soft', effect: 'softFocus', music: 'calmWaves', textStyle: 'minimal', bright: 1.12, contrast: 0.95, saturate: 0.9, ratio: '9x16', fit: 'cover', photoDuration: 12, uses: 5300000, badge: 'Hot', trending: true, forYou: true, source: 'capcut', cover: 'linear-gradient(145deg,#0f0c29 0%,#302b63 50%,#24243e 100%)' },
     { id: 'cc_slowmoClassic', name: 'Slow Motion Template', cat: 'Slow Motion', filter: 'cinema', effect: 'slowReveal', music: 'memories', textStyle: 'clean', bright: 0.95, contrast: 1.25, saturate: 0.88, ratio: '9x16', fit: 'cover', photoDuration: 14, uses: 4800000, badge: 'Hot', trending: true, forYou: true, source: 'capcut', cover: 'linear-gradient(145deg,#200122 0%,#6f0000 100%)' },
     { id: 'cc_slowmoNew', name: 'New SlowMo Video', cat: 'Slow Motion', filter: 'haze', effect: 'fadePulse', music: 'whisperPad', textStyle: 'shadow', bright: 1.15, contrast: 0.88, saturate: 0.75, ratio: '9x16', fit: 'cover', photoDuration: 11, uses: 4100000, badge: 'Hot', trending: true, forYou: true, source: 'capcut', cover: 'linear-gradient(160deg,#0B1C2C 0%,#1B6CA8 50%,#5EEAD4 100%)' },
-    { id: 'cc_smoothSlomo', name: '4 Clips Smooth Slomo', cat: 'Slow Motion', filter: 'muted', effect: 'kenBurns', music: 'lofiLoop', textStyle: 'minimal', bright: 1.05, contrast: 1.1, saturate: 1.1, ratio: '9x16', fit: 'contain', photoDuration: 15, uses: 993700, trending: true, forYou: true, source: 'capcut', cover: 'linear-gradient(160deg,#2A0612 0%,#FE2C55 50%,#FF8A3D 100%)' },
+    { id: 'cc_smoothSlomo', name: 'Smooth Slomo Pro', cat: 'Slow Motion', filter: 'muted', effect: 'kenBurns', music: 'lofiLoop', textStyle: 'minimal', bright: 1.08, contrast: 0.98, saturate: 0.82, ratio: '9x16', fit: 'contain', photoDuration: 15, uses: 993700, trending: true, forYou: true, source: 'capcut', cover: 'linear-gradient(160deg,#2A0612 0%,#FE2C55 50%,#FF8A3D 100%)' },
     { id: 'cc_viralSlowmo', name: 'Viral SlowMo Video', cat: 'Slow Motion', filter: 'bloom', effect: 'float', music: 'goldenHour', textStyle: 'gradient', bright: 1.05, contrast: 1.1, saturate: 1.1, ratio: '1x1', fit: 'cover', photoDuration: 8, uses: 868900, badge: 'Hot', trending: true, forYou: true, source: 'capcut', cover: 'linear-gradient(160deg,#12061F 0%,#7C3AED 50%,#FE2C55 100%)' },
     { id: 'cc_trendSlowmo', name: 'Trend SlowMo', cat: 'Slow Motion', filter: 'fade', effect: 'softFocus', music: 'nightDrive', textStyle: 'clean', bright: 1.08, contrast: 1.05, saturate: 1.0, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 570800, trending: true, source: 'capcut', cover: 'linear-gradient(160deg,#1a1025 0%,#6366f1 50%,#f472b6 100%)' },
-    { id: 'cc_trendingSlowmo', name: 'Trending Slowmotion', cat: 'Slow Motion', filter: 'moonlight', effect: 'drift', music: 'spaceEcho', textStyle: 'iceText', bright: 0.92, contrast: 1.2, saturate: 0.7, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 256100, trending: true, source: 'capcut', cover: 'linear-gradient(160deg,#134e4a 0%,#14b8a6 50%,#fef3c7 100%)' },
-    { id: 'cc_slowmoHdr', name: 'SLOWMO HDR', cat: 'Slow Motion', filter: 'vivid', effect: 'blurIn', music: 'highEnergy', textStyle: 'impact', bright: 1.05, contrast: 1.1, saturate: 1.8, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 120200, badge: 'New', source: 'capcut', cover: 'linear-gradient(160deg,#3A2A00 0%,#F0B429 45%,#FE2C55 100%)' },
+    { id: 'cc_trendingSlowmo', name: 'Trending Slow Motion', cat: 'Slow Motion', filter: 'moonlight', effect: 'drift', music: 'spaceEcho', textStyle: 'iceText', bright: 0.92, contrast: 1.2, saturate: 0.7, ratio: '9x16', fit: 'cover', photoDuration: 11, uses: 256100, trending: true, source: 'capcut', cover: 'linear-gradient(160deg,#134e4a 0%,#14b8a6 50%,#fef3c7 100%)' },
+    { id: 'cc_slowmoHdr', name: 'SlowMo HDR Pro', cat: 'Slow Motion', filter: 'vivid', effect: 'blurIn', music: 'highEnergy', textStyle: 'impact', bright: 1.06, contrast: 1.22, saturate: 1.8, ratio: '9x16', fit: 'cover', photoDuration: 9, uses: 120200, badge: 'New', source: 'capcut', cover: 'linear-gradient(160deg,#3A2A00 0%,#F0B429 45%,#FE2C55 100%)' },
     { id: 'cc_velocity2026', name: 'Velocity Edit 2026', cat: 'Slow Motion', filter: 'chrome', effect: 'whipPan', music: 'trapBeat', textStyle: 'outline', bright: 1.05, contrast: 1.3, saturate: 1.1, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 890000, trending: true, forYou: true, source: 'capcut', cover: 'linear-gradient(160deg,#0a1628 0%,#1e3a5f 42%,#7dd3fc 100%)' },
     { id: 'cc_cinematicSlow', name: 'Cinematic SlowMo', cat: 'Slow Motion', filter: 'cinema', effect: 'kenBurns', music: 'memories', textStyle: 'typewriter', bright: 1.05, contrast: 1.1, saturate: 1.1, ratio: '16x9', fit: 'cover', photoDuration: 16, uses: 445000, source: 'capcut', cover: 'linear-gradient(160deg,#1c1917 0%,#78716c 50%,#ef4444 100%)' },
     { id: 'cc_smoothVelocity', name: 'Smooth Velocity', cat: 'Slow Motion', filter: 'soft', effect: 'fadePulse', music: 'calmWaves', textStyle: 'minimal', bright: 1.05, contrast: 1.1, saturate: 1.1, ratio: '9x16', fit: 'cover', photoDuration: 10, uses: 720000, trending: true, source: 'capcut', cover: 'linear-gradient(160deg,#14532d 0%,#22c55e 40%,#fbbf24 100%)' },
@@ -356,36 +356,117 @@ window.CUT_TEMPLATE_CATALOG = [
     { id: 'airDribblePack', name: 'Air Dribble', cat: 'MAGNOM', filter: 'teal', effect: 'float', music: 'aerial', textStyle: 'glowCyan', caption: 'AIR DRIBBLE', bright: 1.05, contrast: 1.1, saturate: 1.1, ratio: '9x16', fit: 'cover', photoDuration: 8, uses: 20000, source: 'magnom', cover: 'linear-gradient(160deg,#4a044e 0%,#c026d3 50%,#f9a8d4 100%)' },
 ];
 
-// CapCut-style enrichment: covers, badges, trending flags
+// CapCut-style enrichment: unique covers, tuned looks, search tags, badges
+function cutTemplateUniqueCover(t, index) {
+    let hash = 0;
+    const seed = `${t.id}|${t.name}|${index}`;
+    for (let i = 0; i < seed.length; i += 1) hash = (hash * 33 + seed.charCodeAt(i)) >>> 0;
+    const catHue = {
+        'Slow Motion': 205,
+        Trending: 12,
+        Attitude: 0,
+        Viral: 285,
+        'Photo Dump': 255,
+        'Beat Sync': 350,
+        Cinematic: 42,
+        Vlog: 168,
+        Seasonal: 32,
+        Aesthetic: 310,
+        Gaming: 265,
+        Sports: 215,
+        Transition: 230,
+        Retro: 28,
+        Nature: 135,
+        Luxury: 38,
+        Modern: 248,
+        MAGNOM: 45,
+    };
+    const base = catHue[t.cat] ?? 220;
+    const h1 = (base + (hash % 48) - 24 + 360) % 360;
+    const h2 = (h1 + 42 + (hash % 20)) % 360;
+    const h3 = (h1 + 95 + (hash % 30)) % 360;
+    const sat = 52 + (hash % 28);
+    const l1 = 28 + (hash % 18);
+    const l2 = l1 + 14 + (hash % 10);
+    const l3 = l2 + 10 + (hash % 8);
+    return `linear-gradient(165deg,hsl(${h1},${sat}%,${l1}%) 0%,hsl(${h2},${sat + 8}%,${l2}%) 46%,hsl(${h3},${sat - 4}%,${l3}%) 100%)`;
+}
+
+const CUT_FILTER_ADJUST = {
+    soft: { bright: 1.12, contrast: 0.92, saturate: 0.88 },
+    cinema: { bright: 0.95, contrast: 1.25, saturate: 0.88 },
+    haze: { bright: 1.14, contrast: 0.88, saturate: 0.78 },
+    muted: { bright: 1.06, contrast: 1.05, saturate: 0.72 },
+    bloom: { bright: 1.14, contrast: 1.08, saturate: 1.22 },
+    fade: { bright: 1.08, contrast: 0.94, saturate: 0.86 },
+    moonlight: { bright: 0.92, contrast: 1.2, saturate: 0.82 },
+    vivid: { bright: 1.06, contrast: 1.18, saturate: 1.55 },
+    pastel: { bright: 1.14, contrast: 0.9, saturate: 0.78 },
+    bw: { bright: 0.98, contrast: 1.35, saturate: 0.12 },
+    ink: { bright: 1.0, contrast: 1.38, saturate: 0.15 },
+    midnight: { bright: 0.88, contrast: 1.28, saturate: 0.85 },
+    neon: { bright: 1.05, contrast: 1.18, saturate: 1.48 },
+    gold: { bright: 1.1, contrast: 1.12, saturate: 1.28 },
+    ice: { bright: 1.04, contrast: 1.15, saturate: 0.9 },
+    heat: { bright: 1.04, contrast: 1.25, saturate: 1.38 },
+    drama: { bright: 0.92, contrast: 1.32, saturate: 1.05 },
+    chrome: { bright: 1.05, contrast: 1.28, saturate: 0.92 },
+    cyberpunk: { bright: 1.03, contrast: 1.22, saturate: 1.42 },
+    crisp: { bright: 1.1, contrast: 1.16, saturate: 1.02 },
+    sharp: { bright: 1.04, contrast: 1.24, saturate: 1.15 },
+    teal: { bright: 1.05, contrast: 1.12, saturate: 1.22 },
+};
+
+const CUT_CAT_CAPTIONS = {
+    Vlog: 'DAY IN LIFE',
+    Gaming: 'HIGHLIGHT',
+    Sports: 'HIGHLIGHTS',
+};
+
 window.CUT_TEMPLATE_CATALOG = (window.CUT_TEMPLATE_CATALOG || []).map((t, i) => {
     if (t.effect === 'victory-ish') t.effect = 'goalBurst';
-    const covers = {
-        'Slow Motion': 'linear-gradient(160deg,#0a1628 0%,#1e3a5f 42%,#7dd3fc 100%)',
-        'Trending': 'linear-gradient(160deg,#FE2C55 0%,#FF8A3D 48%,#F0B429 100%)',
-        'Attitude': 'linear-gradient(160deg,#1c1917 0%,#44403c 50%,#ef4444 100%)',
-        'Viral': 'linear-gradient(160deg,#2e1065 0%,#a855f7 50%,#fe2c55 100%)',
-        'Photo Dump': 'linear-gradient(160deg,#1a1025 0%,#6366f1 50%,#f472b6 100%)',
-        'Beat Sync': 'linear-gradient(160deg,#1a0505 0%,#dc2626 50%,#fbbf24 100%)',
-        'Cinematic': 'linear-gradient(160deg,#0a0a0a 0%,#374151 50%,#d4af37 100%)',
-        'Vlog': 'linear-gradient(160deg,#134e4a 0%,#14b8a6 50%,#fef3c7 100%)',
-        'Seasonal': 'linear-gradient(160deg,#14532d 0%,#fbbf24 50%,#f97316 100%)',
-        'Aesthetic': 'linear-gradient(160deg,#4a044e 0%,#c026d3 50%,#f9a8d4 100%)',
-        'Gaming': 'linear-gradient(160deg,#12061F 0%,#7C3AED 50%,#FE2C55 100%)',
-        'Sports': 'linear-gradient(160deg,#071018 0%,#143B6B 45%,#F0B429 100%)',
-        'Transition': 'linear-gradient(160deg,#1e1b4b 0%,#4f46e5 50%,#38bdf8 100%)',
-        'Retro': 'linear-gradient(160deg,#431407 0%,#ea580c 50%,#fde047 100%)',
-        'Nature': 'linear-gradient(160deg,#052e16 0%,#15803d 50%,#86efac 100%)',
-        'Luxury': 'linear-gradient(160deg,#3A2A00 0%,#F0B429 45%,#FE2C55 100%)',
-        'Modern': 'linear-gradient(160deg,#0f172a 0%,#6366f1 42%,#ec4899 100%)',
-        'MAGNOM': 'linear-gradient(160deg,#3A2A00 0%,#F0B429 45%,#FE2C55 100%)',
+
+    const isGenericAdjust = t.bright === 1.05 && t.contrast === 1.1 && t.saturate === 1.1;
+    if (isGenericAdjust && CUT_FILTER_ADJUST[t.filter]) {
+        Object.assign(t, CUT_FILTER_ADJUST[t.filter]);
     }
-    if (!t.cover) t.cover = covers[t.cat] || covers.Trending;
-    t.uses = t.uses || (12000 - i * 137);
-    t.duration = t.photoDuration || 8;
+
+    if (t.cat === 'MAGNOM' && isGenericAdjust) {
+        const magnomTune = {
+            magnomGold: { bright: 1.1, contrast: 1.15, saturate: 1.28 },
+            sslPath: { bright: 1.02, contrast: 1.18, saturate: 0.88 },
+            clutchHeat: { bright: 1.04, contrast: 1.28, saturate: 1.42 },
+            whatASave: { bright: 1.08, contrast: 1.2, saturate: 1.35 },
+            flipReset: { bright: 1.02, contrast: 1.22, saturate: 1.45 },
+            demoed: { bright: 0.92, contrast: 1.38, saturate: 1.05 },
+            arenaNeon: { bright: 1.05, contrast: 1.2, saturate: 1.55 },
+            tournament: { bright: 0.94, contrast: 1.3, saturate: 0.95 },
+            mustyPack: { bright: 1.04, contrast: 1.32, saturate: 1.18 },
+            airDribblePack: { bright: 1.06, contrast: 1.12, saturate: 1.25 },
+        };
+        if (magnomTune[t.id]) Object.assign(t, magnomTune[t.id]);
+    }
+
+    t.cover = cutTemplateUniqueCover(t, i);
+    t.uses = t.uses || Math.max(12000, 900000 - i * 137);
+    t.duration = t.photoDuration || (t.cat === 'Beat Sync' ? 6 : t.cat === 'Transition' ? 4 : 8);
+    t.photoDuration = t.photoDuration || t.duration;
+
+    if (!t.caption && CUT_CAT_CAPTIONS[t.cat] && t.cat !== 'MAGNOM') {
+        t.caption = CUT_CAT_CAPTIONS[t.cat];
+    }
+
     if (!t.badge && t.uses >= 1000000) t.badge = 'Hot';
     else if (!t.badge && t.uses >= 500000) t.badge = 'New';
-    t.trending = t.trending != null ? t.trending : (i < 12 || i % 5 === 0);
-    t.forYou = t.forYou != null ? t.forYou : (i % 2 === 0 || i < 10);
+
+    if (t.trending == null) {
+        t.trending = t.uses >= 400000 || t.cat === 'Trending' || t.cat === 'Modern' || t.badge === 'Hot';
+    }
+    if (t.forYou == null) {
+        t.forYou = t.cat === 'Modern' || t.cat === 'MAGNOM' || t.trending || t.badge === 'Hot' || t.uses >= 350000;
+    }
+
+    t.tags = `${t.name} ${t.cat} ${t.filter} ${t.effect} ${t.music} ${t.caption || ''}`.toLowerCase();
     t.emoji = '';
     t.sticker = '';
     return t;
